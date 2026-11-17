@@ -1,0 +1,1163 @@
+{
+  "revision": "R01",
+  "date": "2026-11-17",
+  "source": "Vaccino 26/27 kamuya açık demo verileri",
+  "inventory": [
+    {
+      "name": "Sensör envanteri",
+      "rows": [
+        {
+          "A": "VACCINO 26/27   |   SENSÖR ENVANTERİ",
+          "B": "",
+          "C": "",
+          "D": "",
+          "E": "",
+          "F": "",
+          "G": "",
+          "H": "",
+          "I": "",
+          "J": "",
+          "K": "",
+          "L": ""
+        },
+        {
+          "A": "17 Kasım 2026  ·  ZED 2i ilk tedarik  ·  Modeller ve hedef yayın hızları entegrasyon taslağıdır.",
+          "B": "",
+          "C": "",
+          "D": "",
+          "E": "",
+          "F": "",
+          "G": "",
+          "H": "",
+          "I": "",
+          "J": "",
+          "K": "",
+          "L": ""
+        },
+        {
+          "A": "",
+          "B": "",
+          "C": "",
+          "D": "",
+          "E": "",
+          "F": "",
+          "G": "",
+          "H": "",
+          "I": "",
+          "J": "",
+          "K": "",
+          "L": ""
+        },
+        {
+          "A": "ID",
+          "B": "Aşama",
+          "C": "Sensör / ölçüm",
+          "D": "Model / ürün",
+          "E": "Adet",
+          "F": "Arayüz",
+          "G": "Çıktı",
+          "H": "Yayın / zamanlama",
+          "I": "İlk kabul testi",
+          "J": "Karar durumu",
+          "K": "Sorumlu ekip",
+          "L": "Üretici / kaynak"
+        },
+        {
+          "A": "S01",
+          "B": "İlk prototip",
+          "C": "Ön stereo kamera",
+          "D": "ZED 2i · 2,1 mm polarizeli\nZED-221120",
+          "E": "1",
+          "F": "USB 3 → araç bilgisayarı",
+          "G": "RGB, derinlik (m), kamera kalibrasyonu",
+          "H": "30 Hz RGB/derinlik başlangıç hedefi",
+          "I": "Pist çizgileri, dur çizgisi ve bilinen hedefle kayıt",
+          "J": "Tedarik önceliği",
+          "K": "Yazılım + donanım",
+          "L": "https://docs.stereolabs.com/docs/products/cameras/zed/specifications"
+        },
+        {
+          "A": "S02",
+          "B": "İlk prototip",
+          "C": "IMU",
+          "D": "ZED 2i dahili IMU",
+          "E": "1 (S01 içinde)",
+          "F": "ZED SDK / ROS 2",
+          "G": "İvme (m/s²), açısal hız (rad/s)",
+          "H": "ZED zaman damgası",
+          "I": "Araç eksenini, işareti ve dururken sapmayı doğrula",
+          "J": "S01 ile gelir",
+          "K": "Yazılım",
+          "L": "https://docs.stereolabs.com/docs/products/cameras/zed/specifications"
+        },
+        {
+          "A": "S03",
+          "B": "İlk prototip",
+          "C": "Direksiyon çıkış açısı",
+          "D": "Infineon AS5048A",
+          "E": "1",
+          "F": "SPI → araç MCU → CAN",
+          "G": "Açı (rad), geçerlilik",
+          "H": "50 Hz hedef",
+          "I": "Merkez ve son noktaları kalibre et. Mafsal boşluğunu ölç.",
+          "J": "Aday",
+          "K": "Elektrik + mekanik",
+          "L": "https://www.infineon.com/part/AS5048A"
+        },
+        {
+          "A": "S04",
+          "B": "İlk prototip",
+          "C": "Arka teker hızları",
+          "D": "Honeywell 1GT101DC + dişli hedef",
+          "E": "2",
+          "F": "Darbe → MCU timer → CAN",
+          "G": "Sol/sağ hız (rad/s), veri yaşı",
+          "H": "50 Hz yayın hedefi",
+          "I": "Süzülmede, düşük hızda ve duruşta kontrol et. Diş sayısı ve sıfır hız zaman aşımı açık.",
+          "J": "Aday",
+          "K": "Elektrik + mekanik",
+          "L": "https://automation.honeywell.com/it/it/products/sensing-solutions/sensors/magnetic-sensors/4av-series-magnetic-sensor"
+        },
+        {
+          "A": "S05",
+          "B": "İlk prototip",
+          "C": "Fren hareketi ve pedal",
+          "D": "Aktüatör konumu + pedal anahtarı",
+          "E": "1 + 1",
+          "F": "Analog / dijital → MCU → CAN",
+          "G": "Konum (%), pedal durumu, geçerlilik",
+          "H": "50 Hz hedef",
+          "I": "Komut ve gerçek hareketi karşılaştır. Hidrolik frenin işleyişi ayrı doğrulanır.",
+          "J": "Model açık",
+          "K": "Elektrik + mekanik",
+          "L": ""
+        },
+        {
+          "A": "S06",
+          "B": "İlk prototip",
+          "C": "Motor rotor konumu",
+          "D": "Motorun Hall sensörleri veya enkoderi",
+          "E": "1 set",
+          "F": "Hall / enkoder → sürücü MCU",
+          "G": "Rotor konumu ve motor devri (dev/dk)",
+          "H": "FOC döngüsünden ayrı telemetri",
+          "I": "Motor seçilince pin dizilimi, kutup çifti ve düşük devir ölçümü",
+          "J": "Motorla seçilecek",
+          "K": "Elektrik",
+          "L": "https://www.st.com/en/embedded-software/x-cube-mcsdk.html"
+        },
+        {
+          "A": "S07",
+          "B": "İlk prototip",
+          "C": "Güç katı ölçümleri",
+          "D": "Faz şöntleri + Vbus + sıcaklık",
+          "E": "1 set",
+          "F": "ADC → sürücü MCU → CAN",
+          "G": "Faz akımı (A), bara (V), sıcaklık (°C), arıza",
+          "H": "ADC örnekleme PWM ile tetiklenir",
+          "I": "Şönt ofseti, voltaj ölçeği ve arıza kesmesini tezgâhta doğrula",
+          "J": "Kartla seçilecek",
+          "K": "Elektrik",
+          "L": "https://www.ti.com/product/DRV8353"
+        },
+        {
+          "A": "S08",
+          "B": "İlk prototip",
+          "C": "Batarya ölçümleri",
+          "D": "15S LiFePO₄ ile uyumlu BMS",
+          "E": "1",
+          "F": "Modele bağlı CAN / seri",
+          "G": "Paket V/A, SoC, hücre sıcaklığı, hata",
+          "H": "BMS modeli ile belirlenir",
+          "I": "Akım işareti, ayrı şarj/deşarj sınırları ve eskimiş veri",
+          "J": "Model açık",
+          "K": "Elektrik",
+          "L": ""
+        },
+        {
+          "A": "S09",
+          "B": "Karara bağlı",
+          "C": "Ayırıcı konumu ve devir farkı",
+          "D": "Konum anahtarları + kasnak tarafı enkoderi",
+          "E": "1 set",
+          "F": "Dijital / darbe → MCU → CAN",
+          "G": "Bağlı/ayrık/belirsiz, iki tarafın devri",
+          "H": "Aktüatör seçimiyle belirlenir",
+          "I": "Fiziksel konumu doğrula. Yeniden kavrama için devir farkını ölç.",
+          "J": "Kavrama kararı açık",
+          "K": "Mekanik + elektrik",
+          "L": ""
+        },
+        {
+          "A": "S10",
+          "B": "Kıyas ve ikinci aşama",
+          "C": "3B LiDAR · aday A",
+          "D": "Livox Mid-360S",
+          "E": "1 (S11 alternatifi)",
+          "F": "Ethernet → livox_ros_driver2",
+          "G": "PointCloud2, zaman damgası",
+          "H": "Tipik 10 Hz",
+          "I": "Aynı brakette güneş/gölge, alçak ve koyu engel",
+          "J": "Demo adayı",
+          "K": "Yazılım",
+          "L": "https://www.livoxtech.com/mid-360s/specs"
+        },
+        {
+          "A": "S11",
+          "B": "Kıyas ve ikinci aşama",
+          "C": "3B LiDAR · aday B",
+          "D": "Hesai JT128",
+          "E": "1 (S10 alternatifi)",
+          "F": "Ethernet → Hesai ROS sürücüsü",
+          "G": "PointCloud2, zaman damgası",
+          "H": "Cihaz modu ve varyantıyla teyit",
+          "I": "Aynı hedefle karşılaştır. Aşağı görüş açısını varyantla teyit et.",
+          "J": "Demo adayı",
+          "K": "Yazılım",
+          "L": "https://www.hesaitech.com/product/jt128/"
+        },
+        {
+          "A": "S12",
+          "B": "Karara bağlı",
+          "C": "Aşağı bakan kamera",
+          "D": "USB UVC kamera",
+          "E": "0–1",
+          "F": "USB → araç bilgisayarı",
+          "G": "Ön yakın RGB",
+          "H": "30 Hz hedef",
+          "I": "ZED ile çizgi kaput altında erkenden kaybolursa değerlendir",
+          "J": "İhtiyaç testi",
+          "K": "Yazılım",
+          "L": ""
+        },
+        {
+          "A": "S13",
+          "B": "Karara bağlı",
+          "C": "Kısa mesafe",
+          "D": "Benewake TFmini Plus",
+          "E": "İlk deneme 2",
+          "F": "UART → MCU → CAN",
+          "G": "Mesafe (m), geçerlilik",
+          "H": "Test ile belirlenecek",
+          "I": "Köşelerde güneş, koyu hedef ve dar görüş alanını dene",
+          "J": "Aday",
+          "K": "Elektrik + yazılım",
+          "L": "https://www.e-komponent.com/tfmini-plus-lidar"
+        },
+        {
+          "A": "S14",
+          "B": "Karara bağlı",
+          "C": "GNSS",
+          "D": "Okuldaki mevcut modül",
+          "E": "1",
+          "F": "Model etiketiyle teyit",
+          "G": "Konum, zaman, fix durumu",
+          "H": "Model etiketiyle teyit",
+          "I": "Model ve portu saptayın. Pistte gerekli konum doğruluğunu ölçün.",
+          "J": "Model bilinmiyor",
+          "K": "Yazılım + elektrik",
+          "L": ""
+        }
+      ]
+    },
+    {
+      "name": "Veri arayüzleri",
+      "rows": [
+        {
+          "A": "VACCINO 26/27   |   YAZILIM VERİ ARAYÜZLERİ",
+          "B": "",
+          "C": "",
+          "D": "",
+          "E": "",
+          "F": "",
+          "G": ""
+        },
+        {
+          "A": "ROS 2 / CAN prototip sözleşmesi  ·  CAN kimlikleri, hızlar ve zaman aşımı değerleri entegrasyonda belirlenecek.",
+          "B": "",
+          "C": "",
+          "D": "",
+          "E": "",
+          "F": "",
+          "G": ""
+        },
+        {
+          "A": "",
+          "B": "",
+          "C": "",
+          "D": "",
+          "E": "",
+          "F": "",
+          "G": ""
+        },
+        {
+          "A": "ID",
+          "B": "Sinyal",
+          "C": "Veri yolu",
+          "D": "Birim / biçim",
+          "E": "Tazelik ve geçerlilik",
+          "F": "İlk doğrulama",
+          "G": "Simülasyon kaynağı"
+        },
+        {
+          "A": "I01",
+          "B": "RGB, derinlik, IMU",
+          "C": "Kamera sürücüsü → ROS 2",
+          "D": "Görüntü + m + m/s² + rad/s",
+          "E": "Kaynak zaman damgası, frame_id, geçerlilik",
+          "F": "Kare yaşını ve kesintiyi kaydet",
+          "G": "CARLA RGB + örnek kayıt"
+        },
+        {
+          "A": "I02",
+          "B": "Sol / sağ arka teker hızı",
+          "C": "MCU → CAN → ROS 2",
+          "D": "rad/s; sol ve sağ ayrı",
+          "E": "Sayaç, zaman, geçerlilik, sıfır hız zaman aşımı",
+          "F": "Süzülürken ve çok yavaşken doğrula",
+          "G": "CARLA teker/hız adaptörü"
+        },
+        {
+          "A": "I03",
+          "B": "Direksiyon çıkış açısı",
+          "C": "MCU → CAN → ROS 2",
+          "D": "rad; öneri: sol pozitif",
+          "E": "Sıfır referansı, zaman, geçerlilik",
+          "F": "Mekanik merkez ve uçları ölç",
+          "G": "CARLA direksiyon adaptörü"
+        },
+        {
+          "A": "I04",
+          "B": "Fren durumu",
+          "C": "MCU → CAN → ROS 2",
+          "D": "Konum %, pedal bool, hata bitleri",
+          "E": "Geri bildirim ve komutu ayrı kaydet",
+          "F": "Aracın durduğunu teker hızından doğrula",
+          "G": "CARLA fren adaptörü"
+        },
+        {
+          "A": "I05",
+          "B": "Sürücü ve batarya durumu",
+          "C": "Sürücü/BMS → CAN → ROS 2",
+          "D": "V, A, °C, arıza, SoC %",
+          "E": "Akım işareti, sınır, zaman aşımı",
+          "F": "Hata ve veri kesintisi senaryosu",
+          "G": "Sentetik telemetri"
+        },
+        {
+          "A": "I06",
+          "B": "Ayırıcı durumu",
+          "C": "MCU → CAN → ROS 2",
+          "D": "Bağlı / ayrık / belirsiz, Δdev/dk",
+          "E": "Komut ve fiziksel konum ayrı alanlar",
+          "F": "Yeniden bağlama kararı MCU ile sınanır",
+          "G": "Durum makinesi testi"
+        },
+        {
+          "A": "I07",
+          "B": "3B nokta bulutu",
+          "C": "LiDAR Ethernet → ROS 2",
+          "D": "PointCloud2; metre",
+          "E": "Zaman senkronu, frame_id, araç dönüşümü",
+          "F": "Aynı hedef ve montajla iki aday kaydı",
+          "G": "CARLA LiDAR / örnek kayıt"
+        },
+        {
+          "A": "I08",
+          "B": "Araç modu ve emniyet durumu",
+          "C": "Araç MCU → CAN → ROS 2",
+          "D": "Sürüş modu, izin, arıza durumları",
+          "E": "Donanımsal emniyet zincirini yazılım mesajından bağımsız doğrula",
+          "F": "Bağlantı kaybı ve geçersiz komut testi",
+          "G": "Durum makinesi testi"
+        }
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "team": "Mekanik",
+      "title": "Tek motorlu aktarma",
+      "status": "Tasarım yönü",
+      "reason": "Tek şasi içi BLDC, redüksiyon, kapalı gövdeli açık diferansiyel, iki mafsallı yarım aks ve arka çift salıncak. Güncel CAD adayı.",
+      "next": "Kasnak oranı, aks boy değişimi ve mafsal açıları kontrol edilecek.",
+      "date": "2026-11-17",
+      "source": "Ana gereksinim belgesi · karar kaydı",
+      "simple": "Tek motorun gücü iki arka tekerleğe aktarılacak. Mevcut araç bu tasarım yönünü gösteriyor.",
+      "nextSimple": "Parçaların ölçüleri, bağlantıları ve hareket sırasında birbirine yaklaşması kontrol edilecek."
+    },
+    {
+      "team": "Mekanik",
+      "title": "Motor mili üzerinde ayırıcı",
+      "status": "Aday",
+      "reason": "İlk prototip için sabit bağlantı ve ayırıcı rezervi önerilir. Kayar manşon veya tek yönlü kavrama kararı açık. Görsel kayar manşon prensibini gösterir.",
+      "next": "Sıfır torkta kavrama, devir farkı ve fiziksel konum geri bildirimi tezgâhta sınanacak.",
+      "date": "2026-11-17",
+      "source": "Ana gereksinim belgesi · karar kaydı",
+      "simple": "Motor ile tekerleklerin bağlantısını açabilecek bir mekanizma değerlendiriliyor. İlk araçta bu özelliğin kullanılıp kullanılmayacağı henüz açık.",
+      "nextSimple": "Bağlantının açılması ve yeniden birleşmesi kontrollü tezgâh koşullarında sınanacak."
+    },
+    {
+      "team": "Elektrik",
+      "title": "48 V BLDC motor",
+      "status": "Aday",
+      "reason": "800 W ve 1000 W adayları; 1000 W ilk inceleme adayı. Nihai model seçilmedi.",
+      "next": "Tork-devir, redüksiyon, faz akımı ve sıcaklık sınırları ölçülecek.",
+      "date": "2026-11-17",
+      "source": "Ana gereksinim belgesi · karar kaydı",
+      "simple": "Motor seçimi kesinleşmedi. Adaylar aracın ihtiyacına ve test sonuçlarına göre karşılaştırılacak.",
+      "nextSimple": "Güç ihtiyacı, ısınma ve uygun aktarım düzeni ölçülerek kontrol edilecek."
+    },
+    {
+      "team": "Elektrik",
+      "title": "{{battery.series}}S{{battery.parallel}}P LiFePO₄ batarya",
+      "status": "Tasarım yönü",
+      "reason": "{{battery.nominalV}} V nominal, {{battery.capacityAh}} Ah hedef; {{battery.cellCount}} hücre varsayımı. Hücre başına {{battery.cellFullV}} V ile tam dolu {{battery.fullV}} V hesaplanır. Tepe akım hücre/BMS/süre ile doğrulanmadı.",
+      "next": "Hücre, BMS, süre, paket taşıyıcısı ve koruma tasarımı doğrulanacak.",
+      "date": "2026-11-17",
+      "source": "Ana gereksinim belgesi · karar kaydı",
+      "simple": "Araca enerji sağlayacak paketin yerleşimi ve korumaları tasarlanıyor. Hücreler ve koruma elektroniği henüz seçilmedi.",
+      "nextSimple": "Paket, korumalar ve bağlantılar seçildikten sonra kontrollü ölçümler yapılacak."
+    },
+    {
+      "team": "Elektrik",
+      "title": "Motor sürücüsü ve araç kontrolü",
+      "status": "Test bekliyor",
+      "reason": "Üç yarım köprü, altı MOSFET; STM32G4 ve DRV8353RS aday. İkinci STM32G4 için araç kontrolü ve CAN görevi öneriliyor. SEM PCB maskesi kaydı: güncel resmî kural maddesi/sürümü bekliyor.",
+      "next": "Donanımsal PWM kesme; faz akımı, bara ve sıcaklık için akım sınırlı tezgâh testi.",
+      "date": "2026-11-17",
+      "source": "Ana gereksinim belgesi · karar kaydı",
+      "simple": "Motoru yönetecek elektronik kart ve araçla haberleşmesi için bir mimari öneriliyor. Bileşenler tezgâh testi bekliyor.",
+      "nextSimple": "Kartın gücü güvenli biçimde kesmesi ve aşırı ısınma gibi durumları algılaması sınanacak."
+    },
+    {
+      "team": "Yazılım",
+      "title": "CARLA → gerçek araç hattı",
+      "status": "Tasarım yönü",
+      "reason": "Önce mevcut RGB şerit takibi demosu, ardından dur çizgisi, engel ve araç arayüzleri. ZED 2i ilk tedarik önceliği.",
+      "next": "Demoyu yeniden çalıştır, zaman damgası ve veri kesintisi senaryolarını kaydet.",
+      "date": "2026-11-17",
+      "source": "Ana gereksinim belgesi · karar kaydı",
+      "simple": "Önce kamerayla yolu takip eden mevcut demo yeniden çalıştırılacak. Ardından durma ve engel algılama geliştirilecek.",
+      "nextSimple": "Yol takibi, çizgiden önce durma ve farklı engelleri görme kontrollü olarak denenecek."
+    },
+    {
+      "team": "Takım",
+      "title": "2027 yarış hedefleri",
+      "status": "Test bekliyor",
+      "reason": "Shell Eco-marathon Urban Concept / Battery Electric, ADC ve Mileage ile TEKNOFEST Robotaksi hedefleri. Başvuru, kabul ve teknik uygunluk ayrı durumlardır. 25 km/sa yalnızca tasarım/test girdisi.",
+      "next": "Güncel resmî kural sürümü ve madde numarası kayda alınacak; 2026 Polonya bilgisi 2027 şartı değildir.",
+      "date": "2026-11-17",
+      "source": "Ana gereksinim belgesi · karar kaydı",
+      "simple": "Farklı yarış hedefleri aynı araç üzerinde değerlendiriliyor. Katılım ve teknik uygunluk henüz doğrulanmış değil.",
+      "nextSimple": "Güncel yarış kuralları ve başvuru durumu resmî kaynaklarla kontrol edilecek."
+    },
+    {
+      "team": "Tarihçe",
+      "title": "Önceki aktarma seçenekleri",
+      "status": "Tarihçe",
+      "reason": "Çift hub motor ve tek arka tekeri kayışla sürme önceki kıyas seçenekleridir. Güncel model tek şasi içi motor kullanır.",
+      "next": "Gerekirse kıyas gerekçelerini tarihli karar belgesiyle tamamla.",
+      "date": "2026-11-17",
+      "source": "Ana gereksinim belgesi · karar kaydı",
+      "simple": "Önceki motor yerleşimleri karşılaştırma için tutuluyor. Güncel araç tek şasi içi motorla gösteriliyor.",
+      "nextSimple": "Eski seçeneklerin gerekçeleri tarihli karar kayıtlarıyla tamamlanacak."
+    }
+  ],
+  "tests": [
+    {
+      "team": "Aktarma",
+      "title": "25 → 15 km/sa süzülme",
+      "method": "Aynı zeminde bağlı/ayrık kıyas. Tekrar adedi, süre, yön, rüzgâr, lastik basıncı ve zemin kaydedilecek.",
+      "status": "Planlandı",
+      "result": "Ölçüm bekliyor"
+    },
+    {
+      "team": "Mekanik",
+      "title": "Tam süspansiyon hareketi",
+      "method": "Aks boy değişimi, mafsal açısı, lastik/kaliper boşluğu ve bağlantılar ölçülecek. Çakışma ve dayanım analizi yapılmadı.",
+      "status": "Planlandı",
+      "result": "Ölçüm bekliyor"
+    },
+    {
+      "team": "Elektrik",
+      "title": "Akım sınırlı tezgâh",
+      "method": "Faz akımı, DC bara gerilimi, donanımsal PWM kesme ve sıcaklık kaydedilecek.",
+      "status": "Planlandı",
+      "result": "Ölçüm bekliyor"
+    },
+    {
+      "team": "Yazılım",
+      "title": "Algılama ve tam duruş",
+      "method": "Şerit takibi, çizgiden önce tam duruş; alçak/koyu engelde ilk kararlı algılama mesafesi ölçülecek.",
+      "status": "Planlandı",
+      "result": "Ölçüm bekliyor"
+    }
+  ],
+  "parts": [
+    {
+      "id": "frame",
+      "label": "Şasi",
+      "status": "V2 GEOMETRİSİ",
+      "point": [
+        -0.3,
+        0.78,
+        -0.36
+      ],
+      "desc": "Yeni araç için tek sürücülü, dört tekerli hafif alüminyum şasi hedefleniyor.",
+      "facts": [
+        "Prototipte belirtilen V2 şasi: yaklaşık {{chassis.lengthMm}} × {{chassis.widthMm}} × {{chassis.heightMm}} mm. Ayrı STEP sağlanmadığı için ölçüler bağımsız doğrulanmadı.",
+        "Ø40 × 2 mm boru ve R50/R60 büküm yarıçapları CAD varsayımları. Malzeme ve bağlantılar seçilecek.",
+        "Ön tarafta çift salıncak yaklaşımı var. Arka süspansiyon geometrisi açık.",
+        "16 inç jant önceki tasarım hedefiydi. Jant, porya, disk ve kaliper kesiti birlikte kontrol edilecek.",
+        "v1.2 bağlantı plakaları ve kaynak izleri görsel detaydır; üretim çizimi veya kaynak yöntemi doğrulaması değildir."
+      ],
+      "simple": "Aracın tüm parçalarını bir arada tutan hafif taşıyıcı yapı. V2 yerleşimi bu çalışmanın temelini oluşturuyor."
+    },
+    {
+      "id": "motor",
+      "label": "Tek motor ve redüksiyon",
+      "status": "800 / 1.000 W ADAY",
+      "point": [
+        0.49,
+        0.34,
+        0.01
+      ],
+      "desc": "Enine yerleşimli şasi içi BLDC motor, triger kasnakları üzerinden diferansiyelin taşıyıcısını döndürür.",
+      "facts": [
+        "Motor modeli ve çalışma devri açık. Toplam oran motorun verim haritasına ve yüklü teker çevresine göre seçilecek.",
+        "Çizimdeki kasnaklar yerleşimi gösterir. Gerekli toplam oran için ikinci kademe gerekebilir.",
+        "Kayış ve kasnak koruması araçta kapalı olacak."
+      ],
+      "simple": "Tek motor, kayış ve kasnaklar üzerinden arka tekerleklere güç gönderir."
+    },
+    {
+      "id": "clutch",
+      "label": "Ayırıcı",
+      "status": "İSTEĞE BAĞLI KAVRAMA KONSEPTİ",
+      "point": [
+        0.48,
+        0.27,
+        0.17
+      ],
+      "desc": "Kumandalı ayırıcı motor çıkışı ile küçük kasnak arasındadır. Açıldığında tekerlekler motor rotorunu çevirmeden süzülür.",
+      "facts": [
+        "Bu yerleşimde kayış, kasnaklar, diferansiyel ve akslar tekerlekle dönmeye devam eder.",
+        "Yeniden bağlama sıfır tork ve düşük devir farkıyla denenmeli. Ayrık durumda motor freni ve rejenerasyon yok.",
+        "Kayar manşon hareketi temsili. Kavrama tipi, aktüatör ve konum geri bildirimi seçilmedi."
+      ],
+      "simple": "Motor ile tekerlekler arasındaki bağlantıyı açmayı amaçlayan tasarım adayı. Ayrıldığında tekerlekler dönmeye devam edebilir."
+    },
+    {
+      "id": "diff",
+      "label": "Diferansiyel ve yarım akslar",
+      "status": "ANA CAD ADAYI",
+      "point": [
+        0.87,
+        0.31,
+        0.01
+      ],
+      "desc": "Şasiye bağlı, kapalı gövdeli açık diferansiyel iki arka tekerin virajda farklı hızlarla dönmesine izin verir.",
+      "facts": [
+        "İki yarım aks, içte boy değişimi yapabilen mafsal ve dışta CV mafsalı ile poryalara uzanır.",
+        "Körükler, çıkış flanşları, gövde cıvataları ve arka frenler şematik 3B parçalarla gösteriliyor.",
+        "Gerçek aks boyu, mafsal açıları, taşıma noktaları ve kaliper boşluğu henüz doğrulanmadı.",
+        "Sağ iç CV körüğü görsel kasnak hacminden uzağa taşındı. Kasnaklar ve giriş boynu delikli modellenir. Bu, sınırlı statik hacim incelemesidir; imalat veya süspansiyon hareketi doğrulaması değildir."
+      ],
+      "simple": "Gücü iki arka tekerleğe dağıtır. Virajda tekerleklerin farklı hızlarda dönmesine izin verir."
+    },
+    {
+      "id": "battery",
+      "label": "Batarya",
+      "status": "TASARIM HEDEFİ",
+      "point": [
+        1.03,
+        0.31,
+        0.02
+      ],
+      "desc": "Hedef {{battery.nominalV}} V sınıfında, {{battery.capacityAh}} Ah, {{battery.series}}S{{battery.parallel}}P paket. Batarya aktarmayı görünür bırakacak şekilde arka tarafta yükseltilmiş taslak taşıyıcıya alındı.",
+      "facts": [
+        "{{battery.series}}S{{battery.parallel}}P düzeni {{battery.cellCount}} hücre kullanır. {{battery.capacityAh}} Ah hedefi için hücre kapasitesi paket seçimiyle doğrulanacak.",
+        "BMS, hücre modeli, şarj cihazı ve son kutu ölçüsü kesinleşecek.",
+        "Önceki PC-2 bataryası 48 V 100 Ah LiFePO4 ve yaklaşık 52 kg."
+      ],
+      "simple": "Motoru ve elektronik sistemleri beslemek için düşünülen enerji paketi. Paket ve koruma tasarımı henüz tamamlanmadı."
+    },
+    {
+      "id": "drive",
+      "label": "Motor sürücüsü",
+      "status": "TEK MOTOR · KART TASLAĞI",
+      "point": [
+        0.86,
+        0.31,
+        -0.33
+      ],
+      "desc": "Bir üç fazlı köprü için altı MOSFET. STM32G4 PWM üretir, DRV8353RS MOSFET kapılarını sürer.",
+      "facts": [
+        "İkinci STM32G4 için araç kontrolü ve CAN öngörülüyor. Görev dağılımı taslak.",
+        "Faz akımı, bara gerilimi ve sıcaklık ölçümü boyutlandırılacak.",
+        "Mileage kart tasarımında SEM PCB maskesi şartı dikkate alınacak."
+      ],
+      "simple": "Motorun ne zaman ve ne kadar güç alacağını yöneten elektronik sistem. Kart tasarımı test bekliyor."
+    },
+    {
+      "id": "pc",
+      "label": "Araç bilgisayarı",
+      "status": "YERLEŞİM ADAYI",
+      "point": [
+        0.19,
+        0.36,
+        -0.43
+      ],
+      "desc": "Araç bilgisayarı kameradan gelen görüntüyü işler ve aracın izleyeceği yolu belirler.",
+      "facts": [
+        "V2’de PC koltuğun yanında. Koltuk arkası alternatif konum.",
+        "İşlemci, besleme ve soğutma henüz seçilecek.",
+        "Kontrol kartıyla haberleşme için CAN değerlendiriliyor."
+      ],
+      "simple": "Kameradan gelen bilgiyi işleyerek sürüş kararlarının hazırlanmasına yardımcı olan bilgisayar."
+    },
+    {
+      "id": "camera",
+      "label": "Kamera ve sensörler",
+      "status": "ÖN KAMERA REZERVİ",
+      "point": [
+        -1.25,
+        0.49,
+        0
+      ],
+      "desc": "Burundaki kamera şerit, tabela ve engel algılama için görüntü sağlar.",
+      "facts": [
+        "Öncelik geniş açılı polarizeli ZED 2i. Mid-360S ve JT128 3B LiDAR adayları. Ekipte modeli teyit edilecek GPS var.",
+        "Kamera yüksekliği ve görüş açısı dış kabukla birlikte kontrol edilecek.",
+        "IMU ve tekerlek ölçümü, aracın hareketini anlamak için değerlendiriliyor."
+      ],
+      "simple": "Aracın önünü görmesini sağlar. Burada yalnızca ön kamera için temsili bir yerleşim gösteriliyor."
+    },
+    {
+      "id": "steering",
+      "label": "Direksiyon",
+      "status": "YERLEŞİM TASLAĞI",
+      "point": [
+        -0.57,
+        0.49,
+        0
+      ],
+      "desc": "Önde bir step motor, direksiyon miline aktarım üzerinden hareket verecek.",
+      "facts": [
+        "PC-2’den NEMA43 olarak anılan motor ve DM860H benzeri sürücü yeniden kullanım adayı.",
+        "Etiket, mil bağlantısı ve hareket aralığı doğrulanacak."
+      ],
+      "simple": "Tekerlekleri yönlendirir. Motorlu kumanda ve hareket sınırları araç üzerinde doğrulanacak."
+    },
+    {
+      "id": "brake",
+      "label": "Fren",
+      "status": "AKTÜATÖR REZERVİ",
+      "point": [
+        -0.57,
+        0.3,
+        0.04
+      ],
+      "desc": "Ön mekanik alanda fren aktüatörüne yer ayrıldı.",
+      "facts": [
+        "Aktüatör, pedal ve fren mekanizmasının bağlantısı mekanik ekipçe tasarlanacak.",
+        "Gerçek fren hareketi ve güvenli duruş kontrollü testlerle doğrulanacak."
+      ],
+      "simple": "Aracı yavaşlatan ve durduran sistem. Otomatik kumanda ve güvenli duruş kontrollü test bekliyor."
+    },
+    {
+      "id": "hmi",
+      "label": "Nextion konsolu",
+      "status": "EKRAN ADAYI",
+      "point": [
+        -0.33,
+        0.625,
+        0.252
+      ],
+      "desc": "Konsolda Nextion ekran düşünülüyor. Sürüş modu ve sistem durumu gibi bilgiler burada gösterilebilir.",
+      "facts": [
+        "Ekran boyutu ve bağlantıları henüz seçilmedi.",
+        "Konsolun görüş, direksiyon ve pedal alanlarıyla birlikte kontrolü yapılacak."
+      ],
+      "simple": "Sürücüye aracın durumu hakkında bilgi vermesi düşünülen ekran."
+    },
+    {
+      "id": "seat",
+      "label": "Sürücü koltuğu",
+      "status": "KOKPİT KONSEPTİ",
+      "point": [
+        0.17,
+        0.64,
+        0.035
+      ],
+      "desc": "Tek sürücü için yan destekli oturak, sırtlık, başlık ve koltuk kızakları gösteriliyor.",
+      "facts": [
+        "Oturma noktası, pedal erişimi ve emniyet kemeri bağlantıları araç üzerinde belirlenecek."
+      ],
+      "simple": "Sürücünün oturma alanı. Rahatlık, erişim ve bağlantılar gerçek araçta kontrol edilecek."
+    },
+    {
+      "id": "suspension",
+      "label": "Süspansiyon",
+      "status": "GÖRSEL MEKANİK KONSEPT",
+      "point": [
+        -0.96,
+        0.35,
+        0.5
+      ],
+      "desc": "Ön çift salıncak düzeninde üst ve alt kollar, porya taşıyıcısı, yaylı amortisör ve direksiyon rotu görülüyor.",
+      "facts": [
+        "Tekerlekleri gizleyerek salıncakları inceleyebilirsin.",
+        "Arka salıncaklar yerleşim fikrini gösteriyor. Bağlantı noktaları ve süspansiyon hareketi henüz doğrulanmadı.",
+        "Burç, pul, pim ve kaliper bağlantıları temsili görsel detaydır. Tam hareket ve yük analizi yapılmadı."
+      ],
+      "simple": "Tekerlekleri şasiye bağlar, yol hareketlerini karşılar. Kollar ve yaylı amortisörler yerleşim fikrini gösteriyor."
+    },
+    {
+      "id": "power",
+      "label": "Yardımcı sistemler",
+      "status": "V2 YERLEŞİMİ",
+      "point": [
+        0.58,
+        0.31,
+        0
+      ],
+      "desc": "Koltuk arkasında yangın tüpü ve arka yanda DC-DC dönüştürücü için alan ayrıldı.",
+      "facts": [
+        "DC-DC, yardımcı sistemlerin ihtiyaç duyduğu besleme gerilimini sağlar.",
+        "Kontrol kutusu için kabin yanında yer ayrıldı. Araç kontrol kartında ESP32 ve STM32 seçenekleri açık.",
+        "Güç dağıtımı ve güvenli duruş zinciri ayrı teknik tasarım gerektiriyor."
+      ],
+      "simple": "Ana enerji kaynağından yardımcı sistemlere besleme sağlayan parçalar ve güvenlik donanımı için ayrılan alan."
+    },
+    {
+      "id": "software",
+      "label": "Otonom yazılım",
+      "status": "GELİŞTİRME MİMARİSİ",
+      "desc": "Kamera verisi işlenir. Yazılım şeridi ve çevreyi algılar, hareketi planlar ve kontrol katmanına komut verir.",
+      "facts": [
+        "Önceki sezonda PC-2 ile uzaktan sürüş denendi. KTR geçildi ve sezon video değerlendirmesinde sona erdi.",
+        "Gazebo’da park, şerit takibi ve tabela görevleri denendi. CARLA’da kamera verisiyle şerit algılama ve direksiyon kontrolü üzerinde çalışıldı.",
+        "Hedef, simülasyondaki algoritmaları kontrollü araç testleriyle doğrulamak."
+      ],
+      "simple": "Görüntüyü anlamlandırır, izlenecek yolu belirler ve araç kontrolüne komut üretir. Önce simülasyonda, sonra kontrollü araç testlerinde sınanacak."
+    },
+    {
+      "id": "shell",
+      "label": "Urban Concept gövde",
+      "status": "GÖRSEL KONSEPT",
+      "desc": "Eğrisel kesitlerden üretilen simetrik BufferGeometry gövde, tek kişilik saydam kokpit ve ön/arka davlumbaz rezervleri. CAD/CFD ve hareket zarfı doğrulanmadı.",
+      "facts": [
+        "V2 geometri ve tekerlek merkezleri değiştirilmedi. Gövde ayrı bir konsept katmanıdır.",
+        "Gövde yüzeyleri, davlumbazlar ve servis kapağı üretici CAD’i değildir.",
+        "Direksiyon/süspansiyon hareketi, teker boşluğu, kapak mafsalı, görüş ve aerodinamik analiz bekliyor."
+      ],
+      "simple": "V2 yerleşimi üzerine geliştirilen beyaz, altın ve grafit gövde konsepti. Tekerlek açıklıkları ve kapaklar gerçek araçta doğrulanacak."
+    }
+  ],
+  "uiVersion": "1.3",
+  "parameters": {
+    "chassis": {
+      "lengthMm": 2675,
+      "widthMm": 1183,
+      "heightMm": 694
+    },
+    "battery": {
+      "nominalV": 48,
+      "capacityAh": 18,
+      "series": 15,
+      "parallel": 3,
+      "cellFullV": 3.65
+    },
+    "transmission": {
+      "smallRadiusMm": 48,
+      "largeRadiusMm": 108,
+      "smallTeeth": 24,
+      "largeTeeth": 54
+    }
+  },
+  "presentation": {
+    "routes": [
+      {
+        "id": "overview",
+        "label": "Genel Bakış",
+        "title": "Mühendisliği birlikte ilerlet.",
+        "simple": "Araç, sistemler ve takımın sıradaki adımları.",
+        "technical": "Kaynak tabanlı tasarım kaydı / V2 yerleşim / R01"
+      },
+      {
+        "id": "vehicle",
+        "label": "3B Araç",
+        "title": "Tasarımı her açıdan gör.",
+        "simple": "Döndür, bir parça seç ve nasıl çalıştığını keşfet.",
+        "technical": "Şasi ölçeği korunmuş V2 model. Üretici CAD’i olmayan bileşenler temsili."
+      },
+      {
+        "id": "mechanical",
+        "label": "Mekanik Sistemler",
+        "title": "Güçten harekete.",
+        "simple": "Motorun gücünün tekerleklere nasıl ulaştığını keşfet.",
+        "technical": "Tek BLDC / kayış redüksiyonu / açık diferansiyel / çift salıncak"
+      },
+      {
+        "id": "electrical",
+        "label": "Elektrik & Elektronik",
+        "title": "Enerjiyi kontrol et.",
+        "simple": "Enerjinin bataryadan motora ve elektronik sistemlere yolculuğu.",
+        "technical": "Paket, güç katı ve kontrol kartı: aday bileşenler ve tezgâh doğrulamaları."
+      },
+      {
+        "id": "autonomy",
+        "label": "Otonom Sürüş",
+        "title": "Gör. Anla. Yolunu bul.",
+        "simple": "Araç çevreyi nasıl algılar, kararlar nasıl harekete dönüşür?",
+        "technical": "Algılama → planlama → araç kontrolü. ROS 2 / CAN prototip sözleşmesi."
+      },
+      {
+        "id": "decisions",
+        "label": "Mühendislik Kararları",
+        "title": "Her kararın bir gerekçesi var.",
+        "simple": "Neyi seçiyoruz, neden seçiyoruz, sırada hangi kontrol var?",
+        "technical": "Disiplin, kaynak, revizyon ve doğrulama adımıyla karar defteri."
+      },
+      {
+        "id": "tests",
+        "label": "Testler & Geliştirme",
+        "title": "Varsayımdan kanıta.",
+        "simple": "Tasarımı gerçek ölçümlerle sınamak için sıradaki adımlar.",
+        "technical": "Planlanmış deneyler / ölçüm protokolleri / sonuç ve izlenebilirlik."
+      },
+      {
+        "id": "team",
+        "label": "Takım & Yarışmalar",
+        "title": "Birlikte tasarla. Birlikte ilerle.",
+        "simple": "Disiplinleri, yarış hedeflerini ve kaynak dosyalarını bir arada gör.",
+        "technical": "Takım çalışma alanları / yarış hedefleri / özgün kaynak kayıtları."
+      },
+      {
+        "id": "experience",
+        "label": "Araç Deneyimi",
+        "title": "Bir araç. Üç perspektif.",
+        "simple": "Gövdeyi keşfet, atölyede incele, demo parkurda bir varsayımı sına.",
+        "technical": "Showroom / Atölye / Demo pist · temsili geometri ve parametrik boyuna model"
+      },
+      {
+        "id": "inventory",
+        "label": "Mühendislik Envanteri",
+        "title": "İhtiyaçtan doğrulamaya.",
+        "simple": "Parçaları, tedarik ihtiyaçlarını ve yerel kayıtlarını bir arada yönet.",
+        "technical": "Mekanik / Elektrik / Sensörler · yerel tarayıcı kaydı · CSV / JSON"
+      }
+    ],
+    "systems": {
+      "mechanical": [
+        {
+          "id": "transmission",
+          "label": "Aktarma",
+          "parts": [
+            "motor",
+            "clutch",
+            "diff"
+          ],
+          "focus": "transmission",
+          "decisionTeams": [
+            "Mekanik"
+          ],
+          "flow": [
+            "Motor",
+            "Ayırıcı",
+            "Kayış & kasnak",
+            "Diferansiyel",
+            "Arka tekerlekler"
+          ]
+        },
+        {
+          "id": "suspension",
+          "label": "Süspansiyon & fren",
+          "parts": [
+            "suspension",
+            "brake"
+          ],
+          "focus": "suspension",
+          "decisionTeams": [
+            "Mekanik"
+          ],
+          "flow": [
+            "Yol hareketi",
+            "Çift salıncak",
+            "Yay & amortisör",
+            "Şasi"
+          ]
+        },
+        {
+          "id": "chassis",
+          "label": "Şasi & kokpit",
+          "parts": [
+            "frame",
+            "seat",
+            "steering",
+            "hmi"
+          ],
+          "focus": "chassis",
+          "decisionTeams": [
+            "Mekanik"
+          ],
+          "flow": [
+            "Şasi",
+            "Bağlantılar",
+            "Sürücü alanı",
+            "Kontrol erişimi"
+          ]
+        }
+      ],
+      "electrical": [
+        {
+          "id": "battery",
+          "label": "Batarya & enerji",
+          "parts": [
+            "battery"
+          ],
+          "focus": "battery",
+          "decisionTeams": [
+            "Elektrik"
+          ],
+          "flow": [
+            "Batarya",
+            "Koruma / BMS",
+            "Güç dağıtımı",
+            "Motor sürücüsü"
+          ]
+        },
+        {
+          "id": "control",
+          "label": "Motor kontrolü",
+          "parts": [
+            "drive"
+          ],
+          "focus": "control",
+          "decisionTeams": [
+            "Elektrik"
+          ],
+          "flow": [
+            "Araç komutu",
+            "Kontrol MCU",
+            "Gate sürücü",
+            "Güç katı",
+            "Motor"
+          ]
+        },
+        {
+          "id": "auxiliary",
+          "label": "Yardımcı sistemler",
+          "parts": [
+            "pc",
+            "power",
+            "hmi"
+          ],
+          "focus": "auxiliary",
+          "decisionTeams": [
+            "Elektrik"
+          ],
+          "flow": [
+            "DC-DC",
+            "Araç bilgisayarı",
+            "Sensörler",
+            "Sürücü ekranı"
+          ]
+        }
+      ],
+      "autonomy": [
+        {
+          "id": "perception",
+          "label": "Algılama & kontrol",
+          "parts": [
+            "camera",
+            "pc",
+            "software"
+          ],
+          "focus": "sensors",
+          "decisionTeams": [
+            "Yazılım"
+          ],
+          "flow": [
+            "Kamera & sensör",
+            "Algılama",
+            "Planlama",
+            "Araç kontrolü"
+          ]
+        },
+        {
+          "id": "sensors",
+          "label": "Sensör envanteri",
+          "parts": [
+            "camera"
+          ],
+          "focus": "sensors",
+          "decisionTeams": [
+            "Yazılım"
+          ],
+          "flow": []
+        },
+        {
+          "id": "interfaces",
+          "label": "Veri arayüzleri",
+          "parts": [
+            "software"
+          ],
+          "focus": "sensors",
+          "decisionTeams": [
+            "Yazılım"
+          ],
+          "flow": []
+        }
+      ]
+    },
+    "files": [
+      {
+        "name": "Platformun örnek proje kaydı",
+        "type": "JSON",
+        "note": "Sitede görünen temsilî parametreler ve sunum içeriği",
+        "path": "data/project.json"
+      }
+    ],
+    "interfaceSummaries": {
+      "I01": "Kameranın gördükleri ve aracın hareketi",
+      "I02": "Arka tekerleklerin dönüş bilgisi",
+      "I03": "Direksiyonun gerçek yönü",
+      "I04": "Frenin gerçek hareketi",
+      "I05": "Motor ve bataryanın durumu",
+      "I06": "Motor bağlantısının açık veya kapalı olması",
+      "I07": "Çevrenin üç boyutlu mesafe bilgisi",
+      "I08": "Sürüş izni ve güvenlik durumu"
+    },
+    "slides": [
+      {
+        "id": "introduction",
+        "title": "Vaccino 26/27",
+        "subtitle": "Bir araç. Ortak mühendislik.",
+        "simple": "Mekanik, elektrik ve yazılımı aynı araç üzerinde buluşturuyoruz. Tasarımı her açıdan birlikte keşfedelim.",
+        "technical": "V2 yerleşim · {{chassis.lengthMm}} × {{chassis.widthMm}} mm şasi beyanı. Kaynak R01; bağımsız CAD ölçümü ve doğrulama bekleniyor.",
+        "focus": null,
+        "camera": {
+          "az": -0.88,
+          "el": 0.48,
+          "rad": 3.85,
+          "target": [
+            0,
+            0.38,
+            0
+          ]
+        }
+      },
+      {
+        "id": "chassis",
+        "title": "Araç ve Şasi",
+        "subtitle": "Her sistemi taşıyan temel.",
+        "simple": "Şasi, sürücüyü ve aracın tüm parçalarını bir arada tutar. Bağlantılar ve oturma alanı gerçek araç üzerinde kontrol edilecek.",
+        "technical": "Alüminyum tüp konsepti korunur. Eklenen plaka, bağlantı ve kaynak izleri temsilidir. Bağlantı yükleri ve dayanım analizi yapılmadı.",
+        "focus": "chassis",
+        "camera": {
+          "az": -0.52,
+          "el": 0.62,
+          "rad": 3.8,
+          "target": [
+            0,
+            0.4,
+            0
+          ]
+        }
+      },
+      {
+        "id": "suspension",
+        "title": "Süspansiyon Sistemi",
+        "subtitle": "Yol ile şasi arasındaki bağlantı.",
+        "simple": "Kollar ve yaylı amortisörler tekerlek hareketine eşlik eder. Fren kaliperleri tekerlekle birlikte dönmez.",
+        "technical": "Çift salıncak, porya, burç/pim rezervleri ve coilover. Sabit kaliper; hareket zarfı, aks boy değişimi ve boşluk kontrolleri bekleniyor.",
+        "focus": "suspension",
+        "camera": {
+          "az": -1.05,
+          "el": 0.43,
+          "rad": 2.75,
+          "target": [
+            -0.82,
+            0.3,
+            0.15
+          ]
+        }
+      },
+      {
+        "id": "transmission",
+        "title": "Motor ve Aktarma",
+        "subtitle": "Gücün tekerleklere yolculuğu.",
+        "simple": "Tek motor kayış üzerinden iki arka tekerleği besler. Bağlantı ayrıldığında tekerlekler ve kayış dönerken motor durabilir.",
+        "technical": "Motor mili → ayırıcı → kasnak/kayış → kapalı diferansiyel → CV yarım akslar. Görsel oran {{transmission.ratio}}; nihai oran değildir. Çalışma prensibi gösterimi.",
+        "focus": "transmission",
+        "camera": {
+          "az": 1.03,
+          "el": 0.68,
+          "rad": 1.95,
+          "target": [
+            0.73,
+            0.29,
+            0.04
+          ]
+        }
+      },
+      {
+        "id": "electrical",
+        "title": "Elektrik & Elektronik",
+        "subtitle": "Enerjiden kontrollü harekete.",
+        "simple": "Batarya, motor ve yardımcı sistemlere enerji sağlar. Elektronik kartlar bu enerjiyi ve güvenlik durumlarını yönetir.",
+        "technical": "{{battery.series}}S{{battery.parallel}}P / {{battery.nominalV}} V / {{battery.capacityAh}} Ah hedef. Nominal hesap {{battery.nominalWh}} Wh; ölçülmüş kullanılabilir enerji değildir. Sürücü ve koruma tezgâh testi bekliyor.",
+        "focus": "battery",
+        "camera": {
+          "az": 1.4,
+          "el": 0.75,
+          "rad": 2.95,
+          "target": [
+            0.68,
+            0.35,
+            0
+          ]
+        }
+      },
+      {
+        "id": "autonomy",
+        "title": "Otonom Sürüş",
+        "subtitle": "Gör. Anla. Yolunu bul.",
+        "simple": "Ön kamera aracın çevresini görmesine yardımcı olur. Yazılım bu bilgiyi yorumlayarak yol ve hareket kararlarını hazırlar.",
+        "technical": "Ön ZED 2i rezervi ve araç bilgisayarı. Algılama → planlama → araç MCU / CAN. Diğer sensörlerin fiziksel yerleşimi modellenmedi; veri arayüzleri prototip.",
+        "focus": "sensors",
+        "camera": {
+          "az": -1.46,
+          "el": 0.47,
+          "rad": 2.85,
+          "target": [
+            -0.9,
+            0.34,
+            0
+          ]
+        }
+      },
+      {
+        "id": "future",
+        "title": "Tasarım Hedefleri",
+        "subtitle": "Varsayımdan kanıta.",
+        "simple": "Sıradaki adım parçaları seçmek, ölçmek ve kontrollü testlerle tasarımı geliştirmek. Pist simülasyonu gelecekte ayrı bir modül olacak.",
+        "technical": "Boyuna demo model ve yerel mühendislik envanteri eklendi. Gerçek pist, yanal dinamik, ölçülmüş araç parametreleri ve donanım doğrulaması bekleniyor.",
+        "focus": null,
+        "camera": {
+          "az": 2.36,
+          "el": 0.62,
+          "rad": 4,
+          "target": [
+            0,
+            0.38,
+            0
+          ]
+        }
+      }
+    ]
+  }
+}
