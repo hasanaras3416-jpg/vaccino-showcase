@@ -15,10 +15,41 @@ const sizes=vehicleLayout.battery.variants, descriptions=['520 × 152 × 90 mm',
 const $=id=>document.getElementById(id);
 let refreshBattery=()=>{}, redraw=()=>{}, refreshDrive=()=>{}, refreshSelectionMaterials=()=>{}, pins=[];
 let engaged=true, guardVisible=false;
+const inspector=$('part-inspector');
+let inspectorTrigger=null;
+function openInspector(trigger,moveFocus=true){
+ inspectorTrigger=trigger;
+ inspector.inert=false;
+ inspector.dataset.open='true';
+ $('part-open').setAttribute('aria-expanded','true');
+ if(moveFocus)$('title').focus({preventScroll:true});
+}
+function closeInspector(returnFocus=false){
+ if(inspector.inert)return;
+ inspector.inert=true;
+ delete inspector.dataset.open;
+ $('part-open').setAttribute('aria-expanded','false');
+ if(returnFocus)inspectorTrigger?.focus({preventScroll:true});
+ inspectorTrigger=null;
+}
+function inspect(id,trigger){
+ select(id);
+ openInspector(trigger);
+}
+$('part-open').onclick=()=>openInspector($('part-open'));
+$('part-close').onclick=()=>closeInspector(true);
+document.addEventListener('vaccino:inspector-close',()=>closeInspector());
+document.addEventListener('keydown',event=>{
+ if(event.key==='Escape'&&!inspector.inert&&!document.body.classList.contains('menu-open')){
+  event.preventDefault();
+  closeInspector(true);
+ }
+});
 function select(id){
  chosen=id;
  const info=sections.find(s=>s.id===id);
- $('status').textContent=info.status;$('title').textContent=info.label;$('desc').textContent=workspaceState.mode==='simple'?info.simple:info.desc;
+ $('status').textContent=info.status;$('title').textContent=info.label;$('desc').textContent=info.simple;
+ $('part-technical').textContent=info.desc;
  $('facts').replaceChildren(...info.facts.map(f=>{const li=document.createElement('li');li.textContent=f;return li}));
  $('variants').replaceChildren();$('variant-note').textContent='';
  document.querySelectorAll('[data-part]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.part===id)));
@@ -37,7 +68,6 @@ function select(id){
  }
  refreshDrive();onSelect(id);redraw();document.dispatchEvent(new CustomEvent('vaccino:part',{detail:id}));
 }
-document.addEventListener('vaccino:mode',()=>{const info=sections.find(s=>s.id===chosen);$('desc').textContent=workspaceState.mode==='simple'?info.simple:info.desc;redraw();});
 for(const s of sections){const b=document.createElement('button');b.textContent=s.label;b.dataset.part=s.id;b.onclick=()=>select(s.id);$('parts').append(b)}
 select('frame');
 try{
@@ -62,6 +92,13 @@ try{
  const vehicleRoot=new T.Group();vehicleRoot.name='vaccino-v2-vehicle';scene.add(vehicleRoot);vehicleRoot.add(frame,body,wheels);body.visible=false;
  const studio=createStudio(T,render,scene,vehicleRoot,()=>{draw=true});
  const world=createExperienceWorld(T,scene,vehicleRoot);
+ const studioFloor=new T.Mesh(new T.PlaneGeometry(200,200),new T.MeshStandardMaterial({
+  color:0x171513,metalness:.48,roughness:.38,envMapIntensity:.42
+ }));
+ studioFloor.rotation.x=-Math.PI/2;
+ studioFloor.position.y=-.008;
+ scene.add(studioFloor);
+ studioFloor.visible=false;
  render.toneMapping=T.ACESFilmicToneMapping;render.toneMappingExposure=1.05;
  const chassis=nodePlaceholder(); function nodePlaceholder(){const g=new T.Group();frame.add(g);return g;}
  for(const item of data.frame){
@@ -218,13 +255,46 @@ try{
  });
  const display=decal(hmiTexture,.153,.091,panel);display.rotation.y=Math.PI/2;display.position.x=.016;
  rod([-.331,.515,.252],[-.35,.405,.23],.011,anodized);
- // Pedals and brake actuator.
- for(const z of [-.103,.098]){
-  rod([-.723,.192,z],[-.667,.315,z],.010,machined);
-  const pedal=rounded(.019,.073,.057,.008,dark,frame,-.667,.323,z);pedal.rotation.z=-.26;
+ // Visual study of two separate hydraulic circuits. See docs/v1.3-brakes.md.
+ const brakes=node(frame);
+ const brakeLines=[];
+ const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+ const brakePipe=mat(0x414c47,.55,.44), brakeHose=mat(0x262e2a,.1,.72);
+ const pedalPivot=[-.723,.192,.098], pedalPad=[-.667,.323,.098];
+ rod([-.723,.192,.058],[-.723,.192,.138],.014,machined,brakes);
+ rod(pedalPivot,pedalPad,.011,machined,brakes);
+ rounded(.019,.073,.057,.008,dark,brakes,...pedalPad).rotation.z=-.26;
+ rod([-.723,.192,-.103],[-.667,.315,-.103],.010,machined);
+ rounded(.019,.073,.057,.008,dark,frame,-.667,.323,-.103).rotation.z=-.26;
+ rod([-.702,.252,.098],[-.756,.268,.11],.009,machined,brakes);
+ rod([-.756,.268,.11],[-.884,.268,.11],.024,anodized,brakes);
+ box(.10,.032,.053,-.818,.313,.11,white,brakes);
+ box(.045,.009,.042,-.818,.335,.11,dark,brakes);
+ function brakeLine(points,material,front) {
+  const curve=new T.CatmullRomCurve3(points.map(point=>new T.Vector3(...point)));
+  const line=mesh(new T.TubeGeometry(curve,24,material===brakeHose?.007:.004,6,false),material,brakes);
+  line.userData.brakeColor=front?0x55bfff:0xe18a5b;
+  brakeLines.push({line,curve});
  }
- rod([-.572,.248,.146],[-.742,.262,.146],.029,anodized);
- rod([-.742,.262,.146],[-.799,.276,.12],.010,machined);
+ for(const front of [true,false]) {
+  const terminal=front?-.92:.79, port=front?-.86:-.79;
+  const junction=front?-.89:.59;
+  const feed=[[port,.267,.136],[port,.224,.19]];
+  if(!front) feed.push([-.65,.221,.29],[.48,.221,.29]);
+  brakeLine([...feed,[junction,.221,.22]],brakePipe,front);
+  box(.025,.023,.024,junction,.221,.22,machined,brakes);
+  for(const side of [-1,1]) {
+   brakeLine([[junction,.221,.22],[junction,.221,side*.28],[terminal,.223,side*.32]],brakePipe,front);
+   box(.031,.018,.025,terminal,.22,side*.32,machined,brakes);
+   brakeLine([[terminal,.225,side*.32],[terminal+.10,.237,side*.41],[terminal+.10,.33,side*.51],[(front?-.96:.87)+.071,.382,side*.603]],brakeHose,front);
+  }
+ }
+ const brakeMarkers=brakeLines.map(({line})=>{
+  const marker=mesh(new T.SphereGeometry(.010,8,6),new T.MeshBasicMaterial({color:line.userData.brakeColor}),scene);
+  marker.visible=false;
+  return marker;
+ });
+ let brakeFlow=false;
  // Upper and lower wishbones, uprights and spring-damper units.
  function coilover(a,b,parent){
   const v=new T.Vector3(...a),w=new T.Vector3(...b),axis=w.clone().sub(v);
@@ -244,7 +314,7 @@ try{
   }
   joint(a,.019,parent);joint(b,.019,parent);
  }
- const suspension=node(frame),brakes=node(suspension);
+ const suspension=node(frame);
  for(const axle of [-.96,.87])for(const s of [-1,1]){
   const front=axle<0;
   const lower=[axle,.194,s*.564],upper=[axle-.015,.371,s*.553];
@@ -289,6 +359,7 @@ try{
    mesh(new T.CylinderGeometry(.008,.008,.01,6),machined,wheel,.041*Math.cos(a),.041*Math.sin(a),side*.047).rotation.x=Math.PI/2;
   }
   const disc=mesh(new T.RingGeometry(.083,.134,48),studio.apply(new T.MeshStandardMaterial({color:0xb4bdc2,side:T.DoubleSide}),'brake'),wheel,0,0,-side*.054);
+  disc.userData.part='brake';
   disk(.091,.005,-side*.055,hubmat);
   rounded(.073,.043,.043,.011,red,brakes,x+.071,.382,z-side*.057);
 
@@ -402,8 +473,8 @@ try{
  const bodyShell=createBodyShell(T,body);body.userData.part='shell';
  studio.apply(steel,'metal');studio.apply(machined,'metal');studio.apply(hubmat,'metal');studio.apply(anodized,'cast');studio.apply(housing,'cast');studio.apply(alloy,'metal');studio.apply(rubber,'rubber');
  addMechanicalDetails(T,{chassis,suspension,brakes,motorGroup,diffGroup,axleGroup,wheels,studio});
- sections.filter(s=>s.point).forEach((s,i)=>{
-  const b=document.createElement('button');b.className='marker';b.textContent=i+1;b.dataset.part=s.id;b.title=s.label;b.setAttribute('aria-label',s.label);b.onclick=()=>{select(s.id);if(matchMedia('(max-width: 850px)').matches)$('status').scrollIntoView({block:'nearest',behavior:'smooth'})};$('pins').append(b);pins.push({button:b,position:new T.Vector3(...s.point),id:s.id});
+ sections.filter(s=>s.point).forEach(s=>{
+  const b=document.createElement('button');b.className='marker';b.setAttribute('aria-controls','part-inspector');b.dataset.part=s.id;b.title=s.label;b.setAttribute('aria-label',s.label);b.onclick=()=>inspect(s.id,b);$('pins').append(b);pins.push({button:b,position:new T.Vector3(...s.point),id:s.id});
  });
  let hideWheels=false, cockpitView=false, rearView=false;
  function setMode(mode){
@@ -426,7 +497,7 @@ try{
  canvas.addEventListener('pointerup',e=>{if(!downPoint||Math.hypot(e.clientX-downPoint[0],e.clientY-downPoint[1])>5)return;
   const r=canvas.getBoundingClientRect();raycaster.setFromCamera(new T.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),camera);
   const hit=raycaster.intersectObjects([frame,body,wheels],true).find(h=>{let n=h.object;while(n){if(!n.visible)return false;n=n.parent}return true});
-  if(hit){let n=hit.object;while(n){if(n.userData.part){select(n.userData.part);break}n=n.parent}}
+  if(hit){let n=hit.object;while(n){if(n.userData.part){inspect(n.userData.part,canvas);break}n=n.parent}}
  });
  for(const [id,g] of Object.entries(partGroups))g.userData.part=id;
  axleGroup.userData.part='diff';
@@ -440,7 +511,11 @@ try{
  function owner(m){let node=m;while(node){if(node.userData.part)return node.userData.part;node=node.parent}return 'frame';}
  function updateHighlight(){
   for(const [m,base] of materialState){const mat=m.material;const id=owner(m),dim=focusContext&&isolation&&!focusIds.has(id)&&id!==chosen;mat.color.copy(base.color);mat.opacity=dim?.16:base.opacity;mat.transparent=dim||base.transparent;mat.depthWrite=dim?false:base.depthWrite;mat.roughness=base.roughness;
-   if(mat.emissive)mat.emissive.copy(base.emissive||new T.Color(0)).add(new T.Color(id===chosen?0x332305:focusIds.has(id)?0x100b02:0));mat.needsUpdate=true;
+   if(mat.emissive)mat.emissive.copy(base.emissive||new T.Color(0)).add(new T.Color(id===chosen?0x332305:focusIds.has(id)?0x100b02:0));if(m.userData.brakeColor && (focusContext==='braking'||chosen==='brake')) {
+    mat.color.setHex(m.userData.brakeColor);
+    mat.emissive?.setHex(m.userData.brakeColor).multiplyScalar(.3);
+   }
+   mat.needsUpdate=true;
   }
  }
  refreshSelectionMaterials=()=>{registerMaterials();updateHighlight();};
@@ -456,7 +531,7 @@ try{
  $('quality').onchange=e=>studio.quality(e.target.value);
  $('shadows').onchange=e=>studio.setShadows(e.target.checked);
  studio.quality('auto');
- const originalReset=$('reset').onclick;$('reset').onclick=()=>{cameraMotion.cancel();focusContext=null;focusIds.clear();isolation=true;updateHighlight();document.getElementById('system-isolate')?.setAttribute('aria-pressed','false');exploded=false;batteryHidden=false;playing=false;demoEnd=0;engaged=true;guardVisible=false;hideWheels=false;wheels.visible=true;setMode('frame');focusGoal=null;originalReset();$('explode').setAttribute('aria-pressed','false');$('battery-toggle').setAttribute('aria-pressed','false');$('wheel-toggle').setAttribute('aria-pressed','false');$('wheel-toggle').textContent='Tekerlekleri gizle';$('engage').setAttribute('aria-pressed','true');$('engage').textContent='Bağlı';$('play').setAttribute('aria-pressed','false');$('play').textContent='Canlandır';refreshDrive()};
+ const originalReset=$('reset').onclick;$('reset').onclick=()=>{cameraMotion.cancel();focusContext=null;focusIds.clear();brakeFlow=false;isolation=true;updateHighlight();document.getElementById('brake-flow')?.setAttribute('aria-pressed','false');document.getElementById('system-isolate')?.setAttribute('aria-pressed','false');exploded=false;batteryHidden=false;playing=false;demoEnd=0;engaged=true;guardVisible=false;hideWheels=false;wheels.visible=true;setMode('frame');focusGoal=null;originalReset();$('explode').setAttribute('aria-pressed','false');$('battery-toggle').setAttribute('aria-pressed','false');$('wheel-toggle').setAttribute('aria-pressed','false');$('wheel-toggle').textContent='Tekerlekleri gizle';$('engage').setAttribute('aria-pressed','true');$('engage').textContent='Bağlı';$('play').setAttribute('aria-pressed','false');$('play').textContent='Canlandır';refreshDrive()};
  for(const id of ['rear','top','cockpit']){const old=$(id).onclick;$(id).onclick=()=>{old();focusGoal=null;draw=true};}
  const pointers=new Map();let pinch=0;
  canvas.addEventListener('pointerdown',e=>{cameraMotion.cancel();canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY])});
@@ -478,13 +553,28 @@ try{
  });
  new ResizeObserver(()=>{draw=true}).observe($('stage'));
  document.addEventListener('vaccino:resize',()=>{draw=true});
+ let renderWidth=0,renderHeight=0;
  function loop(now){
   requestAnimationFrame(loop);
-  if($('viewer').hidden||canvas.clientWidth<2||canvas.clientHeight<2){lastNow=now;return;}
+  if(document.hidden||$('viewer').hidden||canvas.clientWidth<2||canvas.clientHeight<2){lastNow=now;return;}
   if(cameraMotion.tick(now))draw=true;
   const sleeveEnd=engaged?.145:.105;if(Math.abs(sleeve.position.z-sleeveEnd)>.0001){sleeve.position.z=T.MathUtils.lerp(sleeve.position.z,sleeveEnd,.18);draw=true;}
   const dt=Math.min(.05,lastNow?(now-lastNow)/1000:0);lastNow=now;
   if(world.update(dt))draw=true;
+  const inHome=workspaceState.route==='overview'&&!document.body.classList.contains('presentation-active');
+  const inStudio=!experienceState.active||experienceState.environment==='showroom'||document.body.classList.contains('presentation-active');
+  studioFloor.visible=inStudio;
+  if(inStudio) scene.background.setHex(0x100f0e);
+  const showFlow=brakeFlow&&focusContext==='braking';
+  for(const [index,marker] of brakeMarkers.entries()) {
+   if(marker.visible!==showFlow) draw=true;
+   marker.visible=showFlow;
+   if(showFlow) {
+    const phase=reducedMotion.matches?.55:(now/1400+index*.13)%1;
+    brakeLines[index].curve.getPoint(phase,marker.position);
+    if(!reducedMotion.matches)draw=true;
+   }
+  }
   if(bodyShell.tick(dt,experienceState.hatchOpen&&!document.body.classList.contains('presentation-active')))draw=true;
   if(focusGoal){target.lerp(focusGoal,.12);if(target.distanceTo(focusGoal)<.001)focusGoal=null;draw=true;}
   const destination=exploded?1:0;
@@ -497,48 +587,40 @@ try{
   if(!draw)return;draw=false;
   for(let i=0;i<72;i++){const u=((i/72-wheelSpin*largeR/beltLength)%1+1)%1;const p=beltCurve.getPointAt(u),t=beltCurve.getTangentAt(u);scratch.position.set(p.x,p.y,pulleyZ);scratch.rotation.set(0,0,Math.atan2(t.y,t.x));scratch.scale.set(1,1,1);scratch.updateMatrix();beltMarks.setMatrixAt(i,scratch.matrix);}beltMarks.instanceMatrix.needsUpdate=true;
   const w=canvas.clientWidth,h=canvas.clientHeight;
-  render.setSize(w,h,false);camera.aspect=w/h;
-  const fit=Math.max(1,(document.body.classList.contains('presentation-active')?.95:rearView?.91:1.13)/camera.aspect);
+  if(renderWidth!==w||renderHeight!==h){render.setSize(w,h,false);renderWidth=w;renderHeight=h;}camera.aspect=w/h;
+  const fit=Math.max(1,(inHome?.83:document.body.classList.contains('presentation-active')?.95:rearView?.91:1.13)/camera.aspect);
   if(!world.camera(camera,target,az,el,rad,fit)){camera.position.set(target.x+fit*rad*Math.cos(el)*Math.sin(az),target.y+fit*rad*Math.sin(el),target.z+fit*rad*Math.cos(el)*Math.cos(az));camera.lookAt(target);}camera.updateProjectionMatrix();render.render(scene,camera);
-  const occupied=[];
   for(const p of pins){
    const v=p.position.clone().applyMatrix4(vehicleRoot.matrixWorld).project(camera);
    p.button.hidden=cockpitView||(rearView&&!['motor','clutch','diff','drive'].includes(p.id))||(pickMode==='body'&&p.id!=='camera')||Math.abs(v.x)>.97||Math.abs(v.y)>.97;
-   let px=(v.x+1)*w/2,py=(1-v.y)*h/2;
-   if(!p.button.hidden){
-    const anchorY=py;
-    for(const shift of [0,-30,30,-60,60]){
-     const candidate=anchorY+shift;
-     if(candidate>56&&candidate<h-34&&!occupied.some(([x,y])=>Math.hypot(x-px,y-candidate)<29)){py=candidate;break}
-    }
-    occupied.push([px,py]);
-   }
-   p.button.style.left=px+'px';p.button.style.top=py+'px';
+   p.button.style.left=(v.x+1)*w/2+'px';
+   p.button.style.top=(1-v.y)*h/2+'px';
   }
  }
  refreshDrive=()=>{simulation.coupled=engaged;if(engaged){rotor.rotation.z=smallPulley.rotation.z;sleeve.rotation.z=smallPulley.rotation.z;}$('engage').setAttribute('aria-pressed',String(engaged));$('engage').textContent=engaged?'Bağlı':'Ayrık / süzülme';batterySupport.visible=!batteryHidden&&(!rearView||chosen==="battery");fire.visible=!rearView; sleeve.position.z=T.MathUtils.lerp(sleeve.position.z,engaged?.145:.105,.25);guard.visible=guardVisible;const state=$('drive-state');state.hidden=pickMode==='body'||(!rearView&&!['motor','clutch','diff'].includes(chosen));state.textContent=engaged?'BAĞLI · Motor ve akslar':'AYRIK · Akslar dönmeye devam eder';redraw()};
- function clearFocus(wide=false){focusContext=null;focusIds.clear();isolation=true;updateHighlight();if(wide){focusGoal=null;rearView=false;cockpitView=false;target.set(0,.39,0);az=-.88;el=.50;rad=4.04;$('scene-focus-label').textContent='GENEL GÖRÜNÜM';refreshDrive();}draw=true;}
+ function clearFocus(wide=false){brakeFlow=false;cameraMotion.cancel();focusContext=null;focusIds.clear();isolation=true;updateHighlight();if(wide){$('reset').click();focusGoal=null;rearView=false;cockpitView=false;target.set(0,.39,0);az=-.88;el=.38;rad=3.65;$('scene-focus-label').textContent='GENEL GÖRÜNÜM';refreshDrive();}draw=true;}
  function focusSystem(name){
-  const map={transmission:{ids:['motor','clutch','diff'],part:'motor',camera:'rear'},suspension:{ids:['suspension','brake'],part:'suspension'},chassis:{ids:['frame','seat','steering','hmi'],part:'frame'},battery:{ids:['battery'],part:'battery'},control:{ids:['drive'],part:'drive'},auxiliary:{ids:['pc','power','hmi'],part:'pc'},sensors:{ids:['camera','pc'],part:'camera'}};
+  brakeFlow=false;
+  const map={braking:{ids:['brake'],part:'brake'},transmission:{ids:['motor','clutch','diff'],part:'motor',camera:'rear'},suspension:{ids:['suspension','brake'],part:'suspension'},chassis:{ids:['frame','seat','steering','hmi'],part:'frame'},battery:{ids:['battery'],part:'battery'},control:{ids:['drive'],part:'drive'},auxiliary:{ids:['pc','power','hmi'],part:'pc'},sensors:{ids:['camera','pc'],part:'camera'}};
   const spec=map[name];if(!spec)return;focusContext=name;focusIds=new Set(spec.ids);isolation=true;
   if(pickMode==='body')setMode('frame');
   rearView=false;cockpitView=false;
   if(spec.camera==='rear'){$('rear').click();}
   else if(name==='chassis'){focusGoal=null;target.set(0,.39,0);az=-.88;el=.50;rad=4.04;}
-  else{az=name==='sensors'?-1.35:.85;el=.65;}
+  else{az=name==='braking'?-.76:name==='sensors'?-1.35:.85;el=.65;}
   if(name==='battery'){batteryHidden=false;$('battery-toggle').setAttribute('aria-pressed','false');}
-  select(spec.part);if(name==='battery')rad=2.25;if(name==='sensors')rad=2.5;refreshDrive();updateHighlight();draw=true;
+  select(spec.part);if(name==='braking'){focusGoal=new T.Vector3(-.07,.23,0);rad=3.55;}if(name==='battery')rad=2.25;if(name==='sensors')rad=2.5;refreshDrive();updateHighlight();draw=true;
  }
 
- function captureView(){return {pose:readPose(),chosen,pickMode,hideWheels,batteryHidden,guardVisible,exploded,engaged,playing,wheelSpin,focusContext,focusedParts:[...focusIds],isolation,rearView,cockpitView,rotor:rotor.rotation.z};}
+ function captureView(){return {pose:readPose(),chosen,pickMode,hideWheels,batteryHidden,guardVisible,exploded,engaged,playing,wheelSpin,brakeFlow,focusContext,focusedParts:[...focusIds],isolation,rearView,cockpitView,rotor:rotor.rotation.z};}
  function syncControls(){
   $('frame').setAttribute('aria-pressed',String(frame.visible));$('body').setAttribute('aria-pressed',String(body.visible));$('wheel-toggle').disabled=pickMode==='body';
   $('wheel-toggle').setAttribute('aria-pressed',String(hideWheels));$('wheel-toggle').textContent=hideWheels?'Tekerlekleri göster':'Tekerlekleri gizle';
   $('battery-toggle').setAttribute('aria-pressed',String(batteryHidden));$('explode').setAttribute('aria-pressed',String(exploded));$('play').setAttribute('aria-pressed',String(playing));$('play').textContent=playing?'Duraklat':'Canlandır';
  }
  function restoreView(view){
-  world.setPresentation(false);if(experienceState.active)bodyShell.style(experienceState.bodyMode);
-  cameraMotion.cancel();pickMode=view.pickMode;hideWheels=view.hideWheels;batteryHidden=view.batteryHidden;guardVisible=view.guardVisible;exploded=view.exploded;engaged=view.engaged;playing=view.playing;wheelSpin=view.wheelSpin;focusContext=view.focusContext;focusIds=new Set(view.focusedParts);isolation=view.isolation;rearView=view.rearView;cockpitView=view.cockpitView;
+  world.setPresentation(false);if(experienceState.active)bodyShell.style(workspaceState.route==='overview'?'hidden':experienceState.bodyMode);
+  cameraMotion.cancel();pickMode=view.pickMode;hideWheels=view.hideWheels;batteryHidden=view.batteryHidden;guardVisible=view.guardVisible;exploded=view.exploded;engaged=view.engaged;playing=view.playing;wheelSpin=view.wheelSpin;brakeFlow=view.brakeFlow;focusContext=view.focusContext;focusIds=new Set(view.focusedParts);isolation=view.isolation;rearView=view.rearView;cockpitView=view.cockpitView;
   frame.visible=pickMode==='frame';body.visible=pickMode==='body';wheels.visible=pickMode==='body'||!hideWheels;
   for(const w of rollers)w.wheel.rotation.z=wheelSpin;largePulley.rotation.z=wheelSpin;smallPulley.rotation.z=wheelSpin*largeR/smallR;carrier.rotation.z=wheelSpin;for(const a of axleWitnesses)a.rotation.z=wheelSpin;
   select(view.chosen);writePose(view.pose);rotor.rotation.z=view.rotor;demoEnd=0;syncControls();updateHighlight();refreshDrive();draw=true;
@@ -556,5 +638,5 @@ try{
  function setShell(mode){cameraMotion.cancel();pickMode='frame';frame.visible=true;bodyShell.style(mode);draw=true;}
  function moveCamera(pose){cameraMotion.moveTo(pose,800);draw=true;}
 
- select('frame');focusGoal=null;rad=4.04;refreshDrive();document.body.dataset.webgl='ready';window.vaccino={state:()=>({shell:bodyShell.state(),world:world.state(),graphics:studio.status(),cameraTransition:cameraMotion.active,layoutChecks:checkVisualEnvelopes(),focusContext,isolation,focusedParts:[...focusIds],engaged,playing,exploded,batteryHidden,hideWheels,wheelSpin,chosen,camera:{az,el,rad,target:target.toArray()},visible:{body:body.visible,frame:frame.visible,battery:batterySupport.visible,guard:guard.visible,wheels:wheels.visible},explodePosition:motorGroup.position.toArray(),rotor:rotor.rotation.z,carrier:carrier.rotation.z,sleeve:sleeve.position.z,small:smallPulley.rotation.z,large:largePulley.rotation.z,meshes:render.info.render.calls}),setShell,moveCamera,experienceState:()=>world.state(),shellState:()=>bodyShell.state(),captureView,restoreView,presentScene,setAnimating,setEngaged,setQuality,setShadows,select,focusSystem,clearFocus,isolate:enabled=>{isolation=enabled;updateHighlight();draw=true;}};requestAnimationFrame(loop);
+ select('frame');focusGoal=null;rad=4.04;refreshDrive();document.body.dataset.webgl='ready';window.vaccino={state:()=>({shell:bodyShell.state(),world:world.state(),graphics:studio.status(),brakeFlow,cameraTransition:cameraMotion.active,layoutChecks:checkVisualEnvelopes(),focusContext,isolation,focusedParts:[...focusIds],engaged,playing,exploded,batteryHidden,hideWheels,wheelSpin,chosen,camera:{az,el,rad,target:target.toArray()},visible:{body:body.visible,frame:frame.visible,battery:batterySupport.visible,guard:guard.visible,wheels:wheels.visible},explodePosition:motorGroup.position.toArray(),rotor:rotor.rotation.z,carrier:carrier.rotation.z,sleeve:sleeve.position.z,small:smallPulley.rotation.z,large:largePulley.rotation.z,meshes:render.info.render.calls}),setStudioPose(pose,duration){cameraMotion.moveTo(pose,duration);},toggleBrakeFlow(){if(focusContext!=='braking')focusSystem('braking');brakeFlow=!brakeFlow;draw=true;return brakeFlow;},setShell,moveCamera,experienceState:()=>world.state(),shellState:()=>bodyShell.state(),captureView,restoreView,presentScene,setAnimating,setEngaged,setQuality,setShadows,select,inspect,focusSystem,clearFocus,isolate:enabled=>{isolation=enabled;updateHighlight();draw=true;}};requestAnimationFrame(loop);
 }catch(e){document.querySelector('.part-library').open=true;$('fallback').hidden=false;document.body.dataset.webgl='failed';console.error(e)}

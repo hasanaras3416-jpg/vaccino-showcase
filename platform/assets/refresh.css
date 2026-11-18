@@ -1,0 +1,206 @@
+:root {
+  color-scheme: dark;
+  --black: #080808;
+  --metallic-gold: #b88a32;
+  --dark-gold: #76551e;
+  --warm-white: #f0ebdf;
+  --soft-beige: #d5ccbb;
+  --paper: var(--black);
+  --surface: #171513;
+  --rail: #27231e;
+  --gold: var(--metallic-gold);
+  --gold-light: var(--metallic-gold);
+  --ink: var(--warm-white);
+  --muted: var(--soft-beige);
+  --line: #51493e;
+  --gutter: clamp(1.25rem, 5vw, 6rem);
+}
+body { background: var(--paper); color: var(--ink); font: 400 1rem/1.55 "Segoe UI", sans-serif; }
+body ::selection { background: var(--gold); color: var(--paper); }
+[hidden] { display: none !important; }
+a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-visible, canvas:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+button, select, input:not([type=checkbox]) { min-height: 44px; }
+h1, h2, h3 { text-wrap: balance; }
+.app-shell { margin: 0; }
+.topbar { position: relative; z-index: 2; height: 80px; padding-inline: var(--gutter); display: flex; gap: 1rem; background: var(--paper); border-color: var(--line); }
+#menu-toggle { display: inline-flex; align-items: center; justify-content: center; width: 44px; background: var(--surface); color: var(--ink); }
+.studio-brand, .sidebar .brand { font-weight: 750; letter-spacing: .18em; color: var(--ink); }
+.breadcrumb { font-size: .95rem; color: var(--muted); }
+.presentation-enter { margin-left: auto; font-size: .95rem; background: var(--gold); color: var(--paper); border: 1px solid var(--gold); padding: .6rem 1rem; white-space: nowrap; }
+.presentation-enter:hover, #season-start:hover { background: var(--ink); color: var(--paper); }
+.sidebar { z-index: 42; width: min(23rem, 85vw); display: block; background: var(--surface); padding: 2rem clamp(1.5rem, 5vw, 3rem); transform: translateX(-100%); visibility: hidden; transition: transform .28s ease, visibility 0s .28s; }
+.menu-open .sidebar { transform: none; visibility: visible; transition-delay: 0s; }
+.drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2.5rem; }
+.sidebar .brand { display: inline-flex; align-items: center; min-height: 44px; }
+#menu-close { padding: 0 .75rem; border: 1px solid var(--line); }
+.primary-nav a { display: flex; min-height: 64px; padding: .75rem 0; font-size: 1.35rem; color: var(--ink); border-bottom: 1px solid var(--line); }
+.primary-nav a[aria-current] { color: var(--gold); }
+.menu-scrim { display: block; position: fixed; inset: 0; z-index: 41; background: rgb(8 8 8 / 72%); backdrop-filter: none; }
+.menu-open { overflow: hidden; }
+.skip-link { left: var(--gutter); z-index: 50; }
+#workspace { width: 100%; max-width: 1690px; margin-inline: auto; padding: clamp(2rem, 5vw, 5rem) var(--gutter); }
+.screen-heading { display: block; margin-bottom: 2rem; }
+#screen-title { font-size: clamp(2.5rem, 5vw, 4.5rem); line-height: 1.06; letter-spacing: -.04em; }
+#screen-description { max-width: 62ch; font-size: 1rem; margin-top: .8rem; color: var(--muted); }
+.app-footer { margin-inline: var(--gutter); font-size: .8rem; }
+body[data-route=overview] #workspace { padding: 0; max-width: none; }
+body[data-route=overview] .topbar { position: absolute; inset: 0 0 auto; background: transparent; border: 0; }
+body[data-route=overview] .screen-heading { position: absolute; clip-path: inset(50%); width: 1px; height: 1px; overflow: hidden; }
+body[data-route=overview] :is(.breadcrumb,.app-footer) { display: none; }
+.studio-home { position: relative; background: var(--paper); }
+.scene-shell[data-context=overview]:not([data-presentation]) { display: block; }
+.scene-shell[data-context=overview]:not([data-presentation]) .stage { height: 100dvh; min-height: 32rem; margin: 0; border: 0; background: var(--surface); }
+.scene-shell[data-context=overview]:not([data-presentation]) :is(.tools,#pins,.stage-label,.guide,.simulation,.caption,.inspector) { display: none; }
+.scene-shell[data-context=overview]:not([data-presentation]) .stage::before,
+.scene-shell[data-context=overview]:not([data-presentation]) .stage::after { content: none; }
+.studio-description { position: absolute; inset: auto var(--gutter) max(2.5rem, env(safe-area-inset-bottom)) auto; margin: 0; color: var(--ink); max-width: 62ch; font-size: 1rem; pointer-events: none; }
+.season-intro { width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: var(--gutter); inset: 0; border: 0; color: var(--ink); background: transparent; overflow: hidden; }
+.season-intro[open] { display: grid; place-items: center; }
+.season-intro::backdrop { background: #000; transition: background-color 1.25s ease; }
+.season-intro.season-revealing::backdrop { background: transparent; }
+#season-start { display: grid; place-items: center; background: transparent; padding: 0; border: 0; transition: opacity .5s ease, transform .5s ease; }
+#season-start img { display: block; width: min(54vw, 21rem); max-height: 55dvh; height: auto; object-fit: contain; mix-blend-mode: screen; filter: drop-shadow(0 0 16px rgb(184 138 50 / 18%)); transition: filter .22s ease; }
+.season-intro[open] #season-start { animation: lion-appear .8s ease-out both; }
+#season-start:is(:hover,:focus-visible) img { filter: brightness(1.09) drop-shadow(0 0 20px rgb(184 138 50 / 26%)); }
+.season-intro.season-revealing #season-start { animation: none; opacity: 0; transform: scale(.9); pointer-events: none; }
+@keyframes lion-appear { from { opacity: 0; } to { opacity: 1; } }
+#season-skip { position: absolute; bottom: max(2rem, env(safe-area-inset-bottom)); right: var(--gutter); background: var(--surface); color: var(--ink); padding: .7rem 1rem; border: 1px solid var(--line); }
+.season-intro:not(.season-revealing) #season-skip:not(:focus-visible) { clip-path: inset(50%); }
+.studio-brand img, .sidebar .brand img, .presentation-brand img { display: block; width: auto; height: 44px; max-width: 110px; object-fit: contain; mix-blend-mode: screen; }
+body:has(.season-intro[open]) .topbar { visibility: hidden; }
+.vehicle-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+.vehicle-options a, .competition-list details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.vehicle-options a { display: flex; flex-direction: column; justify-content: end; min-height: clamp(9rem, 23vh, 15rem); padding: clamp(1.25rem, 4vw, 2.5rem); }
+.vehicle-options a:hover, .competition-list details:focus-within { border-color: var(--gold); }
+.vehicle-options h2, .competition-list h2 { color: var(--ink); font-size: clamp(1.45rem, 3vw, 2.5rem); line-height: 1.1; margin: .4rem 0; }
+.vehicle-options p { margin: .5rem 0 0; color: var(--muted); }
+.secondary-links { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; margin-top: 1.75rem; }
+.secondary-links a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: .24em; }
+.competition-list { display: grid; gap: 1rem; }
+.competition-list details { color: var(--black); background: var(--soft-beige); border: 1px solid transparent; }
+.competition-list summary { display: grid; grid-template-columns: minmax(9rem, 1fr) minmax(0, 3fr) auto; gap: 1.5rem; align-items: center; padding: clamp(1.15rem, 3vw, 2.5rem); list-style: none; cursor: pointer; }
+.competition-list summary::-webkit-details-marker { display: none; }
+.competition-list summary::after { content: ""; width: .65rem; height: .65rem; border: solid var(--dark-gold); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.competition-list details[open] summary::after { transform: rotate(225deg); }
+.competition-list summary > span:first-child { color: var(--dark-gold); font-weight: 700; }
+.competition-list h2 { color: var(--black); margin: 0; }
+.competition-list summary p { margin: .25rem 0 0; }
+.competition-detail { margin: 0 clamp(1.15rem, 3vw, 2.5rem); padding: 1rem 0 1.5rem; border-top: 1px solid var(--dark-gold); }
+.competition-detail dt { margin-top: 1rem; font-weight: 650; }
+.competition-detail dd { margin: 0; max-width: 68ch; }
+.competition-detail .text-link { color: var(--dark-gold); text-decoration: underline; }
+.text-link { color: var(--gold); }
+#workspace :is(button,summary,select,input,a) { font-size: max(0.95rem, 1em); }
+#workspace :is(.subnav a,.secondary-links a,.system-parts button,summary) { min-height: 44px; }
+#workspace :is(.system-brief,.brief-explanation,.principle-flow,.sensor-list,.inspector,.sim-limits,.section-title,.view-toolbar) :is(p,li,span,small,td) { font-size: max(.875rem, 1em); }
+#workspace :is(.stage,.inspector,.system-brief,.sim-parameters,.sim-limits,.simulation,.inventory-table,.inventory-controls,.table-wrap,.vehicle-status,.calculation-strip,.geometry-note,.badge,.subnav a[aria-current]) { color: var(--ink); background-color: var(--surface); border-color: var(--line); }
+#workspace :is(button,select,input,textarea,.file-import) { color: var(--ink); background: var(--rail); border-color: var(--line); }
+#workspace button:hover, #workspace button[aria-pressed=true] { border-color: var(--gold); color: var(--gold); }
+#workspace :is(.muted,.caption,.guide,.stage-label,.geometry-tag,#status,#desc,#variant-note,#facts,.inventory-intro p) { color: var(--muted); }
+#workspace :is(.stage-label,.guide) { text-shadow: 0 1px 4px var(--black); pointer-events: none; }
+#workspace .stage { min-height: 340px; }
+#workspace .tools { align-items: start; }
+.extra-tools { max-width: min(85%, 24rem); }
+.extra-tools summary { padding: .5rem .8rem; background: var(--rail); cursor: pointer; }
+.extra-tools div { display: flex; flex-wrap: wrap; gap: .25rem; background: var(--surface); padding: .5rem; }
+#part-details { margin-top: 1rem; }
+#part-details summary { cursor: pointer; color: var(--gold); }
+#workspace .technical-only { display: revert; }
+#workspace :is(.sim-limits,.sensor-technical,.vehicle-options,.competition-list,.inventory-controls) { margin-bottom: 1.25rem; }
+#workspace .inventory-table table { min-width: 0; width: 100%; }
+#workspace .inventory-table :is(th,td) { font-size: 1rem; padding: .85rem .65rem; background: var(--surface); color: var(--ink); vertical-align: middle; border-color: var(--line); }
+#workspace .inventory-table th { background: var(--rail); }
+#workspace .inventory-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; padding: 0; background: transparent; }
+#workspace .inventory-controls label { font-size: .95rem; }
+#workspace .inventory-table b { font-size: 1rem; color: var(--ink); }
+.inventory-table summary { padding-block: .55rem; color: var(--gold); }
+.inventory-table dl { max-width: 50ch; }
+.inventory-table dt { font-weight: 650; margin-top: .65rem; }
+.inventory-table dd { margin: 0; color: var(--muted); }
+#workspace .inventory-actions output { color: var(--muted); font: inherit; }
+.power-diagram { margin-block: 2rem; }
+.power-diagram ol { margin: .5rem 0; }
+.power-branches { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+.power-branches ol { padding: .8rem; background: var(--rail); }
+#workspace .inventory-intro { padding: 0; }
+#inventory-editor { background: var(--surface); color: var(--ink); border-color: var(--line); }
+@media(max-width: 750px) {
+  .topbar { height: 70px; gap: .65rem; }
+  .topbar .breadcrumb { display: none; }
+  .studio-description { font-size: .95rem; }
+  .vehicle-options,.competition-list { grid-template-columns: 1fr; }
+  .competition-list summary { grid-template-columns: minmax(0,1fr) auto; gap: .4rem 1rem; }
+  .competition-list summary > span:first-child { grid-column: 1 / -1; }
+  .scene-shell[data-context=overview]:not([data-presentation]) .stage { min-height: 0; }
+  #workspace .inventory-table table { min-width: 34rem; }
+  .power-branches { grid-template-columns: 1fr; }
+}
+@media(prefers-reduced-motion: reduce) {
+  .sidebar,.season-intro::backdrop,#season-start { transition: none; }
+  .season-intro[open] #season-start { animation: none; }
+}
+
+@media print {
+  #workspace .inventory-table :is(th,td), #workspace .inventory-table b { color: var(--black); background: white; }
+}
+
+#workspace :is(.decision-body p, .decision-body small, .test-method, .brief-explanation p, .provenance p, .ledger-foot, .sensor-list > details > div, .inventory-controls label, .file-list small, .experience-limit, .sim-limits p) {
+  color: var(--muted);
+  font-size: .95rem;
+}
+#workspace :is(.section-title label, .filters label, .simulation label, .vehicle-status span, .interface-disclosure summary, .result-pending, .geometry-note, .badge, .part-library summary) {
+  color: var(--ink);
+  font-size: .94rem;
+}
+#workspace :is(.decision-row summary, .test-step summary, .sensor-list summary, .caption) { font-size: .95rem; }
+#workspace .inspector { padding: 1rem; }
+#workspace .principle-flow li::after { color: var(--gold); }
+
+.topbar .presentation-enter { font-size: .95rem; padding: .6rem 1rem; }
+.presentation-root #presentation-stage .stage { height: 100%; min-height: 0; }
+.presentation-header,.presentation-footer { color: var(--ink); background: var(--surface); border-color: var(--line); }
+.presentation-root :is(.presentation-brand small,.presentation-copy .eyebrow,.presentation-copy h2) { color: var(--gold); }
+.presentation-root :is(.presentation-caveat,.presentation-quality,.stage-label,.guide) { color: var(--muted); font-size: .875rem; }
+#presentation-description { color: var(--ink); font-size: 1rem; line-height: 1.55; }
+.presentation-root :is(button,select) { color: var(--ink); background: var(--rail); border-color: var(--line); font-size: .9rem; }
+.presentation-footer nav button[aria-current=step] { color: var(--paper); background: var(--gold); border-color: var(--gold); }
+#presentation-announcement { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media(max-width: 700px) {
+  .presentation-root { grid-template-rows: 68px minmax(0,1fr) 142px; }
+  .presentation-actions #presentation-fullscreen { width: auto; font-size: .875rem; padding: .45rem .55rem; }
+  .presentation-actions #presentation-fullscreen::after { content: none; }
+  .presentation-footer nav button { min-width: 30px; padding: 0 .42rem; }
+  .presentation-footer > button { width: 40px; height: 44px; }
+}
+
+.scene-shell { position: relative; display: block; }
+#workspace .marker,
+#workspace .marker:hover,
+#workspace .marker[aria-pressed=true] {
+  display: grid; place-items: center; width: 32px; height: 32px; min-height: 0;
+  padding: 0; background: transparent; border: 0; box-shadow: none;
+  transform: translate(-50%,-50%);
+}
+#workspace .marker::before {
+  content: ""; width: 8px; height: 8px; border: 1px solid var(--black);
+  border-radius: 50%; background: var(--metallic-gold); opacity: .82;
+}
+#workspace .marker:is(:hover,:focus-visible,[aria-pressed=true]) { z-index: 5; }
+#workspace .marker:is(:hover,:focus-visible,[aria-pressed=true])::before {
+  opacity: 1; box-shadow: 0 0 0 3px rgb(184 138 50 / 40%);
+}
+#workspace .marker[aria-pressed=true]::before { background: var(--warm-white); }
+#workspace .scene-shell { overflow: clip; }
+#workspace .inspector {
+  position: absolute; inset: 0 0 auto auto; width: min(100%, 24rem); max-height: min(100%, 44rem);
+  z-index: 12; margin: 0; padding: 1.25rem; background: var(--surface); border: 1px solid var(--line);
+  transform: translateX(100%); visibility: hidden; transition: transform .24s ease, visibility 0s .24s;
+}
+#workspace .inspector[data-open] { transform: none; visibility: visible; transition-delay: 0s; }
+.inspector-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.inspector h4 { margin: 1rem 0 .3rem; font-size: 1rem; color: var(--ink); }
+#part-open { padding-inline: .8rem; }
+#workspace .inspector #title { color: var(--ink); }
+body[data-webgl=failed] #workspace .simulation { display: flex !important; }
+body[data-webgl=failed] #workspace .simulation > :not(#part-open) { display: none; }
+@media(prefers-reduced-motion: reduce) { #workspace .inspector { transition: none; } }

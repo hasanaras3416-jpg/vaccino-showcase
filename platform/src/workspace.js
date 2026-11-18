@@ -1,4 +1,5 @@
-import {record, parameters, format, state, part, setMode} from './store.js';
+import {record, parameters, format, state, part} from './store.js';
+import {initializeSeason, loadBrandLogo} from './season.js';
 
 const $ = id => document.getElementById(id);
 const make = (tag, text, className) => {
@@ -15,9 +16,14 @@ const viewer = $('viewer');
 let vehicleReady = false;
 
 function modeText(simple, technical) {
-  const fragment = document.createDocumentFragment();
-  fragment.append(paragraph(simple, 'simple-only'), paragraph(technical, 'technical-only'));
-  return fragment;
+  const section = make('div');
+  section.append(paragraph(simple));
+  if (technical && technical !== simple) {
+    const details = make('details');
+    details.append(make('summary','Detayları Gör'), paragraph(technical));
+    section.append(details);
+  }
+  return section;
 }
 function renderTabs() {
   for (const [route, entries] of Object.entries(systems)) {
@@ -28,11 +34,10 @@ function renderTabs() {
 }
 function updateHeading() {
   const route = routes.find(r => r.id === state.route);
-  $('screen-title').textContent = route.title;
-  $('breadcrumb').textContent = route.label;
-  $('screen-eyebrow').textContent = `${String(routes.indexOf(route)+1).padStart(2,'0')} / ${route.label.toLocaleUpperCase('tr')}`;
-  $('screen-description').textContent = route[state.mode];
-  $('footer-context').textContent = `${state.mode === 'simple' ? 'Basit' : 'Teknik'} anlatım / ${record.revision} / v${record.uiVersion}`;
+  $('screen-title').textContent = ({overview:'Vaccino stüdyosu',vehicle:'3B Model',mechanical:'Mekanik',electrical:'Elektrik',autonomy:'Yazılım',team:'Yarışmalar',inventory:'Envanter'})[state.route] || route.title;
+  $('breadcrumb').textContent = $('screen-title').textContent;
+  $('screen-description').textContent = state.route==='overview'?'':route.simple;
+  $('footer-context').textContent = `${record.revision} / v${record.uiVersion}`;
   document.title = `${route.label} — Vaccino 26/27`;
 }
 function closeMenu(returnFocus = false) {
@@ -40,7 +45,8 @@ function closeMenu(returnFocus = false) {
   $('menu-toggle').setAttribute('aria-expanded','false');
   $('menu-toggle').setAttribute('aria-label','Menüyü aç');
   $('menu-scrim').hidden = true;
-  if (matchMedia('(max-width: 980px)').matches) $('sidebar').inert = true;
+  $('sidebar').inert = true;
+  document.querySelector('.app-shell').inert = false;
   if (returnFocus) $('menu-toggle').focus();
 }
 function toggleMenu() {
@@ -50,13 +56,15 @@ function toggleMenu() {
   $('menu-toggle').setAttribute('aria-expanded','true');
   $('menu-toggle').setAttribute('aria-label','Menüyü kapat');
   $('menu-scrim').hidden = false;
-  $('sidebar').querySelector('[aria-current="page"]')?.focus();
+  document.querySelector('.app-shell').inert = true;
+  ($('sidebar').querySelector('[aria-current="page"]') || $('sidebar').querySelector('nav a')).focus();
 }
 $('menu-toggle').onclick = toggleMenu;
+$('menu-close').onclick = () => closeMenu(true);
 $('menu-scrim').onclick = () => closeMenu(true);
-document.querySelectorAll('.primary-nav a').forEach(a=>a.addEventListener('click',()=>{
-  if(a.dataset.route===state.route){closeMenu();$('screen-title').focus({preventScroll:true});}
-}));
+$('sidebar').addEventListener('click',event=>{
+  if(event.target.closest('a')) closeMenu(true);
+});
 document.addEventListener('keydown', event => {
   if (!document.body.classList.contains('menu-open')) return;
   if (event.key === 'Escape') {event.preventDefault();closeMenu(true);}
@@ -67,9 +75,7 @@ document.addEventListener('keydown', event => {
     else if (!event.shiftKey && document.activeElement===last) {event.preventDefault();first.focus();}
   }
 });
-const mobileMenu = matchMedia('(max-width: 980px)');
-function syncMenu() {closeMenu();$('sidebar').inert = mobileMenu.matches;}
-mobileMenu.addEventListener('change', syncMenu);syncMenu();
+closeMenu();
 
 function diagram(labels, className='principle-flow') {
   const node=make('ol',null,className);
@@ -80,7 +86,7 @@ function systemBrief(route, entry) {
   const target=$(`${route}-brief`); if(!target) return;
   const head=make('div',null,'brief-heading');head.append(make('span','SİSTEMİN İZİ','eyebrow'),make('span','Yerleşim ve çalışma prensibi','muted'));
   const actions=make('div',null,'system-parts');
-  entry.parts.forEach(id=>{const info=part(id);const button=make('button',info.label);button.dataset.inspect=id;button.setAttribute('aria-pressed','false');button.onclick=()=>window.vaccino?.select(id);actions.append(button);});
+  entry.parts.forEach(id=>{const info=part(id);const button=make('button',info.label);button.dataset.inspect=id;button.setAttribute('aria-pressed','false');button.onclick=()=>window.vaccino?.inspect(id,button);actions.append(button);});
   const focus=make('button','Sistemi öne çıkar','isolate-button');focus.id='system-isolate';focus.setAttribute('aria-pressed','true');focus.onclick=()=>{
     const enabled=focus.getAttribute('aria-pressed')!=='true';focus.setAttribute('aria-pressed',String(enabled));
     if(enabled&&window.vaccino?.state().focusContext!==entry.focus)window.vaccino?.focusSystem(entry.focus);else window.vaccino?.isolate(enabled);
@@ -89,7 +95,15 @@ function systemBrief(route, entry) {
   explanation.append(modeText(part(entry.parts[0]).simple,part(entry.parts[0]).desc));
   const source=make('div',null,'brief-source technical-only');source.append(make('small','KAYNAK & DOĞRULAMA'),paragraph(`${record.source} · ${record.revision}`),paragraph('Gerçek CAD, montaj açıklıkları ve test sonuçları bekleniyor.'));
   explanation.append(source);
-  target.replaceChildren(head,diagram(entry.flow),actions,explanation);
+  target.replaceChildren(diagram(entry.flow),actions,explanation);
+  if (route==='mechanical' && entry.id==='braking') {
+    const flow = make('button','Fren akışını göster');
+    flow.id='brake-flow';
+    flow.setAttribute('aria-pressed','false');
+    flow.onclick=()=>flow.setAttribute('aria-pressed', String(window.vaccino?.toggleBrakeFlow() || false));
+    actions.append(flow);
+    target.append(paragraph('Ön devre: mavi. Arka devre: bakır. Yerleşim ve akış temsilidir. Montaj, hareket açıklığı ve donanım seçimi mühendislik doğrulaması gerektirir.','muted'));
+  }
   if(route==='electrical'&&entry.id==='battery'){
     const calc=make('div',null,'calculation-strip technical-only');
     const b=parameters.battery;
@@ -97,6 +111,14 @@ function systemBrief(route, entry) {
   }
   if(route==='mechanical'&&entry.id==='transmission'){
     const calc=make('p',`Prensip gösterimi: kasnak yarıçapları ${format(parameters.transmission.smallRadiusMm)} / ${format(parameters.transmission.largeRadiusMm)} mm; oran ${format(parameters.transmission.ratio)}. Nihai redüksiyon seçimi değildir.`, 'technical-only muted');target.append(calc);
+  }
+  if(route==='electrical'){
+    const power=make('section',null,'power-diagram');
+    const trunk=diagram(['Batarya ve BMS','Koruma ve güç dağıtımı']);
+    const branches=make('div',null,'power-branches');
+    branches.append(diagram(['Motor sürücüsü','BLDC motor']),diagram(['DC/DC dönüştürücü','Araç bilgisayarı, kontrol ve sensör beslemeleri']));
+    power.append(make('h2','Güç dağıtımı'),trunk,branches,paragraph('Akış ve kablaj temsilidir. Koruma elemanları, DC/DC seçimi ve bağlantılar doğrulanacak.','muted'));
+    target.append(power);
   }
   if(route==='autonomy') target.append(paragraph('3B sahnede yalnızca ön stereo kamera rezervi gösterilir. Diğer sensörlerin gerçek yerleşimleri henüz modellenmedi.','geometry-note'));
 }
@@ -107,9 +129,10 @@ function applySceneFocus() {
   else window.vaccino?.clearFocus(state.route==='overview');
 }
 function navigate({focusHeading=false}={}) {
+  document.dispatchEvent(new Event('vaccino:inspector-close'));
   if(document.body.classList.contains('presentation-active'))document.dispatchEvent(new Event('vaccino:presentation-exit'));
   const raw=location.hash.replace(/^#\/?/,'').split('/');
-  const alias={sensors:['autonomy','sensors'],files:['team','files'],'vehicle-section':['vehicle']};
+  const alias={competitions:['team','goals'],sensors:['autonomy','sensors'],files:['team','files'],'vehicle-section':['vehicle']};
   const path=alias[raw[0]]||raw;
   state.route=routes.some(r=>r.id===path[0])?path[0]:'overview';
   const entries=systems[state.route];
@@ -117,29 +140,24 @@ function navigate({focusHeading=false}={}) {
   if(state.route==='experience')state.sub=['showroom','workshop','track'].includes(path[1])?path[1]:'showroom';
   document.body.dataset.route=state.route;document.body.dataset.sub=state.sub;
   document.querySelectorAll('[data-screen]').forEach(screen=>{screen.hidden=screen.dataset.screen!==state.route;});
-  document.querySelectorAll('.primary-nav a').forEach(a=>{if(a.dataset.route===state.route)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  document.querySelectorAll('.primary-nav a').forEach(a=>{if(a.dataset.route===(['vehicle','mechanical','electrical','autonomy','experience','decisions','tests'].includes(state.route)?'garage':state.route))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   document.querySelectorAll('.subnav a').forEach(a=>{if(a.dataset.sub===state.sub)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   const slot=document.querySelector(`[data-slot="${state.route}"]`);
   if(slot){slot.append(viewer);viewer.hidden=false;viewer.dataset.context=state.route;}
   else viewer.hidden=true;
-  if(entries){const entry=entries.find(e=>e.id===state.sub);systemBrief(state.route,entry);}
+  if(entries&&(state.route!=='autonomy'||state.sub==='perception')){const entry=entries.find(e=>e.id===state.sub);systemBrief(state.route,entry);}
   $('team-goals').hidden=state.sub==='files';$('files').hidden=state.sub!=='files';
   $('sensors').hidden=state.route!=='autonomy'||state.sub==='perception';
   document.querySelector('[data-slot="autonomy"]').hidden=state.route==='autonomy'&&state.sub!=='perception';
   $('autonomy-brief').hidden=state.sub!=='perception';
-  $('autonomy-flow').hidden=true;
+  $('autonomy-flow').hidden=state.sub!=='perception';
   const interfaces=state.route==='autonomy'&&state.sub==='interfaces';
   const disclosure=document.querySelector('.interface-disclosure');
   disclosure.classList.toggle('force-visible',interfaces);disclosure.open=interfaces;
   $('sensors').classList.toggle('interfaces-view',interfaces);
-  if(state.route==='overview') $('overview-facts').replaceChildren(...[
-    [String(record.inventory[0].rows.length-4).padStart(2,'0'),'sensör kalemi'],
-    [String(record.inventory[1].rows.length-4).padStart(2,'0'),'veri arayüzü'],
-    ['V2','şasi yerleşimi']
-  ].map(([value,label])=>{const node=make('div');node.append(make('b',value),make('small',label));return node;}));
   updateHeading();applySceneFocus();closeMenu();
   window.scrollTo({top:0,behavior:'instant'});
-  if(focusHeading) $('screen-title').focus({preventScroll:true});
+  if(focusHeading) (state.route==='overview'?$('menu-toggle'):$('screen-title')).focus({preventScroll:true});
   document.dispatchEvent(new CustomEvent('vaccino:route',{detail:{route:state.route,sub:state.sub}}));
   document.dispatchEvent(new Event('vaccino:resize'));
 }
@@ -181,17 +199,30 @@ function filesAndTeam() {
   $('file-list').replaceChildren(...record.presentation.files.map(file=>{
     const a=link('',file.path);a.download='';const name=make('span');name.append(make('b',file.name),make('small',file.note));a.append(make('span',file.type,'file-type'),name,make('span','↗','file-arrow'));return a;
   }));
-  $('team-disciplines').replaceChildren(...['Mekanik','Elektrik','Yazılım'].map(team=>{
-    const node=make('div');const test=record.tests.find(t=>t.team===team);node.append(make('small',team.toLocaleUpperCase('tr')),make('h3',test.title),paragraph('Sıradaki doğrulama'),link('Test planını incele ↗','#/tests','text-link'));return node;
+  const rules='https://www.shellecomarathon.com/about/global-rules.html';
+  const competitions=[
+    ['TEKNOFEST','Robotaksi','Özgün Araç Yarışması','Özgün araçlarda otonom sürüşü sınamak.','Vaccino V2 üzerinde algılama, karar ve araç kontrolünü birleştirmek.','Kamera, araç bilgisayarı, direksiyon ve fren.','https://www.teknofest.org/tr/yarismalar/robotaksi-binek-otonom-arac-yarismasi/'],
+    ['Shell Eco-marathon','Autonomous Driving Competition','','Kapalı parkurda otonom sürüş görevlerini tamamlamak.','Parkur takibi ve araç kontrolünü demo ortamından araç testine taşımak.','Algılama, şerit takibi ve kontrol.',rules],
+    ['Shell Eco-marathon','Mileage Challenge','','Pist üzerinde enerji verimliliğini karşılaştırmak.','Aktarma ve enerji tüketimi varsayımlarını ölçümle sınamak.','BLDC motor, kayış-kasnak, batarya ve enerji modeli.',rules]
+  ];
+  $('competition-record').replaceChildren(...competitions.map(([organizer,title,category,purpose,goal,systems,url])=>{
+    const detail=make('details'), summary=make('summary');
+    const heading=make('div');
+    heading.append(make('h2',title));
+    if(category) heading.append(make('p',category));
+    summary.append(make('span',organizer),heading);
+    const body=make('div',null,'competition-detail');
+    const facts=make('dl');
+    for(const [label,value] of [['Amaç',purpose],['Vaccino’nun hedefi',goal],['Temel sistemler',systems],['Hazırlık durumu','Tasarım ve demo çalışmaları mevcut. Başvuru, kabul ve teknik uygunluk doğrulanmayı bekliyor.']]){
+      facts.append(make('dt',label),make('dd',value));
+    }
+    body.append(facts,link('Resmî yarışma gereksinimleri',url,'text-link'));
+    detail.append(summary,body);
+    return detail;
   }));
-  const competition=record.decisions.find(d=>d.team==='Takım');
-  $('competition-record').append(make('h3',competition.title),modeText(competition.reason.split('.')[0]+'.',competition.reason),paragraph(competition.next,'muted'),make('span',competition.status,'badge'));
 }
-document.querySelectorAll('.narration-switch button').forEach(button=>button.onclick=()=>setMode(button.dataset.mode));
-document.addEventListener('vaccino:mode',updateHeading);
 document.addEventListener('vaccino:part',event=>{
   document.querySelectorAll('[data-inspect]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.inspect===event.detail)));
-  if(vehicleReady&&state.route==='overview'&&!document.body.classList.contains('presentation-active'))location.hash='#/vehicle';
 });
 $('decision-filter').onchange=decisions;$('sensor-search').oninput=sensors;$('sensor-filter').onchange=sensors;
 renderTabs();decisions();sensors();tests();filesAndTeam();
@@ -202,12 +233,20 @@ for(const row of record.inventory[1].rows.slice(4)){
   const body=make('div');body.append(paragraph(row.C),paragraph(row.F));item.append(summary,body);interfaceSummary.append(item);
 }
 const interfaceSection=document.querySelector('.interface-disclosure');interfaceSection.insertBefore(interfaceSummary,interfaceSection.querySelector('p'));
-interfaceSection.querySelector('p').classList.add('technical-only');interfaceSection.querySelector('.table-wrap').classList.add('technical-only');
-setMode(state.mode);navigate();
+
+$('autonomy-flow').append(diagram(['Kamera ve sensörler','Algılama ve şerit takibi','Karar','Araç kontrolü','Gerçek araç entegrasyonu']),link('2B simülasyon ve 3B pist','#/experience/track','text-link'));
+navigate();
 window.addEventListener('hashchange',()=>navigate({focusHeading:true}));
 document.body.dataset.data='ready';
+const logo=loadBrandLogo();
 await import('./vehicle.js');vehicleReady=!!window.vaccino;applySceneFocus();
 const {initializePresentation}=await import('./presentation.js');initializePresentation();
 const {initializeExperienceUI}=await import('./experience-ui.js');initializeExperienceUI();
+const brandLogo=await logo;
+if(brandLogo){
+  const presentationBrand=document.querySelector('.presentation-brand');
+  presentationBrand?.prepend(brandLogo.cloneNode());
+}
+initializeSeason(brandLogo,toggleMenu)();
 document.body.dataset.app='ready';
 document.body.dataset.readyMs=String(performance.now());

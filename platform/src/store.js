@@ -17,14 +17,5 @@ function resolve(value) {
 }
 export const record = resolve(raw);
 export {parameters, format};
-export const state = {route: 'overview', sub: '', mode: new URLSearchParams(location.search).get('mode') === 'technical' ? 'technical' : 'simple'};
+export const state = {route:'overview', sub:''};
 export const part = id => record.parts.find(p => p.id === id);
-export function setMode(mode) {
-  state.mode = mode === 'technical' ? 'technical' : 'simple';
-  document.body.dataset.mode = state.mode;
-  document.querySelectorAll('.narration-switch button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === state.mode)));
-  const url = new URL(location.href);
-  if (state.mode === 'technical') url.searchParams.set('mode', 'technical'); else url.searchParams.delete('mode');
-  history.replaceState(null, '', url);
-  document.dispatchEvent(new CustomEvent('vaccino:mode', {detail: state.mode}));
-}

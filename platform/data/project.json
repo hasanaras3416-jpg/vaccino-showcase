@@ -1,7 +1,7 @@
 {
   "revision": "R01",
   "date": "2026-11-17",
-  "source": "Vaccino 26/27 kamuya açık demo verileri",
+  "source": "Vaccino_ATLAS_Web_Sitesi_ve_3B_Model_Promptu.md",
   "inventory": [
     {
       "name": "Sensör envanteri",
@@ -653,15 +653,15 @@
     {
       "id": "brake",
       "label": "Fren",
-      "status": "AKTÜATÖR REZERVİ",
+      "status": "TEMSİLİ HİDROLİK YERLEŞİM",
       "point": [
         -0.57,
         0.3,
         0.04
       ],
-      "desc": "Ön mekanik alanda fren aktüatörüne yer ayrıldı.",
+      "desc": "Pedal ve pivot, tandem ana merkezi kumanda eder. Ön ve arka çıkışlar iki bağımsız devreyi besler. Şasi üzerindeki hatlar tekerlek bölgelerinde esnek hortumlara geçer.",
       "facts": [
-        "Aktüatör, pedal ve fren mekanizmasının bağlantısı mekanik ekipçe tasarlanacak.",
+        "Dört fren diski ve dört sabit kaliper. Ön ve arka devreler ayrı renkte gösterilir.",
         "Gerçek fren hareketi ve güvenli duruş kontrollü testlerle doğrulanacak."
       ],
       "simple": "Aracı yavaşlatan ve durduran sistem. Otomatik kumanda ve güvenli duruş kontrollü test bekliyor."
@@ -780,6 +780,13 @@
   "presentation": {
     "routes": [
       {
+        "id": "garage",
+        "label": "Araç",
+        "title": "Araç",
+        "simple": "Vaccino V2’yi ve mühendislik sistemlerini keşfet.",
+        "technical": "Vaccino V2 yerleşimi ve teknik sistem kayıtları."
+      },
+      {
         "id": "overview",
         "label": "Genel Bakış",
         "title": "Mühendisliği birlikte ilerlet.",
@@ -871,6 +878,13 @@
             "Diferansiyel",
             "Arka tekerlekler"
           ]
+        },
+        {
+          "id": "braking",
+          "label": "Fren",
+          "parts": ["brake"],
+          "focus": "braking",
+          "flow": ["Pedal ve pivot", "Tandem ana merkez", "Bağımsız ön ve arka devreler", "Dört disk ve kaliper"]
         },
         {
           "id": "suspension",
@@ -1015,10 +1029,34 @@
     },
     "files": [
       {
-        "name": "Platformun örnek proje kaydı",
+        "name": "Özgün 3B aktarma prototipi",
+        "type": "HTML",
+        "note": "V2 şasi ve özgün etkileşimler",
+        "path": "../inputs/Vaccino_26-27_Aktarma_3B.html"
+      },
+      {
+        "name": "Sensör envanteri",
+        "type": "XLSX",
+        "note": "Sensörler ve veri arayüzleri",
+        "path": "../inputs/Vaccino_26-27_Sensor_Envanteri.xlsx"
+      },
+      {
+        "name": "Ana gereksinim belgesi",
+        "type": "MD",
+        "note": "Tasarım yönü ve doğrulama kapsamı",
+        "path": "../inputs/Vaccino_ATLAS_Web_Sitesi_ve_3B_Model_Promptu.md"
+      },
+      {
+        "name": "Platform kaydı",
         "type": "JSON",
-        "note": "Sitede görünen temsilî parametreler ve sunum içeriği",
+        "note": "Tek kaynak · parametreler, kararlar, sensörler",
         "path": "data/project.json"
+      },
+      {
+        "name": "Pist simülasyonu mimarisi ve sınırları",
+        "type": "MD",
+        "note": "İlk boyuna demo model · gerçek pist bekleniyor",
+        "path": "../docs/simulation-architecture.md"
       }
     ],
     "interfaceSummaries": {
@@ -1070,9 +1108,9 @@
       },
       {
         "id": "suspension",
-        "title": "Süspansiyon Sistemi",
+        "title": "Süspansiyon ve Direksiyon",
         "subtitle": "Yol ile şasi arasındaki bağlantı.",
-        "simple": "Kollar ve yaylı amortisörler tekerlek hareketine eşlik eder. Fren kaliperleri tekerlekle birlikte dönmez.",
+        "simple": "Kollar ve amortisörler tekerlek hareketine eşlik eder. Direksiyon bağlantısı ön tekerlekleri yönlendirir.",
         "technical": "Çift salıncak, porya, burç/pim rezervleri ve coilover. Sabit kaliper; hareket zarfı, aks boy değişimi ve boşluk kontrolleri bekleniyor.",
         "focus": "suspension",
         "camera": {
@@ -1142,15 +1180,15 @@
       },
       {
         "id": "future",
-        "title": "Tasarım Hedefleri",
-        "subtitle": "Varsayımdan kanıta.",
-        "simple": "Sıradaki adım parçaları seçmek, ölçmek ve kontrollü testlerle tasarımı geliştirmek. Pist simülasyonu gelecekte ayrı bir modül olacak.",
+        "title": "Genel Araç Görünümü",
+        "subtitle": "Vaccino V2",
+        "simple": "Sıradaki adım parçaları seçmek, ölçmek ve kontrollü testlerle tasarımı geliştirmek. Araç bölümünden pist demosunu ve teknik kayıtları açabilirsin.",
         "technical": "Boyuna demo model ve yerel mühendislik envanteri eklendi. Gerçek pist, yanal dinamik, ölçülmüş araç parametreleri ve donanım doğrulaması bekleniyor.",
         "focus": null,
         "camera": {
           "az": 2.36,
           "el": 0.62,
-          "rad": 4,
+          "rad": 4.0,
           "target": [
             0,
             0.38,

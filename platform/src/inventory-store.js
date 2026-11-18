@@ -15,7 +15,7 @@ export function validateItem(input){
 }
 export function seedInventory(record){
  const electrical=new Set(['battery','drive','pc','hmi','power','camera','software']);
- const rows=record.parts.filter(p=>!['shell','camera','software'].includes(p.id)).map(p=>validateItem({id:'part-'+p.id,name:p.label,category:electrical.has(p.id)?inventoryCategories[1]:inventoryCategories[0],quantity:p.id==='motor'?'1':null,description:p.desc,status:'Tasarlanıyor',priority:p.id==='motor'?'Yüksek':'Normal',team:electrical.has(p.id)?'Elektrik':'Mekanik',estimatedCost:null,supplier:'',document:'',source:'Gereksinim R01; stok ve tedarik doğrulanmadı.'}));
+ const rows=record.parts.filter(p=>!['shell','camera','software'].includes(p.id)).map(p=>validateItem({id:'part-'+p.id,name:p.label,category:electrical.has(p.id)?inventoryCategories[1]:inventoryCategories[0],quantity:p.id==='motor'?'1':null,description:p.desc,status:'Tasarlanıyor',priority:p.id==='motor'?'Yüksek':'Normal',team:electrical.has(p.id)?'Elektrik':'Mekanik',estimatedCost:null,supplier:'',document:'../inputs/Vaccino_ATLAS_Web_Sitesi_ve_3B_Model_Promptu.md',source:'Gereksinim R01; stok ve tedarik doğrulanmadı.'}));
  for(const r of record.inventory[0].rows.slice(4))rows.push(validateItem({id:r.A,name:r.C,category:'Sensörler',quantity:r.E||null,description:r.D+' · '+r.G,status:r.A==='S01'?'Temin edilecek':'Planlanıyor',priority:['S01','S03','S04','S05'].includes(r.A)?'Yüksek':r.B==='Karara bağlı'?'Koşullu':'Normal',team:r.K,estimatedCost:null,supplier:'',document:r.L||'',source:'Sensör envanteri R01 · '+r.J+'; stok/sipariş bilgisi sağlanmadı.'}));return rows;
 }
 export function parseCSV(text){

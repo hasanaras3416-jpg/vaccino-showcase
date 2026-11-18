@@ -14,7 +14,7 @@ export function initializeExperienceUI(){
    const env=state.route==='overview'?'showroom':state.sub;
    if(experienceState.environment!==env||!api?.experienceState().active){setEnvironment(env);}
    if(state.route==='experience')document.getElementById('reset').click();
-   api?.setShell(experienceState.bodyMode);
+   api?.setShell(state.route==='overview'?'hidden':experienceState.bodyMode);
   }
   document.querySelectorAll('[data-environment]').forEach(a=>a.setAttribute('aria-current',a.dataset.environment===experienceState.environment?'page':'false'));
   $('workshop-controls').hidden=experienceState.environment!=='workshop';$('track-controls').hidden=experienceState.environment!=='track';$('simulation-panel').hidden=experienceState.environment!=='track';
@@ -36,12 +36,14 @@ export function initializeExperienceUI(){
  document.querySelectorAll('[data-workshop-focus]').forEach(b=>b.onclick=()=>{shell('hidden');if(b.dataset.workshopFocus==='under'){experienceState.liftRaised=true;$('lift-toggle').textContent='Lifti indir';$('lift-toggle').setAttribute('aria-pressed','true');api?.moveCamera({az:-.9,el:-.16,rad:3.8,target:[0,.25,0]});}else api?.focusSystem(b.dataset.workshopFocus);});
  document.querySelectorAll('[data-track-view]').forEach(b=>b.onclick=()=>{experienceState.view=b.dataset.trackView;updateView();});
  $('track-camera').onchange=event=>{experienceState.camera=event.target.value;document.dispatchEvent(new Event('vaccino:resize'));};
- function status(){const s=simulation.snapshot(),core=api?.state(),track=experienceState.active&&experienceState.environment==='track';
+ function status(){if(state.route!=='experience')return;const s=simulation.snapshot(),core=api?.state(),track=experienceState.active&&experienceState.environment==='track';
   $('vehicle-status-mode').textContent=labels[experienceState.environment]+' · '+(track?'SİMÜLASYON':'GÖRSEL DEMO')+' · DONANIM BAĞLI DEĞİL';
   $('status-speed').textContent=(track?s.speed*3.6:0).toLocaleString('tr-TR',{maximumFractionDigits:1})+' km/sa';$('status-drive').textContent=core?.engaged===false?'Ayrık':'Bağlı';
   $('status-motor').textContent=track?(s.powerW>0&&core?.engaged!==false?'Modelde güç veriliyor':'Modelde tork yok'):(core?.playing?'Prensip animasyonu':'Duruyor / demo');
   $('status-time').textContent=(track?s.time:0).toFixed(1)+' s';$('status-battery').textContent=`${parameters.battery.series}S${parameters.battery.parallel}P · ${parameters.battery.nominalV} V hedef`;
  }
+ $('simulation-panel').addEventListener('click',status);
+ $('sim-form').addEventListener('submit',status);
  document.addEventListener('vaccino:route',route);document.addEventListener('vaccino:simulation',status);startExperienceClock();route();
  window.vaccinoExperience={state:()=>({...experienceState,world:api?.experienceState(),shell:api?.shellState(),simulation:simulation.snapshot()}),environment(name){location.hash='#/experience/'+name;},shell,update:status};
 }
