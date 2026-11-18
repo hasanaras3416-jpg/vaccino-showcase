@@ -65,7 +65,7 @@ body[data-route=overview] :is(.breadcrumb,.app-footer) { display: none; }
 .season-intro.season-revealing #season-start { animation: none; opacity: 0; transform: scale(.9); pointer-events: none; }
 @keyframes lion-appear { from { opacity: 0; } to { opacity: 1; } }
 #season-skip { position: absolute; bottom: max(2rem, env(safe-area-inset-bottom)); right: var(--gutter); background: var(--surface); color: var(--ink); padding: .7rem 1rem; border: 1px solid var(--line); }
-.season-intro:not(.season-revealing) #season-skip:not(:focus-visible) { clip-path: inset(50%); }
+.season-intro:not(.season-revealing,.season-unavailable) #season-skip:not(:focus-visible) { clip-path: inset(50%); }
 .studio-brand img, .sidebar .brand img, .presentation-brand img { display: block; width: auto; height: 44px; max-width: 110px; object-fit: contain; mix-blend-mode: screen; }
 body:has(.season-intro[open]) .topbar { visibility: hidden; }
 .vehicle-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
@@ -204,3 +204,6 @@ body:has(.season-intro[open]) .topbar { visibility: hidden; }
 body[data-webgl=failed] #workspace .simulation { display: flex !important; }
 body[data-webgl=failed] #workspace .simulation > :not(#part-open) { display: none; }
 @media(prefers-reduced-motion: reduce) { #workspace .inspector { transition: none; } }
+
+#season-error { max-width: 34ch; text-align: center; overflow-wrap: anywhere; }
+.competition-brand img { display: block; width: 100%; max-width: 8rem; height: 3.5rem; object-fit: contain; object-position: left center; }

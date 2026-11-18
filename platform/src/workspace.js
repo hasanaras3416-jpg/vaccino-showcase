@@ -205,12 +205,19 @@ function filesAndTeam() {
     ['Shell Eco-marathon','Autonomous Driving Competition','','Kapalı parkurda otonom sürüş görevlerini tamamlamak.','Parkur takibi ve araç kontrolünü demo ortamından araç testine taşımak.','Algılama, şerit takibi ve kontrol.',rules],
     ['Shell Eco-marathon','Mileage Challenge','','Pist üzerinde enerji verimliliğini karşılaştırmak.','Aktarma ve enerji tüketimi varsayımlarını ölçümle sınamak.','BLDC motor, kayış-kasnak, batarya ve enerji modeli.',rules]
   ];
+  const organizerLogos={'TEKNOFEST':'teknofest-logo.png','Shell Eco-marathon':'shell-logo.png'};
   $('competition-record').replaceChildren(...competitions.map(([organizer,title,category,purpose,goal,systems,url])=>{
     const detail=make('details'), summary=make('summary');
     const heading=make('div');
     heading.append(make('h2',title));
     if(category) heading.append(make('p',category));
-    summary.append(make('span',organizer),heading);
+    const identity=make('span',null,'competition-brand');
+    identity.textContent=organizer;
+    const logo=make('img');
+    logo.alt=organizer;
+    logo.addEventListener('load',()=>identity.replaceChildren(logo),{once:true});
+    logo.src=`assets/branding/${organizerLogos[organizer]}`;
+    summary.append(identity,heading);
     const body=make('div',null,'competition-detail');
     const facts=make('dl');
     for(const [label,value] of [['Amaç',purpose],['Vaccino’nun hedefi',goal],['Temel sistemler',systems],['Hazırlık durumu','Tasarım ve demo çalışmaları mevcut. Başvuru, kabul ve teknik uygunluk doğrulanmayı bekliyor.']]){
@@ -239,6 +246,7 @@ navigate();
 window.addEventListener('hashchange',()=>navigate({focusHeading:true}));
 document.body.dataset.data='ready';
 const logo=loadBrandLogo();
+const finishSeasonSetup=initializeSeason(logo,toggleMenu);
 await import('./vehicle.js');vehicleReady=!!window.vaccino;applySceneFocus();
 const {initializePresentation}=await import('./presentation.js');initializePresentation();
 const {initializeExperienceUI}=await import('./experience-ui.js');initializeExperienceUI();
@@ -247,6 +255,6 @@ if(brandLogo){
   const presentationBrand=document.querySelector('.presentation-brand');
   presentationBrand?.prepend(brandLogo.cloneNode());
 }
-initializeSeason(brandLogo,toggleMenu)();
+await finishSeasonSetup();
 document.body.dataset.app='ready';
 document.body.dataset.readyMs=String(performance.now());

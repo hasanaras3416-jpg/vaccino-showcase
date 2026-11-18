@@ -23,10 +23,9 @@ export function initializeSeason(logo,openMenu=()=>{}) {
   const skip=document.getElementById('season-skip');
 
   const onHome=()=>['','#','#/overview','#overview'].includes(location.hash);
-  let seen=false, timeout;
-  try { seen=sessionStorage.getItem('vaccino-season')==='started'; } catch {}
-  if (!logo || seen || !onHome()) return ()=>{};
-  start.replaceChildren(logo);
+  if (!onHome()) return async ()=>{};
+  const error=document.getElementById('season-error');
+  let timeout;
 
   function finish({focus=true,showMenu=false}={}) {
     clearTimeout(timeout);
@@ -36,12 +35,8 @@ export function initializeSeason(logo,openMenu=()=>{}) {
     if(showMenu) openMenu();
     else if(focus) (tour.disabled?document.getElementById('menu-toggle'):tour).focus({preventScroll:true});
   }
-  function remember() {
-    try { sessionStorage.setItem('vaccino-season','started'); } catch {}
-  }
   start.onclick=()=>{
     const api=window.vaccino;
-    remember();
     if(!api || matchMedia('(prefers-reduced-motion: reduce)').matches) return finish({showMenu:true});
     api.setStudioPose({az:-1.48,el:.17,rad:9,target:[0,.36,0]},0);
     intro.classList.add('season-revealing');
@@ -50,16 +45,31 @@ export function initializeSeason(logo,openMenu=()=>{}) {
     api.setStudioPose(homePose,3600);
     timeout=setTimeout(()=>finish({showMenu:true}),3650);
   };
-  skip.onclick=()=>{remember();finish();};
+  skip.onclick=()=>finish();
   intro.addEventListener('cancel',event=>{
     event.preventDefault();
-    remember();
     finish();
   });
   window.addEventListener('hashchange',()=>{
     if(intro.open&&!onHome()) finish({focus:false});
   });
   start.disabled=true;
+  skip.hidden=true;
   intro.showModal();
-  return ()=>{start.disabled=false;if(intro.open)start.focus();};
+  return async ()=>{
+    const mark=await logo;
+    if(!intro.open) return;
+    skip.hidden=false;
+    if(!mark){
+      start.hidden=true;
+      error.hidden=false;
+      intro.classList.add('season-unavailable');
+      skip.textContent='Stüdyoya geç';
+      skip.focus();
+      return;
+    }
+    start.replaceChildren(mark);
+    start.disabled=false;
+    start.focus();
+  };
 }
