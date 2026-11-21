@@ -70,3 +70,20 @@ body[data-route=overview] #workspace .v-hero-content a {font-size:.76rem}
  body[data-route=overview] .studio-home.v-inspecting .v-hero-content {transform:translateY(0) translateX(-24px)}
 }
 @media(prefers-reduced-motion:reduce){body[data-route=overview] .v-hero-content,body[data-route=overview] .v-hero-bottom, #season-start img {transition:none!important}}
+
+/* Explore-mode control and software-page demo entry. */
+.v-hero-restore { display:none; position:absolute; z-index:6; bottom:38px; left:clamp(26px,7vw,120px);
+ border:1px solid rgba(240,235,223,.55); background:rgba(15,17,19,.76); color:#f0ebdf; font-size:.76rem;
+ letter-spacing:.12em; text-transform:uppercase; padding:13px 18px; cursor:pointer; }
+.studio-home.v-inspecting .v-hero-restore {display:block}
+.v-hero-restore:hover {background:#f0ebdf;color:#141617}
+.nextion-entry {display:flex;align-items:center;justify-content:space-between;gap:35px;flex-wrap:wrap;
+ padding:30px; margin:28px 0; border:1px solid #484743;background:linear-gradient(110deg,#171e21,#0d1012);}
+.nextion-entry h2 {font-weight:400;letter-spacing:-.04em;font-size:clamp(1.4rem,2.5vw,2.4rem);margin:8px 0}
+.nextion-entry p {color:#bbbdbb;max-width:550px;font-size:.93rem}
+.nextion-entry button {border:1px solid #b99a61;background:transparent;color:#e4cda1;padding:14px 23px;cursor:pointer}
+.nextion-entry button:hover {background:#e4cda1;color:#171717}
+.nextion-diagnostics {padding:25px 0;color:#c8dfdb}
+.nextion-diagnostics strong {color:#e4c68b;letter-spacing:.1em}
+.nextion-diagnostics p {padding:7px 0;color:#b4c5c7}
+@media(max-width:600px){.v-hero-restore{left:24px;bottom:32px}.nextion-entry{padding:21px}.driver-stage .driver-dot {width:32px;height:32px}}
