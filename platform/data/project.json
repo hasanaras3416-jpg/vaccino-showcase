@@ -930,6 +930,7 @@
       "electrical": [
         {
           "id": "battery",
+          "summary": "Batarya paketinin konumunu, enerji hesabını ve koruma düzenini incele.",
           "label": "Batarya & enerji",
           "parts": [
             "battery"
@@ -947,6 +948,7 @@
         },
         {
           "id": "control",
+          "summary": "Motor sürücüsünün araç komutunu güç katına nasıl aktardığını incele.",
           "label": "Motor kontrolü",
           "parts": [
             "drive"
@@ -965,6 +967,7 @@
         },
         {
           "id": "auxiliary",
+          "summary": "Araç bilgisayarını, yardımcı güç birimlerini ve sürücü ekranını incele.",
           "label": "Yardımcı sistemler",
           "parts": [
             "pc",

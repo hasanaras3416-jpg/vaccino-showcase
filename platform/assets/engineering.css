@@ -1,27 +1,30 @@
 /* Engineering exhibits use the workspace palette and shared viewer. */
-#workspace .mechanical-exhibit {
+#workspace .scene-shell[data-context=vehicle]:not([data-presentation]) .stage {
+  background:radial-gradient(ellipse at 50% 46%, #26292b, #141413 76%);
+}
+#workspace .system-exhibit {
   display:grid;
   grid-template-columns:minmax(0, 1fr) minmax(17rem, 24%);
   gap:clamp(1.5rem, 4vw, 4.5rem);
   align-items:start;
 }
-#workspace .mechanical-brief {
+#workspace .system-briefing {
   padding-block:clamp(1rem, 3vw, 2.5rem);
   min-width:0;
 }
-.mechanical-brief h2, .software-heading h2 {
+.system-briefing h2, .software-heading h2 {
   font-size:clamp(2.25rem, 4.1vw, 4rem);
   font-weight:450;
   line-height:1.05;
   letter-spacing:-.055em;
 }
-.mechanical-lead, .software-heading > p:last-child {
+.system-lead, .software-heading > p:last-child {
   margin-block:.85rem 1.4rem;
   color:var(--muted);
   max-width:58ch;
 }
-#workspace .mechanical-brief .system-parts { display:grid; gap:0; }
-#workspace .mechanical-brief .system-parts button {
+#workspace .system-briefing .system-parts { display:grid; gap:0; }
+#workspace .system-briefing .system-parts button {
   text-align:left;
   min-height:44px;
   padding:.75rem .65rem;
@@ -30,38 +33,42 @@
   border-bottom:1px solid var(--line);
   border-radius:0;
 }
-#workspace .mechanical-brief .system-parts button[aria-pressed=true] {
+#workspace .system-briefing .system-parts button[aria-pressed=true] {
   color:var(--warm-white);
   box-shadow:inset 2px 0 var(--gold);
 }
-#workspace .mechanical-exhibit .stage {
+#workspace .system-exhibit .stage {
   height:clamp(420px, 62dvh, 720px);
   min-height:0;
   background:radial-gradient(ellipse at 52% 43%, #272521, #151413 80%);
 }
-#workspace .mechanical-exhibit #vehicle { touch-action:pan-y; }
-#workspace .mechanical-exhibit .stage::before,
-#workspace .mechanical-exhibit .stage::after { content:none; }
-#workspace .mechanical-exhibit :is(.caption,.guide) { display:none; }
-#workspace .mechanical-exhibit .stage-label {
+#workspace .system-exhibit #vehicle { touch-action:pan-y; }
+#workspace .system-exhibit .stage::before,
+#workspace .system-exhibit .stage::after { content:none; }
+#workspace .system-exhibit :is(.caption,.guide) { display:none; }
+#workspace .system-exhibit .stage-label {
   inset:auto 1rem 1rem;
   font-size:.65rem;
   gap:.75rem;
 }
-#workspace .mechanical-exhibit .stage-label span:first-child { display:none; }
-#workspace .mechanical-exhibit .drive-state { inset:auto 1rem 2.5rem; width:max-content; max-width:calc(100% - 2rem); }
-#workspace .mechanical-exhibit .viewer-actions:not(:has(button:not([hidden]))) { display:none !important; }
-#workspace .mechanical-exhibit .system-parts + details { margin-top:1.6rem; }
-#workspace .mechanical-brief .principle-flow {
+#workspace .system-exhibit .stage-label span:first-child { display:none; }
+#workspace .system-exhibit .drive-state { inset:auto 1rem 2.5rem; width:max-content; max-width:calc(100% - 2rem); }
+#workspace .system-exhibit .viewer-actions:not(:has(button:not([hidden]))) { display:none !important; }
+#workspace .system-exhibit .system-parts + details { margin-top:1.6rem; }
+.system-briefing .engineering-disclosure + .engineering-disclosure { border-top:0; }
+.system-briefing .calculation-strip { margin:0; }
+#workspace .system-briefing .power-diagram { margin:0; padding:0; border:0; }
+.system-briefing .power-branches { grid-template-columns:1fr; }
+#workspace .system-briefing .principle-flow {
   display:grid;
   grid-template-columns:1fr;
   gap:0;
   margin-block:1rem;
 }
-.mechanical-brief .principle-flow li { min-width:0; padding:.35rem 0; }
-.mechanical-brief .principle-flow li::after { content:none !important; }
-.mechanical-brief .brief-explanation { display:block; }
-.mechanical-brief .brief-explanation > * + * { margin-top:1rem; }
+.system-briefing .principle-flow li { min-width:0; padding:.35rem 0; }
+.system-briefing .principle-flow li::after { content:none !important; }
+.system-briefing .brief-explanation { display:block; }
+.system-briefing .brief-explanation > * + * { margin-top:1rem; }
 
 #workspace .tools:has(.viewer-settings) {
   inset:14px 14px auto;
@@ -192,12 +199,12 @@ body[data-route=autonomy] .screen-heading {
 .competition-gallery > h2 { margin-bottom:1rem; }
 
 @media (max-width:900px) {
-  #workspace .mechanical-exhibit { grid-template-columns:minmax(0,1fr); gap:1rem; }
-  #workspace .mechanical-exhibit .stage { height:clamp(365px, 62vw, 555px); }
-  #workspace .mechanical-brief { padding-block:.5rem 0; }
+  #workspace .system-exhibit { grid-template-columns:minmax(0,1fr); gap:1rem; }
+  #workspace .system-exhibit .stage { height:clamp(365px, 62vw, 555px); }
+  #workspace .system-briefing { padding-block:.5rem 0; }
 }
 @media (max-width:560px) {
-  #workspace .mechanical-exhibit .stage { height:clamp(345px, 95vw, 430px); }
+  #workspace .system-exhibit .stage { height:clamp(345px, 95vw, 430px); }
   #workspace .tools:has(.viewer-settings) { inset:10px 10px auto; }
   .engineering-notes dl div { grid-template-columns:1fr; gap:.2rem; }
 }

@@ -16,9 +16,9 @@ A site that looks like a **premium automotive design studio made it**, not a sch
 
 ## Home hero
 - Present the inherited V2 vehicle with its existing concept body fitted. The lower front three-quarter camera reveals the nose, wheels and side profile. The home scene has a warm key light, a cool rim light and soft fill over a graphite backdrop.
-- Give the headline and vehicle separate space. Put the copy left of the vehicle on desktop and below it at 900 px and under. Fit the default vehicle pose to the scene aspect ratio and keep the full silhouette inside the frame.
+- Render the hero in a single viewport-wide canvas. Compose the vehicle to the right of the copy on desktop and above it at 900 px and under by shifting the camera projection and fitting the model bounds. Copy is an overlay. Only its links and the restore button capture pointer input.
 - Keep the vehicle and editorial typography as the two main elements. Use the existing Showroom and Engineering links, and reserve champagne for small accents and focus cues.
-- Keep vertical page scroll available across the mobile viewer. Use the same inspection state for mouse, touch and keyboard. Keep a static technical illustration in the vehicle area when WebGL is unavailable.
+- The lion reveal moves from a distant pose to the composed home view. Close the intro after the last camera frame and leave navigation closed. Keep vertical scrolling available on touch screens, share the inspection state across mouse, touch and keyboard, and show the static illustration when WebGL is unavailable.
 
 ## Functional UX
 - Mouse drag, touch drag and keyboard orbit or zoom hide the hero copy and reveal the restore control. Restore returns to the composed view and focuses the viewer. Escape restores the introduction when the viewer has focus.
@@ -29,8 +29,9 @@ A site that looks like a **premium automotive design studio made it**, not a sch
 - Maintain keyboard focus, visible interactions and meaningful fallbacks.
 
 ## Engineering exhibits
-- Give the 3D scene priority in Mechanical. Put the active system introduction and keyboard-accessible part list beside the scene on desktop and below it on narrow screens. Keep the working principle and source notes in a disclosure.
-- Use the active mechanical system's part list for highlighting, projected markers, mesh picking and the inspector library. Reset returns to the active system view. A vertical touch gesture scrolls the page across the Mechanical viewer. Make the transmission animation easy to reach in Mechanical › Aktarma, and show its coupling control only there.
+- Give the 3D scene priority in Mechanical and Electrical. Put the active system introduction and keyboard-accessible part list beside the scene on desktop and below it on narrow screens. Put technical notes, power distribution, and battery calculations in disclosures.
+- Use the active engineering system's part list for highlighting, projected markers, mesh picking and the inspector library. Reset returns to the active system view. A vertical touch gesture scrolls the page across the engineering viewer. Make the transmission animation easy to reach in Mechanical › Aktarma, and show its coupling control only there.
+- Give 3B Model its own front three-quarter chassis view. Fit it to the viewport using the chassis and wheel bounds. Route entry and Reset share that pose.
 - Put automatic graphics quality, contact shadows and advanced angles in the viewer settings disclosure. Keep reset and the relevant animation within reach. Use native keyboard behavior and return focus to Settings when Escape closes the disclosure.
 - Give Simülasyon and Görüntü İşleme independent routes. Each page has an introduction, a media showcase and concise engineering notes. Preserve sensor and interface records in Technical Resources.
 - Use the same media frame for competition photos. Empty frames say “İçerik eklenecek.” Add team-provided media in the project record with descriptive alt text and captions where available.

@@ -1,5 +1,5 @@
 // One revisioned record serves both narration modes and the vehicle geometry.
-const response = await fetch('data/project.json?v=engineering-01', {cache:'no-store'});
+const response = await fetch('data/project.json?v=engineering-015', {cache:'no-store'});
 if (!response.ok) throw new Error('Platform kaydı açılamadı. Yerel sunucuyu kontrol edin.');
 const raw = await response.json();
 const parameters = structuredClone(raw.parameters);
@@ -20,8 +20,8 @@ export {parameters, format};
 export const state = {route:'overview', sub:''};
 export const part = id => record.parts.find(p => p.id === id);
 
-export function mechanicalSystem() {
-  if(state.route==='mechanical'&&!document.body.classList.contains('presentation-active')){
-    return record.presentation.systems.mechanical.find(entry=>entry.id===state.sub);
+export function inspectionSystem() {
+  if(['mechanical','electrical'].includes(state.route)&&!document.body.classList.contains('presentation-active')){
+    return record.presentation.systems[state.route].find(entry=>entry.id===state.sub);
   }
 }

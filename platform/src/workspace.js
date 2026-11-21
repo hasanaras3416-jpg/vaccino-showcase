@@ -1,4 +1,4 @@
-import {record, parameters, format, state, part, mechanicalSystem} from './store.js';
+import {record, parameters, format, state, part, inspectionSystem} from './store.js';
 import {initializeSeason, loadBrandLogo} from './season.js';
 
 const $ = id => document.getElementById(id);
@@ -45,7 +45,7 @@ function updateHeading() {
   const route = routes.find(r => r.id === state.route);
   $('screen-title').textContent = ({overview:'Vaccino stüdyosu',vehicle:'3B Model',mechanical:'Mekanik',electrical:'Elektrik',autonomy:'Yazılım',driver:'Driver',team:'Yarışmalar',inventory:'Envanter'})[state.route] || route?.title || 'Vaccino';
   $('breadcrumb').textContent = $('screen-title').textContent;
-  const descriptions={overview:'',autonomy:'',mechanical:'Aracı oluşturan mekanik sistemleri 3B yerleşim üzerinden incele.'};
+  const descriptions={overview:'',autonomy:'',mechanical:'Aracı oluşturan mekanik sistemleri 3B yerleşim üzerinden incele.',electrical:'Enerji, kontrol ve yardımcı sistemleri 3B yerleşim üzerinden incele.'};
   $('screen-description').textContent = descriptions[state.route] ?? route?.simple ?? (state.route==='driver'?'Pilot ekipmanı / konsept görselleştirme':'');
   $('footer-context').textContent = `${record.revision} / v${record.uiVersion}`;
   document.title = `${route?.label || 'Driver'} — Vaccino 26/27`;
@@ -100,56 +100,64 @@ function diagram(labels, className='principle-flow') {
   labels.forEach((label,i)=>{const li=make('li');li.append(make('small',String(i+1).padStart(2,'0')),make('span',label));node.append(li);});
   return node;
 }
+function disclosure(label,content){
+  const detail=make('details',null,'engineering-disclosure');
+  detail.append(make('summary',label),content);
+  return detail;
+}
 function systemBrief(route, entry) {
-  const target=$(`${route}-brief`); if(!target) return;
+  const target=$(`${route}-brief`);
+  const title=make('h2',entry.label);title.id=`${route}-title`;
   const actions=make('div',null,'system-parts');
-  entry.parts.forEach(id=>{const info=part(id);const button=make('button',info.label);button.dataset.inspect=id;button.setAttribute('aria-pressed','false');button.onclick=()=>inspectPart?.(id,button);actions.append(button);});
-  const focus=make('button','Sistemi öne çıkar','isolate-button');focus.id='system-isolate';focus.setAttribute('aria-pressed','true');focus.onclick=()=>{
-    const enabled=focus.getAttribute('aria-pressed')!=='true';focus.setAttribute('aria-pressed',String(enabled));
-    if(enabled&&window.vaccino?.state().focusContext!==entry.focus)window.vaccino?.focusSystem(entry.focus,mechanicalSystem()?.parts);else window.vaccino?.isolate(enabled);
-  };actions.append(focus);
+  for(const id of entry.parts){
+    const button=make('button',part(id).label);
+    button.dataset.inspect=id;
+    button.setAttribute('aria-pressed','false');
+    button.onclick=()=>inspectPart?.(id,button);
+    actions.append(button);
+  }
+
+  const focus=make('button','Sistemi öne çıkar','isolate-button');
+  focus.id='system-isolate';
+  focus.setAttribute('aria-pressed','true');
+  focus.onclick=()=>{
+    const enabled=focus.getAttribute('aria-pressed')!=='true';
+    focus.setAttribute('aria-pressed',String(enabled));
+    window.vaccino?.isolate(enabled);
+  };
   const explanation=make('div',null,'brief-explanation');
-  const lead=part(entry.parts[0]);
   const source=make('div',null,'brief-source technical-only');
   source.append(make('small','KAYNAK VE DOĞRULAMA'),paragraph(`${record.source} · ${record.revision}`),paragraph('Gerçek CAD, montaj açıklıkları ve test sonuçları bekleniyor.'));
+  explanation.append(paragraph(part(entry.parts[0]).desc),diagram(entry.flow),source,focus);
 
-  if(route==='mechanical'){
-    const title=make('h2',entry.label);title.id='mechanical-title';
-    const detail=make('details',null,'engineering-disclosure mechanical-detail');
-    explanation.append(paragraph(lead.desc),diagram(entry.flow),source,focus);
-    if(entry.id==='braking'){
-      const flow=make('button','Fren akışını göster');
-      flow.id='brake-flow';
-      flow.setAttribute('aria-pressed','false');
-      flow.onclick=()=>flow.setAttribute('aria-pressed', String(window.vaccino?.toggleBrakeFlow() || false));
-      actions.append(flow);
-      explanation.append(paragraph('Ön devre mavi, arka devre bakır renkle gösterilir. Yerleşim ve akış temsilidir. Montaj, hareket açıklığı ve donanım seçimi mühendislik doğrulaması gerektirir.'));
-    }
-    if(entry.id==='transmission'){
-      explanation.append(paragraph(entry.conceptNote));
-      const transmission=parameters.transmission;
-      explanation.append(paragraph(`Prensip gösterimi. Kasnak yarıçapları ${format(transmission.smallRadiusMm)} / ${format(transmission.largeRadiusMm)} mm, oran ${format(transmission.ratio)}. Nihai redüksiyon seçimi değildir.`));
-    }
-    const summary=make('summary','Çalışma prensibi ve kaynaklar');
-    detail.append(summary,explanation);
-    target.replaceChildren(title,paragraph(entry.summary,'mechanical-lead'),actions,detail);
-    return;
+  if(entry.id==='braking'){
+    const flow=make('button','Fren akışını göster');
+    flow.id='brake-flow';
+    flow.setAttribute('aria-pressed','false');
+    flow.onclick=()=>flow.setAttribute('aria-pressed',String(window.vaccino?.toggleBrakeFlow()||false));
+    actions.append(flow);
+    explanation.append(paragraph('Ön devre mavi, arka devre bakır renkle gösterilir. Yerleşim ve akış temsilidir. Montaj, hareket açıklığı ve donanım seçimi mühendislik doğrulaması gerektirir.'));
   }
-
-  explanation.append(modeText(lead.simple,lead.desc),source);
-  target.replaceChildren(diagram(entry.flow),actions,explanation);
-  if(route==='electrical'&&entry.id==='battery'){
-    const calc=make('div',null,'calculation-strip technical-only');
+  if(entry.id==='transmission'){
+    explanation.append(paragraph(entry.conceptNote));
+    const transmission=parameters.transmission;
+    explanation.append(paragraph(`Prensip gösterimi. Kasnak yarıçapları ${format(transmission.smallRadiusMm)} / ${format(transmission.largeRadiusMm)} mm, oran ${format(transmission.ratio)}. Nihai redüksiyon seçimi değildir.`));
+  }
+  target.replaceChildren(title,paragraph(entry.summary,'system-lead'),actions,
+    disclosure(route==='electrical'?'Teknik detaylar':'Çalışma prensibi ve kaynaklar',explanation));
+  if(entry.id==='battery'){
+    const calc=make('div',null,'calculation-strip');
     const b=parameters.battery;
-    calc.append(make('span','HEDEF PARAMETRELERDEN HESAP','eyebrow'),make('strong',`${format(b.nominalV)} V × ${format(b.capacityAh)} Ah = ${format(b.nominalWh)} Wh`),paragraph(`Nominal enerji hesabıdır; kullanılabilir enerji ölçümü değildir. ${b.series} × ${format(b.cellFullV)} V = ${format(b.fullV)} V tam dolu gerilim varsayımı. Hücre/BMS doğrulaması bekleniyor.`));target.append(calc);
+    calc.append(make('span','HEDEF PARAMETRELERDEN HESAP','eyebrow'),make('strong',`${format(b.nominalV)} V × ${format(b.capacityAh)} Ah = ${format(b.nominalWh)} Wh`),paragraph(`Nominal enerji hesabıdır; kullanılabilir enerji ölçümü değildir. ${b.series} × ${format(b.cellFullV)} V = ${format(b.fullV)} V tam dolu gerilim varsayımı. Hücre/BMS doğrulaması bekleniyor.`));
+    target.append(disclosure('Hesaplamalar',calc));
   }
   if(route==='electrical'){
-    const power=make('section',null,'power-diagram');
+    const power=make('div',null,'power-diagram');
     const trunk=diagram(['Batarya ve BMS','Koruma ve güç dağıtımı']);
     const branches=make('div',null,'power-branches');
     branches.append(diagram(['Motor sürücüsü','BLDC motor']),diagram(['DC/DC dönüştürücü','Araç bilgisayarı, kontrol ve sensör beslemeleri']));
-    power.append(make('h2','Güç dağıtımı'),trunk,branches,paragraph('Akış ve kablaj temsilidir. Koruma elemanları, DC/DC seçimi ve bağlantılar doğrulanacak.','muted'));
-    target.append(power);
+    power.append(trunk,branches,paragraph('Akış ve kablaj temsilidir. Koruma elemanları, DC/DC seçimi ve bağlantılar doğrulanacak.','muted'));
+    target.append(disclosure('Güç dağıtımı',power));
   }
 }
 function applySceneFocus() {
@@ -161,7 +169,8 @@ function applySceneFocus() {
     return;
   }
   const entry=systems[state.route]?.find(system=>system.id===state.sub);
-  if(entry) api.focusSystem(entry.focus,mechanicalSystem()?.parts);
+  if(entry) api.focusSystem(entry.focus,entry.parts);
+  else if(state.route==='vehicle')api.resetVehicleView();
   else api.clearFocus(state.route==='overview');
 }
 function mediaFrame(items, className=''){
@@ -220,8 +229,8 @@ settings.addEventListener('keydown',event=>{
   }
 });
 function syncViewerControls(){
-  const scoped=!!mechanicalSystem();
-  const transmission=scoped&&state.sub==='transmission';
+  const scoped=!!inspectionSystem();
+  const transmission=state.route==='mechanical'&&state.sub==='transmission';
   $('engage').hidden=!transmission;
   $('play').hidden=scoped&&!transmission;
   $('part-open').hidden=scoped;
@@ -349,7 +358,7 @@ navigate();
 window.addEventListener('hashchange',()=>navigate({focusHeading:true}));
 document.body.dataset.data='ready';
 const logo=loadBrandLogo();
-const finishSeasonSetup=initializeSeason(logo,toggleMenu);
+const finishSeasonSetup=initializeSeason(logo);
 ({inspect:inspectPart}=await import('./vehicle.js'));
 applySceneFocus();
 const {initializePresentation}=await import('./presentation.js');initializePresentation();

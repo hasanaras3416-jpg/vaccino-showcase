@@ -1,5 +1,4 @@
-/* Vaccino Automotive Concept — homepage-only visual layer.
-   Intentionally does not change the existing WebGL vehicle or engineering routes. */
+/* Full-viewport studio scene with independent editorial and interaction layers. */
 :root { --v-ivory:#f5f2ed; --v-champagne:#cbb98b; --v-slate:#999a99; }
 body[data-route="overview"] { background:#090a0b; }
 body[data-route="overview"] .topbar {
@@ -19,16 +18,14 @@ body[data-route="overview"] .studio-home > .scene-slot {
   --hero-gutter:clamp(24px,6vw,110px);
   position:relative;
   display:grid;
-  grid-template-columns:minmax(0, 35fr) minmax(0, 65fr);
   align-items:center;
   min-height:max(640px,100svh);
-  padding:96px clamp(20px,3vw,56px) 70px var(--hero-gutter);
+  padding:96px var(--hero-gutter) 70px;
   background:radial-gradient(ellipse at 72% 51%,#25292c 0%,#141719 34%,#090b0d 69%);
 }
 body[data-route="overview"] .scene-shell[data-context=overview]:not([data-presentation]) {
-  grid-column:2;
-  grid-row:1;
-  align-self:stretch;
+  position:absolute;
+  inset:0;
 }
 body[data-route="overview"] #workspace .scene-shell[data-context=overview]:not([data-presentation]) .stage {
   position:absolute;
@@ -47,7 +44,7 @@ body[data-route="overview"] .scene-shell[data-context=overview]:not([data-presen
 }
 body[data-route="overview"] .scene-shell[data-context=overview]:not([data-presentation]) #fallback:not([hidden]) {
   position:absolute;
-  inset:0;
+  inset:8% 4% 8% 42%;
   display:grid;
   align-content:center;
   justify-items:center;
@@ -68,9 +65,9 @@ body[data-route="overview"][data-webgl="failed"] #workspace .scene-shell[data-co
 body[data-route="overview"] .studio-description { display:none; }
 .v-hero-content {
   z-index:1;
-  grid-column:1;
-  grid-row:1;
+  width:min(38vw, 37rem);
   min-width:0;
+  pointer-events:none;
   color:var(--v-ivory);
 }
 .v-eyebrow { display:flex; align-items:center; gap:14px; margin:0 0 28px;
@@ -82,6 +79,7 @@ body[data-route="overview"] .studio-description { display:none; }
 .v-hero-content h2 strong { display:block; font-weight:650; letter-spacing:-.075em; }
 .v-hero-content .v-subtitle { margin:24px 0 0; font-size:clamp(.96rem,1.5vw,1.25rem);
   line-height:1.7; color:rgba(245,242,237,.76); max-width:34ch; }
+.v-hero-actions a { pointer-events:auto; }
 .v-hero-actions { display:flex; align-items:center; gap:12px 24px; flex-wrap:wrap; margin-top:32px; }
 .v-link { display:inline-flex; min-height:50px; align-items:center; justify-content:space-between; gap:14px;
   padding:0 0 8px; border-bottom:1px solid rgba(245,242,237,.6); color:var(--v-ivory);
@@ -113,7 +111,8 @@ body[data-route="overview"] .studio-description { display:none; }
   transform-origin:right;
 }
 .v-hero-content,.v-hero-bottom { transition:opacity .24s ease,visibility .24s; }
-.studio-home.v-inspecting :is(.v-hero-content,.v-hero-bottom) { opacity:0; visibility:hidden; }
+.studio-home.v-inspecting :is(.v-hero-content,.v-hero-bottom),
+body:has(#season-intro[open]) :is(.v-hero-content,.v-hero-bottom) { opacity:0; visibility:hidden; }
 #workspace .v-hero-restore {
   position:absolute;
   z-index:2;
@@ -158,16 +157,14 @@ body[data-route="overview"] .studio-description { display:none; }
 .v-note { font-size:.8rem; line-height:1.6; margin:24px 0 0; color:#989d9e; }
 @media(max-width:900px){
  body[data-route="overview"] .studio-home > .scene-slot {
-   grid-template-columns:minmax(0,1fr);
-   grid-template-rows:minmax(250px, 1fr) auto;
+   align-items:end;
    padding:76px var(--hero-gutter) 58px;
    background:radial-gradient(ellipse at 50% 32%,#25292c 0%,#141719 35%,#090b0d 68%);
  }
- body[data-route="overview"] .scene-shell[data-context=overview]:not([data-presentation]) {
-   grid-column:1;
-   grid-row:1;
+ body[data-route="overview"] .scene-shell[data-context=overview]:not([data-presentation]) #fallback:not([hidden]) {
+   inset:9% 5% 40%;
  }
- .v-hero-content { grid-row:2; }
+ .v-hero-content { width:100%; }
  .v-hero-content h2 { font-size:clamp(3.75rem,11vw,6.25rem); }
  .v-hero-content h2 strong { display:inline-block; }
  .v-eyebrow { margin-bottom:18px; }
@@ -184,12 +181,8 @@ body[data-route="overview"] .studio-description { display:none; }
  body[data-route="overview"] .topbar { height:75px; }
  body[data-route="overview"] .presentation-enter { padding:10px 12px; font-size:.62rem; }
  body[data-route="overview"] .studio-home > .scene-slot {
-   grid-template-rows:minmax(220px,1fr) auto;
    min-height:max(620px,100svh);
    padding-bottom:59px;
- }
- body[data-route="overview"] .scene-shell[data-context=overview]:not([data-presentation]) {
-   margin:28px -10px 0;
  }
  .v-hero-content h2 { font-size:clamp(3.3rem,13.7vw,5.25rem); }
  .v-hero-content h2 strong { display:block; }

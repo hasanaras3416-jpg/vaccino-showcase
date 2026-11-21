@@ -6,9 +6,9 @@ import {createStudio} from './studio.js';
 import {addMechanicalDetails} from './mechanical-details.js';
 import {createCameraMotion} from './camera-motion.js';
 import {vehicleLayout,checkVisualEnvelopes} from './vehicle-layout.js';
-import {record, parameters, state as workspaceState, mechanicalSystem} from './store.js';
+import {record, parameters, state as workspaceState, inspectionSystem} from './store.js';
 const sections=record.parts;
-const canInspect=id=>mechanicalSystem()?.parts.includes(id)??true;
+const canInspect=id=>inspectionSystem()?.parts.includes(id)??true;
 const playLabel=document.querySelector('#play span');
 
 let onSelect=()=>{};
@@ -77,7 +77,7 @@ for(const section of sections){
  $('parts').append(button);
 }
 function syncPartLibrary(){
- const visible=mechanicalSystem()?.parts.length??sections.length;
+ const visible=inspectionSystem()?.parts.length??sections.length;
  $('part-count').textContent=`${visible} bileşen`;
  $('parts').querySelectorAll('[data-part]').forEach(button=>{button.hidden=!canInspect(button.dataset.part);});
  for(const pin of pins) if(!canInspect(pin.id))pin.button.hidden=true;
@@ -94,9 +94,41 @@ try{
  const readPose=()=>({az,el,rad,target:target.toArray()});
  const writePose=pose=>{az=pose.az;el=pose.el;rad=pose.rad;target.fromArray(pose.target);focusGoal=null;draw=true;};
  const cameraMotion=createCameraMotion({read:readPose,write:writePose,invalidate:()=>{draw=true}});
- const homePose={az:-.77,el:.24,rad:4.65,target:[-.10,.38,-.10]};
+ const homePose={az:-.77,el:.24,rad:4.65,target:[0,.43,0]};
+ const vehiclePose={az:-.83,el:.51,rad:3.55,target:[0,.32,0]};
+ const studioPose={az:-.88,el:.50,rad:4.04,target:[0,.39,0]};
+ const isVehicleView=()=>workspaceState.route==='vehicle'&&!document.body.classList.contains('presentation-active');
  const isHomeView=()=>workspaceState.route==='overview'&&!document.body.classList.contains('presentation-active');
- const resetHomeView=(duration=0)=>cameraMotion.moveTo(homePose,duration);
+ const resetHomeView=(duration=0,onComplete)=>cameraMotion.moveTo(homePose,duration,onComplete);
+ function homeFraming(width,height){
+  if(width>900)return {x:.7,y:.54,width:.55,height:.77};
+  const compact=height<730;
+  return {x:.5,y:compact?.32:.36,width:.94,height:compact?.39:.45};
+ }
+ function boxCorners(bounds){
+  const corners=[];
+  for(const x of [bounds.min.x,bounds.max.x]){
+   for(const y of [bounds.min.y,bounds.max.y]){
+    for(const z of [bounds.min.z,bounds.max.z])corners.push(new T.Vector3(x,y,z));
+   }
+  }
+  return corners;
+ }
+ function distanceToFit(corners,pose,aspect,width,height){
+  const eye=new T.Vector3(Math.sin(pose.az)*Math.cos(pose.el),Math.sin(pose.el),Math.cos(pose.az)*Math.cos(pose.el));
+  const right=new T.Vector3(Math.cos(pose.az),0,-Math.sin(pose.az));
+  const up=eye.clone().cross(right);
+  const center=new T.Vector3(...pose.target);
+  const vertical=Math.tan(T.MathUtils.degToRad(camera.fov/2));
+  let distance=0;
+  const corner=new T.Vector3();
+  for(const point of corners){
+   corner.copy(point).sub(center);
+   const margin=Math.max(Math.abs(corner.dot(right))/(vertical*aspect*width),Math.abs(corner.dot(up))/(vertical*height));
+   distance=Math.max(distance,corner.dot(eye)+margin);
+  }
+  return distance;
+ }
  const steel=new T.MeshStandardMaterial({color:0xaeb8bc,metalness:.65,roughness:.32,side:T.DoubleSide});
  const white=new T.MeshStandardMaterial({color:0xdddeda,roughness:.40,metalness:.22,side:T.DoubleSide});
  const gold=new T.MeshStandardMaterial({color:0xbd8c34,roughness:.35,metalness:.27,side:T.DoubleSide});
@@ -496,6 +528,18 @@ try{
  const bodyShell=createBodyShell(T,body);body.userData.part='shell';
  studio.apply(steel,'metal');studio.apply(machined,'metal');studio.apply(hubmat,'metal');studio.apply(anodized,'cast');studio.apply(housing,'cast');studio.apply(alloy,'metal');studio.apply(rubber,'rubber');
  addMechanicalDetails(T,{chassis,suspension,brakes,motorGroup,diffGroup,axleGroup,wheels,studio});
+ const homeBounds=new T.Box3().setFromObject(frame).union(new T.Box3().setFromObject(wheels)).union(new T.Box3().setFromObject(body));
+ const homeCorners=boxCorners(homeBounds);
+ const vehicleCorners=[];
+ for(const root of [frame,wheels]){
+  root.traverseVisible(mesh=>{
+   if(!mesh.isMesh)return;
+   const source=mesh.isInstancedMesh?mesh:mesh.geometry;
+   if(!source.boundingBox)source.computeBoundingBox();
+   if(source.boundingBox.isEmpty())return;
+   for(const corner of boxCorners(source.boundingBox))vehicleCorners.push(corner.applyMatrix4(mesh.matrixWorld));
+  });
+ }
  sections.filter(s=>s.point).forEach(s=>{
   const b=document.createElement('button');b.className='marker';b.setAttribute('aria-controls','part-inspector');b.dataset.part=s.id;b.title=s.label;b.setAttribute('aria-label',s.label);b.onclick=()=>inspect(s.id,b);$('pins').append(b);pins.push({button:b,position:new T.Vector3(...s.point),id:s.id});
  });
@@ -512,7 +556,11 @@ try{
  $('top').onclick=()=>{rearView=false;refreshDrive();cockpitView=false;target.set(0,.39,0);rad=4.5;el=1.52;az=-Math.PI/2;draw=true};
  $('cockpit').onclick=()=>{if(pickMode==='body')setMode('frame');rearView=false;refreshDrive();cockpitView=true;target.set(-.085,.48,.03);az=1.22;el=.71;rad=2.35;select('hmi');draw=true};
  $('wheel-toggle').onclick=()=>{hideWheels=!hideWheels;wheels.visible=!hideWheels;$('wheel-toggle').setAttribute('aria-pressed',String(hideWheels));$('wheel-toggle').textContent=hideWheels?'Tekerlekleri göster':'Tekerlekleri gizle';draw=true};
- $('reset').onclick=()=>{rearView=false;refreshDrive();cockpitView=false;target.set(0,.39,0);el=.50;az=-.88;rad=4.04;draw=true};
+ $('reset').onclick=()=>{
+  rearView=false;cockpitView=false;
+  writePose(isVehicleView()?vehiclePose:studioPose);
+  refreshDrive();
+ };
  redraw=()=>{draw=true};
  const partGroups={frame:chassis,motor:motorGroup,clutch:clutchGroup,diff:diffGroup,battery:batterySupport,seat,pc:computer,camera:nose,hmi:panel,suspension,brake:brakes,steering,drive:motorController,power:fire};
  const raycaster=new T.Raycaster();let downPoint=null;
@@ -533,7 +581,7 @@ try{
  let focusContext=null,focusIds=new Set(),isolation=true;
  function owner(m){let node=m;while(node){if(node.userData.part)return node.userData.part;node=node.parent}return 'frame';}
  function updateHighlight(){
-  const dimOpacity=mechanicalSystem()?.075:.16;
+  const dimOpacity=inspectionSystem()?.075:.16;
   for(const [m,base] of materialState){const mat=m.material;const id=owner(m),dim=focusContext&&isolation&&!focusIds.has(id)&&id!==chosen;mat.color.copy(base.color);mat.opacity=dim?dimOpacity:base.opacity;mat.transparent=dim||base.transparent;mat.depthWrite=dim?false:base.depthWrite;mat.roughness=base.roughness;
    if(mat.emissive)mat.emissive.copy(base.emissive||new T.Color(0)).add(new T.Color(id===chosen?0x332305:focusIds.has(id)?0x100b02:0));if(m.userData.brakeColor && (focusContext==='braking'||chosen==='brake')) {
     mat.color.setHex(m.userData.brakeColor);
@@ -548,7 +596,7 @@ try{
   const info=sections.find(x=>x.id===id);
   if(info?.point&&id!=='frame'){
    focusGoal=new T.Vector3(...info.point);
-   rad=mechanicalSystem()?3.65:['motor','clutch','diff'].includes(id)?1.85:3.2;
+   rad=inspectionSystem()?3.65:['motor','clutch','diff'].includes(id)?1.85:3.2;
   }
   draw=true;
  };
@@ -556,7 +604,7 @@ try{
  $('explode').onclick=()=>{exploded=!exploded;$('explode').setAttribute('aria-pressed',String(exploded));draw=true};
  $('battery-toggle').onclick=()=>{batteryHidden=!batteryHidden;$('battery-toggle').setAttribute('aria-pressed',String(batteryHidden));refreshDrive()};
  $('engage').onclick=()=>{
-  if(mechanicalSystem()?.id!=='transmission')return;
+  if(inspectionSystem()?.id!=='transmission')return;
   engaged=!engaged;refreshDrive();select(chosen);
  };
  $('play').onclick=()=>{playing=!playing;$('play').setAttribute('aria-pressed',String(playing));playLabel.textContent=playing?'Duraklat':'Canlandır';draw=true};
@@ -564,7 +612,7 @@ try{
  $('shadows').onchange=e=>studio.setShadows(e.target.checked);
  studio.quality('auto');
  const originalReset=$('reset').onclick;$('reset').onclick=()=>{cameraMotion.cancel();focusContext=null;focusIds.clear();brakeFlow=false;isolation=true;updateHighlight();document.getElementById('brake-flow')?.setAttribute('aria-pressed','false');document.getElementById('system-isolate')?.setAttribute('aria-pressed','false');exploded=false;batteryHidden=false;playing=false;demoEnd=0;engaged=true;guardVisible=false;hideWheels=false;wheels.visible=true;setMode('frame');focusGoal=null;originalReset();$('explode').setAttribute('aria-pressed','false');$('battery-toggle').setAttribute('aria-pressed','false');$('wheel-toggle').setAttribute('aria-pressed','false');$('wheel-toggle').textContent='Tekerlekleri gizle';$('engage').setAttribute('aria-pressed','true');$('engage').textContent='Bağlı';$('play').setAttribute('aria-pressed','false');playLabel.textContent='Canlandır';refreshDrive();
-  const entry=mechanicalSystem();
+  const entry=inspectionSystem();
   if(entry){
    focusSystem(entry.focus,entry.parts);
    $('system-isolate')?.setAttribute('aria-pressed','true');
@@ -585,7 +633,7 @@ try{
   if(pointers.size===1){
    if(!pointer.started){
     const verticalTouch=e.pointerType==='touch'&&Math.abs(dy)>Math.abs(dx);
-    if(verticalTouch&&(isHomeView()||mechanicalSystem()))return;
+    if(verticalTouch&&(isHomeView()||inspectionSystem()))return;
     if(isHomeView()&&Math.hypot(dx,dy)<8)return;
    }
    if(!pointer.started)notifyInspection();
@@ -601,7 +649,15 @@ try{
   draw=true;
  });
  for(const ev of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(ev,e=>{pointers.delete(e.pointerId);pinch=0});
- canvas.addEventListener('wheel',e=>{cameraMotion.cancel();e.preventDefault();notifyInspection();rad=Math.max(rearView?1.1:2.35,Math.min(8.5,rad*Math.exp(e.deltaY*.001)));draw=true},{passive:false});
+ canvas.addEventListener('wheel',e=>{
+  if(isHomeView()&&document.activeElement!==canvas){
+   const rect=canvas.getBoundingClientRect(),framing=homeFraming(rect.width,rect.height);
+   const x=(e.clientX-rect.left)/rect.width,y=(e.clientY-rect.top)/rect.height;
+   if(Math.abs(x-framing.x)>framing.width/2||Math.abs(y-framing.y)>framing.height/2)return;
+  }
+  cameraMotion.cancel();e.preventDefault();notifyInspection();
+  rad=Math.max(rearView?1.1:2.35,Math.min(8.5,rad*Math.exp(e.deltaY*.001)));draw=true;
+ },{passive:false});
  canvas.addEventListener('keydown',e=>{
   if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','-'].includes(e.key))return;
   cameraMotion.cancel();e.preventDefault();notifyInspection();if(e.key==='ArrowLeft')az+=.15;if(e.key==='ArrowRight')az-=.15;
@@ -610,7 +666,7 @@ try{
  });
  new ResizeObserver(()=>{draw=true}).observe($('stage'));
  document.addEventListener('vaccino:resize',()=>{draw=true});
- let renderWidth=0,renderHeight=0;
+ let renderWidth=0,renderHeight=0,homeFit=1,vehicleFit=1;
  function loop(now){
   requestAnimationFrame(loop);
   if(document.hidden||$('viewer').hidden||canvas.clientWidth<2||canvas.clientHeight<2){lastNow=now;return;}
@@ -619,13 +675,13 @@ try{
   const dt=Math.min(.05,lastNow?(now-lastNow)/1000:0);lastNow=now;
   scene.background=sceneBackground;
   if(world.update(dt))draw=true;
-  const inHome=isHomeView();
+  const inHome=isHomeView(),inVehicle=isVehicleView();
   const inStudio=!experienceState.active||experienceState.environment==='showroom'||document.body.classList.contains('presentation-active');
-  studioFloor.visible=inStudio&&!inHome;
+  studioFloor.visible=inStudio&&!inHome&&!inVehicle;
   homeLights.visible=inHome;
   ambient.visible=sun.visible=fill.visible=!inHome;
   render.toneMappingExposure=inHome?.90:1.05;
-  if(inHome)scene.background=null;
+  if(inHome||inVehicle)scene.background=null;
   else if(inStudio)sceneBackground.setHex(0x100f0e);
   const showFlow=brakeFlow&&focusContext==='braking';
   for(const [index,marker] of brakeMarkers.entries()) {
@@ -649,8 +705,18 @@ try{
   if(!draw)return;draw=false;
   for(let i=0;i<72;i++){const u=((i/72-wheelSpin*largeR/beltLength)%1+1)%1;const p=beltCurve.getPointAt(u),t=beltCurve.getTangentAt(u);scratch.position.set(p.x,p.y,pulleyZ);scratch.rotation.set(0,0,Math.atan2(t.y,t.x));scratch.scale.set(1,1,1);scratch.updateMatrix();beltMarks.setMatrixAt(i,scratch.matrix);}beltMarks.instanceMatrix.needsUpdate=true;
   const w=canvas.clientWidth,h=canvas.clientHeight;
-  if(renderWidth!==w||renderHeight!==h){render.setSize(w,h,false);renderWidth=w;renderHeight=h;}camera.aspect=w/h;
-  const fit=inHome?Math.max(.86,1.08/camera.aspect):Math.max(1,(document.body.classList.contains('presentation-active')?.95:rearView?.91:1.13)/camera.aspect);
+  camera.aspect=w/h;
+  const framing=homeFraming(w,h);
+  if(renderWidth!==w||renderHeight!==h){
+   render.setSize(w,h,false);renderWidth=w;renderHeight=h;
+   homeFit=distanceToFit(homeCorners,homePose,camera.aspect,framing.width,framing.height)/homePose.rad;
+   vehicleFit=distanceToFit(vehicleCorners,vehiclePose,camera.aspect,.88,.91)/vehiclePose.rad;
+  }
+  if(inHome){
+   camera.setViewOffset(w,h,(.5-framing.x)*w,(.5-framing.y)*h,w,h);
+  }else if(camera.view?.enabled)camera.clearViewOffset();
+  const fit=inHome?homeFit:inVehicle&&!rearView&&!cockpitView?vehicleFit:
+   Math.max(1,(document.body.classList.contains('presentation-active')?.95:rearView?.91:1.13)/camera.aspect);
   if(!world.camera(camera,target,az,el,rad,fit)){camera.position.set(target.x+fit*rad*Math.cos(el)*Math.sin(az),target.y+fit*rad*Math.sin(el),target.z+fit*rad*Math.cos(el)*Math.cos(az));camera.lookAt(target);}camera.updateProjectionMatrix();render.render(scene,camera);
   for(const p of pins){
    const v=p.position.clone().applyMatrix4(vehicleRoot.matrixWorld).project(camera);
@@ -659,7 +725,7 @@ try{
    p.button.style.top=(1-v.y)*h/2+'px';
   }
  }
- refreshDrive=()=>{simulation.coupled=engaged;if(engaged){rotor.rotation.z=smallPulley.rotation.z;sleeve.rotation.z=smallPulley.rotation.z;}$('engage').setAttribute('aria-pressed',String(engaged));$('engage').textContent=engaged?'Bağlı':'Süzülme';batterySupport.visible=!batteryHidden&&(!rearView||chosen==="battery");fire.visible=!rearView; sleeve.position.z=T.MathUtils.lerp(sleeve.position.z,engaged?.145:.105,.25);guard.visible=guardVisible;const state=$('drive-state');state.hidden=mechanicalSystem()?.id!=='transmission';state.textContent=engaged?'BAĞLI · Motor ve akslar':'AYRIK · Akslar dönmeye devam eder';redraw()};
+ refreshDrive=()=>{simulation.coupled=engaged;if(engaged){rotor.rotation.z=smallPulley.rotation.z;sleeve.rotation.z=smallPulley.rotation.z;}$('engage').setAttribute('aria-pressed',String(engaged));$('engage').textContent=engaged?'Bağlı':'Süzülme';batterySupport.visible=!batteryHidden&&(!rearView||chosen==="battery");fire.visible=!rearView; sleeve.position.z=T.MathUtils.lerp(sleeve.position.z,engaged?.145:.105,.25);guard.visible=guardVisible;const state=$('drive-state');state.hidden=inspectionSystem()?.id!=='transmission';state.textContent=engaged?'BAĞLI · Motor ve akslar':'AYRIK · Akslar dönmeye devam eder';redraw()};
  function clearFocus(wide=false){brakeFlow=false;cameraMotion.cancel();focusContext=null;focusIds.clear();isolation=true;updateHighlight();if(wide){$('reset').click();focusGoal=null;rearView=false;cockpitView=false;resetHomeView();$('scene-focus-label').textContent='GENEL GÖRÜNÜM';refreshDrive();}draw=true;}
  function focusSystem(name,parts){
   brakeFlow=false;
@@ -667,13 +733,17 @@ try{
   const spec=map[name];if(!spec)return;focusContext=name;focusIds=new Set(parts??spec.ids);isolation=true;
   if(pickMode==='body')setMode('frame');
   rearView=false;cockpitView=false;
-  if(parts&&mechanicalSystem()){
+  if(parts&&inspectionSystem()){
    const poses={
     transmission:{az:1.04,el:.44,rad:3.65,target:[.27,.34,0]},
     braking:{az:-.85,el:.56,rad:3.65,target:[0,.30,0]},
     suspension:{az:-.74,el:.41,rad:3.65,target:[-.14,.32,0]},
-    chassis:{az:-.88,el:.50,rad:3.65,target:[0,.39,0]}
+    chassis:{az:-.88,el:.50,rad:3.65,target:[0,.39,0]},
+    battery:{az:.79,el:.68,rad:3.64,target:[.05,.34,0]},
+    control:{az:.91,el:.54,rad:3.64,target:[.15,.35,0]},
+    auxiliary:{az:-.86,el:.55,rad:3.7,target:[-.15,.37,0]}
    };
+   if(name==='battery'){batteryHidden=false;$('battery-toggle').setAttribute('aria-pressed','false');}
    select(spec.part);
    writePose(poses[name]);
    refreshDrive();updateHighlight();return;
@@ -704,9 +774,9 @@ try{
   if(spec.focus)focusSystem(spec.focus);else{clearFocus();select('frame');rearView=false;cockpitView=false;}
   syncControls();refreshDrive();writePose(previousPose);cameraMotion.moveTo(spec.camera,950);draw=true;
  }
- let transmissionActive=mechanicalSystem()?.id==='transmission';
+ let transmissionActive=inspectionSystem()?.id==='transmission';
  document.addEventListener('vaccino:route',()=>{
-  const entry=mechanicalSystem();
+  const entry=inspectionSystem();
   const active=entry?.id==='transmission';
   if(!active&&(transmissionActive||entry)){
    setAnimating(false);
@@ -719,8 +789,8 @@ try{
  function setEngaged(value){const pose=readPose();engaged=!!value;select(chosen);writePose(pose);refreshDrive();}
  function setQuality(value){$('quality').value=value;studio.quality(value);}
  function setShadows(value){$('shadows').checked=!!value;studio.setShadows(value);}
- function setShell(mode){cameraMotion.cancel();pickMode='frame';frame.visible=true;bodyShell.style(mode,{immediate:isHomeView()});draw=true;}
+ function setShell(mode,{immediate=isHomeView()}={}){cameraMotion.cancel();pickMode='frame';frame.visible=true;bodyShell.style(mode,{immediate});draw=true;}
  function moveCamera(pose){cameraMotion.moveTo(pose,800);draw=true;}
 
- select('frame');focusGoal=null;rad=4.04;refreshDrive();document.body.dataset.webgl='ready';window.vaccino={state:()=>({shell:bodyShell.state(),world:world.state(),graphics:studio.status(),brakeFlow,cameraTransition:cameraMotion.active,layoutChecks:checkVisualEnvelopes(),focusContext,isolation,focusedParts:[...focusIds],engaged,playing,exploded,batteryHidden,hideWheels,wheelSpin,chosen,camera:{az,el,rad,target:target.toArray()},visible:{body:body.visible,frame:frame.visible,battery:batterySupport.visible,guard:guard.visible,wheels:wheels.visible},explodePosition:motorGroup.position.toArray(),rotor:rotor.rotation.z,carrier:carrier.rotation.z,sleeve:sleeve.position.z,small:smallPulley.rotation.z,large:largePulley.rotation.z,meshes:render.info.render.calls}),setStudioPose(pose,duration){cameraMotion.moveTo(pose,duration);},resetHomeView,toggleBrakeFlow(){if(focusContext!=='braking')focusSystem('braking',mechanicalSystem()?.parts);brakeFlow=!brakeFlow;draw=true;return brakeFlow;},setShell,moveCamera,experienceState:()=>world.state(),shellState:()=>bodyShell.state(),captureView,restoreView,presentScene,setAnimating,setEngaged,setQuality,setShadows,select,inspect,focusSystem,clearFocus,isolate:enabled=>{isolation=enabled;updateHighlight();draw=true;}};requestAnimationFrame(loop);
+ select('frame');focusGoal=null;rad=4.04;refreshDrive();document.body.dataset.webgl='ready';window.vaccino={state:()=>({shell:bodyShell.state(),world:world.state(),graphics:studio.status(),brakeFlow,cameraTransition:cameraMotion.active,layoutChecks:checkVisualEnvelopes(),focusContext,isolation,focusedParts:[...focusIds],engaged,playing,exploded,batteryHidden,hideWheels,wheelSpin,chosen,camera:{az,el,rad,target:target.toArray()},visible:{body:body.visible,frame:frame.visible,battery:batterySupport.visible,guard:guard.visible,wheels:wheels.visible},explodePosition:motorGroup.position.toArray(),rotor:rotor.rotation.z,carrier:carrier.rotation.z,sleeve:sleeve.position.z,small:smallPulley.rotation.z,large:largePulley.rotation.z,meshes:render.info.render.calls}),setStudioPose(pose,duration){cameraMotion.moveTo(pose,duration);},resetHomeView,resetVehicleView:()=>$('reset').click(),toggleBrakeFlow(){if(focusContext!=='braking')focusSystem('braking',inspectionSystem()?.parts);brakeFlow=!brakeFlow;draw=true;return brakeFlow;},setShell,moveCamera,experienceState:()=>world.state(),shellState:()=>bodyShell.state(),captureView,restoreView,presentScene,setAnimating,setEngaged,setQuality,setShadows,select,inspect,focusSystem,clearFocus,isolate:enabled=>{isolation=enabled;updateHighlight();draw=true;}};requestAnimationFrame(loop);
 }catch(e){document.querySelector('.part-library').open=true;$('fallback').hidden=false;document.body.dataset.webgl='failed';console.error(e)}

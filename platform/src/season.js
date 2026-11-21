@@ -7,15 +7,11 @@ export async function loadBrandLogo() {
     mark.alt='';
     link.replaceChildren(mark);
   }
-  const icon=document.createElement('link');
-  icon.rel='icon';
-  icon.href=image.src;
-  document.head.append(icon);
   image.alt='';
   return image;
 }
 
-export function initializeSeason(logo,openMenu=()=>{}) {
+export function initializeSeason(logo) {
   const intro=document.getElementById('season-intro');
   const start=document.getElementById('season-start');
   const skip=document.getElementById('season-skip');
@@ -23,25 +19,21 @@ export function initializeSeason(logo,openMenu=()=>{}) {
   const onHome=()=>['','#','#/overview','#overview'].includes(location.hash);
   if (!onHome()) return async ()=>{};
   const error=document.getElementById('season-error');
-  let timeout;
-
-  function finish({focus=true,showMenu=false}={}) {
-    clearTimeout(timeout);
+  function finish({focus=true,reset=true}={}) {
+    if(!intro.open)return;
+    if(reset&&onHome())window.vaccino?.resetHomeView();
     intro.close();
-    if(onHome()) window.vaccino?.resetHomeView();
-    const tour=document.getElementById('presentation-enter');
-    if(showMenu) openMenu();
-    else if(focus) (tour.disabled?document.getElementById('menu-toggle'):tour).focus({preventScroll:true});
+    if(focus)document.getElementById('menu-toggle').focus({preventScroll:true});
   }
   start.onclick=()=>{
     const api=window.vaccino;
-    if(!api || matchMedia('(prefers-reduced-motion: reduce)').matches) return finish({showMenu:true});
-    api.setStudioPose({az:-1.48,el:.17,rad:9,target:[0,.36,0]},0);
+    if(!api || matchMedia('(prefers-reduced-motion: reduce)').matches)return finish();
+    api.setStudioPose({az:-1.32,el:.16,rad:8.5,target:[0,.36,0]},0);
     intro.classList.add('season-revealing');
     start.disabled=true;
     skip.focus();
-    api.resetHomeView(3600);
-    timeout=setTimeout(()=>finish({showMenu:true}),3650);
+    // Close the dialog after the final camera frame has been rendered.
+    api.resetHomeView(2700,()=>requestAnimationFrame(()=>finish({reset:false})));
   };
   skip.onclick=()=>finish();
   intro.addEventListener('cancel',event=>{

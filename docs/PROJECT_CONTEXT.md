@@ -15,9 +15,10 @@ A polished public-facing digital presentation for Vaccino, an electric student c
 - Public showcase repo; hash routes and static HTML/CSS/JS ES modules.
 - Three.js/WebGL vehicle scene is a **representative** design; its mechanics are not physical validation.
 - Intro uses lion/Vaccino brand asset.
-- `#/overview`: cinematic vehicle hero, editorial storytelling.
+- `#/overview`: full-viewport interactive vehicle hero, lion-triggered camera approach and editorial storytelling.
 - `#/experience/showroom`: showroom scene.
-- `#/vehicle`, `#/mechanical`, `#/electrical`: technical exploration. Mechanical offers scoped views for transmission, braking, suspension and chassis/cockpit.
+- `#/vehicle`: dedicated front three-quarter view of the chassis and wheels, with responsive framing and a matching reset.
+- `#/mechanical` and `#/electrical`: scoped 3D exhibits of each system. Electrical groups battery calculations and power distribution under separate disclosures.
 - `#/autonomy/simulation` and `#/autonomy/vision`: independent software exhibits. Previous perception, sensor and interface routes open Görüntü İşleme, with the corresponding technical resources expanded for the sensor and interface links.
 - `#/team/goals`, `#/inventory`: competition context and inventory. The team photo gallery and both software media showcases currently await approved media.
 - Add media entries to `presentation.software[].media` or `presentation.competitionMedia` in `platform/data/project.json`. Each entry uses `type` (`image` or `video`), `src` relative to `platform/`, descriptive `alt` and an optional `caption`. Video entries can also reference a Turkish WebVTT file with `captions`.

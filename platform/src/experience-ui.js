@@ -9,7 +9,7 @@ export function initializeExperienceUI(){
  const nativeReset=$('reset').onclick;$('reset').onclick=()=>{nativeReset?.();if(state.route==='experience')api?.setShell(experienceState.bodyMode);};
  function route(){
   const wasActive=experienceState.active,active=['experience','overview'].includes(state.route);experienceState.active=active;
-  if(!active&&wasActive){simulation.pause();api?.setShell('hidden');api?.setAnimating(false);}
+  if(!active&&wasActive){simulation.pause();api?.setShell('hidden',{immediate:true});api?.setAnimating(false);}
   else if(active){
    const env=state.route==='overview'?'showroom':state.sub;
    if(experienceState.environment!==env||!api?.experienceState().active){setEnvironment(env);}
