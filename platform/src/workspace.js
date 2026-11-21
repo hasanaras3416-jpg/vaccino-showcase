@@ -26,7 +26,7 @@ for (const [section, entries] of Object.entries({...systems, autonomy: software}
   }
 }
 const viewer = $('viewer');
-let inspectPart;
+let inspectPart, vehicleApi;
 
 function modeText(simple, technical) {
   const section = make('div');
@@ -131,11 +131,11 @@ function isolationButton(){
   const button=make('button','Sistemi öne çıkar','isolate-button');
   button.id='system-isolate';
   button.disabled=document.body.dataset.webgl==='failed';
-  button.setAttribute('aria-pressed',String(window.vaccino?.state().isolation??true));
+  button.setAttribute('aria-pressed',String(vehicleApi?.state().isolation??true));
   button.onclick=()=>{
     const enabled=button.getAttribute('aria-pressed')!=='true';
     button.setAttribute('aria-pressed',String(enabled));
-    window.vaccino?.isolate(enabled);
+    vehicleApi?.isolate(enabled);
   };
   return button;
 }
@@ -172,9 +172,12 @@ function drivetrainBrief(variant){
 }
 function syncDrivetrainPanel(){
   const variant=activeDrivetrain();
-  const pending=window.vaccino?.drivetrainTransitioning()??false;
+  const pending=vehicleApi?.drivetrainTransitioning()??false;
   $('drivetrain-selector').hidden=!variant;
-  $('drivetrain-options').querySelectorAll('input').forEach(input=>{input.checked=input.value===state.drivetrain;});
+  $('drivetrain-options').querySelectorAll('input').forEach(input=>{
+    input.checked=input.value===state.drivetrain;
+    input.disabled=!inspectPart;
+  });
   if(variant){
     $('mechanical-brief').querySelectorAll('[data-inspect]').forEach(button=>{button.disabled=pending;});
   }
@@ -184,11 +187,11 @@ for(const [id,variant] of Object.entries(drivetrainData.variants)){
   const radio=make('input');
   radio.type='radio';radio.name='drivetrain';radio.value=id;radio.checked=id===state.drivetrain;
   radio.addEventListener('change',()=>{
-    if(!radio.checked||!activeDrivetrain())return;
+    if(!inspectPart||!radio.checked||!activeDrivetrain())return;
     state.drivetrain=id;
     drivetrainBrief(activeDrivetrain());
-    window.vaccino?.applyDrivetrain({selectPart:true});
-    if(!window.vaccino)document.dispatchEvent(new Event('vaccino:drivetrain-change'));
+    vehicleApi?.applyDrivetrain({selectPart:true});
+    if(!vehicleApi)document.dispatchEvent(new Event('vaccino:drivetrain-change'));
     syncViewerControls({closeSettings:false});
     syncDrivetrainPanel();
   });
@@ -212,7 +215,7 @@ function systemBrief(route, entry) {
     const flow=make('button','Fren akışını göster');
     flow.id='brake-flow';
     flow.setAttribute('aria-pressed','false');
-    flow.onclick=()=>flow.setAttribute('aria-pressed',String(window.vaccino?.toggleBrakeFlow()||false));
+    flow.onclick=()=>flow.setAttribute('aria-pressed',String(vehicleApi?.toggleBrakeFlow()||false));
     actions.append(flow);
     explanation.append(paragraph('Ön devre mavi, arka devre bakır renkle gösterilir. Yerleşim ve akış temsilidir. Montaj, hareket açıklığı ve donanım seçimi mühendislik doğrulaması gerektirir.'));
   }
@@ -234,7 +237,7 @@ function systemBrief(route, entry) {
   }
 }
 function applySceneFocus() {
-  const api=window.vaccino;
+  const api=vehicleApi;
   if(!api){
     if(document.body.dataset.webgl==='failed'){
       for(const id of ['system-isolate','brake-flow']) if($(id)) $(id).disabled=true;
@@ -343,7 +346,7 @@ function navigate({focusHeading=false}={}) {
   const softwareRoute=state.route==='autonomy';
   $('software-resources').open=softwareRoute&&['sensors','interfaces'].includes(path[1]);
   document.querySelector('.interface-disclosure').open=softwareRoute&&path[1]==='interfaces';
-  window.vaccino?.applyDrivetrain({immediate:true});
+  vehicleApi?.applyDrivetrain({immediate:true});
   syncViewerControls();syncDrivetrainPanel();
   updateHeading();applySceneFocus();closeMenu();
   window.scrollTo({top:0,behavior:'instant'});
@@ -437,8 +440,15 @@ window.addEventListener('hashchange',()=>navigate({focusHeading:true}));
 document.body.dataset.data='ready';
 const logo=loadBrandLogo();
 const finishSeasonSetup=initializeSeason(logo);
-({inspect:inspectPart}=await import('./vehicle.js'));
-window.vaccino?.applyDrivetrain({immediate:true});
+const vehicle=await import('./vehicle.js');
+if(!Object.hasOwn(vehicle,'vehicleApi')||
+  (document.body.dataset.webgl==='ready'&&
+    (typeof vehicle.vehicleApi?.applyDrivetrain!=='function'||typeof vehicle.vehicleApi?.drivetrainTransitioning!=='function'))){
+  throw new Error(`Vaccino 3B görüntüleyici sürümü uyuşmuyor: ${import.meta.url}`);
+}
+({inspect:inspectPart,vehicleApi}=vehicle);
+vehicleApi?.applyDrivetrain({immediate:true});
+syncDrivetrainPanel();
 applySceneFocus();
 const {initializePresentation}=await import('./presentation.js');initializePresentation();
 const {initializeExperienceUI}=await import('./experience-ui.js');initializeExperienceUI();

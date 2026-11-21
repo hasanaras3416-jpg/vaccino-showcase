@@ -22,6 +22,9 @@ python -m http.server 4174
 
 Browse `http://localhost:4174/platform/`. GitHub Pages uses `platform/`.
 
+### Runtime cache version
+The version on `src/app.js?v=…` in `platform/index.html` names a set of compatible JavaScript and project data files. Bump it when shipping changes to the runtime or project data. The bootstrap applies that version to the whole module graph, Three.js and, through the store, `project.json`. Register new runtime modules in the bootstrap’s import map. Check a navigation with an old unversioned module already in the browser cache when changing the bootstrap.
+
 ## 4. Verify
 - Smoke-test primary routes and browser console.
 - Inspect at least a desktop and narrow/mobile viewport.
