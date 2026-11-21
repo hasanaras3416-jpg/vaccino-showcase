@@ -14,6 +14,13 @@ const routes = record.presentation.routes;
 const {mechanical, electrical} = record.presentation.systems;
 const systems = {mechanical, electrical};
 const software = record.presentation.software;
+// All route data must come from the same revision as the JavaScript modules.
+// A stale project.json previously prevented any navigation from initializing.
+for (const [section, entries] of Object.entries({...systems, autonomy: software})) {
+  if (!Array.isArray(entries)) {
+    throw new Error(`Vaccino veri sürümü uyuşmuyor: ${section} alt menüleri bulunamadı. Sayfayı önbelleği temizleyerek yenileyin.`);
+  }
+}
 const viewer = $('viewer');
 let inspectPart;
 
