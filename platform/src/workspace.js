@@ -34,11 +34,11 @@ function renderTabs() {
 }
 function updateHeading() {
   const route = routes.find(r => r.id === state.route);
-  $('screen-title').textContent = ({overview:'Vaccino stüdyosu',vehicle:'3B Model',mechanical:'Mekanik',electrical:'Elektrik',autonomy:'Yazılım',team:'Yarışmalar',inventory:'Envanter'})[state.route] || route.title;
+  $('screen-title').textContent = ({overview:'Vaccino stüdyosu',vehicle:'3B Model',mechanical:'Mekanik',electrical:'Elektrik',autonomy:'Yazılım',driver:'Driver',team:'Yarışmalar',inventory:'Envanter'})[state.route] || route?.title || 'Vaccino';
   $('breadcrumb').textContent = $('screen-title').textContent;
-  $('screen-description').textContent = state.route==='overview'?'':route.simple;
+  $('screen-description').textContent = state.route==='overview'?'':route?.simple || (state.route==='driver'?'Pilot ekipmanı / konsept görselleştirme':'');
   $('footer-context').textContent = `${record.revision} / v${record.uiVersion}`;
-  document.title = `${route.label} — Vaccino 26/27`;
+  document.title = `${route?.label || 'Driver'} — Vaccino 26/27`;
 }
 function closeMenu(returnFocus = false) {
   document.body.classList.remove('menu-open');
@@ -134,7 +134,7 @@ function navigate({focusHeading=false}={}) {
   const raw=location.hash.replace(/^#\/?/,'').split('/');
   const alias={competitions:['team','goals'],sensors:['autonomy','sensors'],files:['team','files'],'vehicle-section':['vehicle']};
   const path=alias[raw[0]]||raw;
-  state.route=routes.some(r=>r.id===path[0])?path[0]:'overview';
+  state.route=(path[0]==='driver'||routes.some(r=>r.id===path[0]))?path[0]:'overview';
   const entries=systems[state.route];
   state.sub=entries?(entries.some(s=>s.id===path[1])?path[1]:entries[0].id):state.route==='team'&&path[1]==='files'?'files':state.route==='team'?'goals':'';
   if(state.route==='experience')state.sub=['showroom','workshop','track'].includes(path[1])?path[1]:'showroom';
