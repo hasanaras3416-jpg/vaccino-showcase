@@ -32,7 +32,7 @@ export function initializePresentation(){
   }
   function exit(){
     if(!active)return;active=false;root.hidden=true;delete viewer.dataset.presentation;home.append(viewer);viewer.hidden=homeHidden;
-    inertState.forEach((value,node)=>{node.inert=value;});inertState.clear();api.restoreView(snapshot);document.body.classList.remove('presentation-active');
+    inertState.forEach((value,node)=>{node.inert=value;});inertState.clear();document.body.classList.remove('presentation-active');api.restoreView(snapshot);
     if(document.fullscreenElement===root)document.exitFullscreen().catch(()=>{});wasFullscreen=false;
     if(returnFocus?.isConnected)returnFocus.focus({preventScroll:true});document.dispatchEvent(new Event('vaccino:resize'));
   }

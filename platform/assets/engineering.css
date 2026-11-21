@@ -208,3 +208,54 @@ body[data-route=autonomy] .screen-heading {
   #workspace .tools:has(.viewer-settings) { inset:10px 10px auto; }
   .engineering-notes dl div { grid-template-columns:1fr; gap:.2rem; }
 }
+
+.drivetrain-selector {
+  margin:0 0 1.25rem;
+  padding:0;
+  border:0;
+  min-width:0;
+}
+.drivetrain-selector legend {
+  padding:0;
+  margin-bottom:.25rem;
+  color:var(--muted);
+  font-size:.88rem;
+}
+#drivetrain-options {
+  display:flex;
+  width:fit-content;
+  max-width:100%;
+  border-bottom:1px solid var(--line);
+}
+#drivetrain-options label { position:relative; cursor:pointer; }
+#drivetrain-options input { position:absolute; opacity:0; margin:0; inset:0; width:100%; min-height:44px; cursor:pointer; }
+#drivetrain-options span {
+  display:flex;
+  min-height:44px;
+  align-items:center;
+  padding:.55rem clamp(.65rem, 2vw, 1.25rem);
+  border-bottom:2px solid transparent;
+  color:var(--muted);
+  font-size:.8rem;
+  font-weight:650;
+  letter-spacing:.095em;
+  text-transform:uppercase;
+}
+#drivetrain-options input:checked + span { color:var(--warm-white); border-color:#cbb98b; background:var(--surface); }
+#drivetrain-options input:focus-visible + span { outline:2px solid var(--gold); outline-offset:2px; }
+.drivetrain-status { color:#cbb98b; font-size:.68rem; letter-spacing:.13em; font-weight:650; margin-bottom:.75rem; }
+#workspace .system-briefing .drivetrain-parts {
+  display:flex;
+  flex-wrap:wrap;
+  gap:0 .55rem;
+  margin-bottom:1.55rem;
+}
+#workspace .drivetrain-parts button { font-size:.88rem; }
+.drivetrain-evaluation { display:grid; gap:.9rem; margin-block:.8rem 1.3rem; }
+.drivetrain-evaluation h3 { font-size:.95rem; font-weight:650; }
+.drivetrain-evaluation ul { margin:.35rem 0 0; padding-inline-start:1.15rem; color:var(--muted); font-size:.9rem; }
+.drivetrain-evaluation li + li { margin-top:.18rem; }
+.drivetrain-comparison > div { padding-block:.65rem; border-top:1px solid var(--line); }
+.drivetrain-comparison dt { font-weight:650; margin-bottom:.4rem; }
+.drivetrain-comparison dd { margin:0 0 .35rem; color:var(--muted); font-size:.875rem; }
+.drivetrain-comparison dd b { color:var(--warm-white); font-size:.79rem; }

@@ -36,6 +36,12 @@ A site that looks like a **premium automotive design studio made it**, not a sch
 - Give Simülasyon and Görüntü İşleme independent routes. Each page has an introduction, a media showcase and concise engineering notes. Preserve sensor and interface records in Technical Resources.
 - Use the same media frame for competition photos. Empty frames say “İçerik eklenecek.” Add team-provided media in the project record with descriptive alt text and captions where available.
 
+## Drivetrain configurator
+- Keep a single vehicle canvas in Mechanical › Aktarma. Give Hub Motor and Merkezi Aktarma a compact keyboard-operable selector. Show the selected concept and its evaluation status above its component links and keep the detailed comparison in a disclosure.
+- Preserve the user's camera when switching concepts. Fade and restore the existing central motor, belt, differential and shafts as a group. Reveal the hub inside the translucent right rear wheel and interpolate the battery between visual reserves. With reduced motion, apply the target state immediately.
+- The selection drives the part list, hotspot and mesh eligibility, comparison and visible assemblies together. Suspend 3D picking during transitions. Keep textual part notes and comparison available without WebGL. Route changes outside Aktarma restore the central layout, and the presentation uses the central geometry.
+- Keep the visual reserves in `vehicle-layout.js` and the existing shaft motion intact. Any future CAD fit, weight distribution or service access requires independent verification.
+
 ## Required quality checks
 1. Test 1440px and 1920px desktop, ~768px tablet and 390px mobile viewport.
 2. Verify scroll boundaries, no text overlap and no horizontal overflow.

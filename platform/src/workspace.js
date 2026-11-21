@@ -1,4 +1,4 @@
-import {record, parameters, format, state, part, inspectionSystem} from './store.js';
+import {record, parameters, format, state, part, inspectionSystem, activeDrivetrain} from './store.js';
 import {initializeSeason, loadBrandLogo} from './season.js';
 
 const $ = id => document.getElementById(id);
@@ -14,6 +14,10 @@ const routes = record.presentation.routes;
 const {mechanical, electrical} = record.presentation.systems;
 const systems = {mechanical, electrical};
 const software = record.presentation.software;
+const drivetrainData=record.presentation.drivetrain;
+if(!drivetrainData?.variants?.central||!drivetrainData?.variants?.hub){
+  throw new Error('Vaccino veri sürümü uyuşmuyor: aktarma mimarileri bulunamadı. Sayfayı yenileyin.');
+}
 // All route data must come from the same revision as the JavaScript modules.
 // A stale project.json previously prevented any navigation from initializing.
 for (const [section, entries] of Object.entries({...systems, autonomy: software})) {
@@ -105,26 +109,100 @@ function disclosure(label,content){
   detail.append(make('summary',label),content);
   return detail;
 }
-function systemBrief(route, entry) {
-  const target=$(`${route}-brief`);
-  const title=make('h2',entry.label);title.id=`${route}-title`;
+function partActions(ids){
   const actions=make('div',null,'system-parts');
-  for(const id of entry.parts){
+  for(const id of ids){
     const button=make('button',part(id).label);
     button.dataset.inspect=id;
     button.setAttribute('aria-pressed','false');
     button.onclick=()=>inspectPart?.(id,button);
     actions.append(button);
   }
-
-  const focus=make('button','Sistemi öne çıkar','isolate-button');
-  focus.id='system-isolate';
-  focus.setAttribute('aria-pressed','true');
-  focus.onclick=()=>{
-    const enabled=focus.getAttribute('aria-pressed')!=='true';
-    focus.setAttribute('aria-pressed',String(enabled));
+  return actions;
+}
+function evaluation(label,items){
+  const block=make('div');
+  const list=make('ul');
+  for(const item of items)list.append(make('li',item));
+  block.append(make('h3',label),list);
+  return block;
+}
+function isolationButton(){
+  const button=make('button','Sistemi öne çıkar','isolate-button');
+  button.id='system-isolate';
+  button.disabled=document.body.dataset.webgl==='failed';
+  button.setAttribute('aria-pressed',String(window.vaccino?.state().isolation??true));
+  button.onclick=()=>{
+    const enabled=button.getAttribute('aria-pressed')!=='true';
+    button.setAttribute('aria-pressed',String(enabled));
     window.vaccino?.isolate(enabled);
   };
+  return button;
+}
+function drivetrainBrief(variant){
+  const title=make('h2',variant.label);title.id='mechanical-title';
+  const headline=make('header',null,'drivetrain-headline');
+  headline.append(paragraph(drivetrainData.status,'drivetrain-status'),title,paragraph(variant.summary,'system-lead'));
+  const evaluationSummary=make('div',null,'drivetrain-evaluation');
+  evaluationSummary.append(evaluation('Potansiyel avantajlar',variant.advantages.slice(0,2)),
+    evaluation('Değerlendirme başlıkları',variant.considerations.slice(0,2)));
+  const additional=make('div',null,'drivetrain-evaluation');
+  additional.append(evaluation('Diğer olası avantajlar',variant.advantages.slice(2)),
+    evaluation('Diğer değerlendirmeler',variant.considerations.slice(2)));
+  const compare=make('dl',null,'drivetrain-comparison');
+  for(const [key,label] of drivetrainData.topics){
+    const row=make('div');
+    row.append(make('dt',label));
+    for(const item of Object.values(drivetrainData.variants)){
+      const value=make('dd');
+      value.append(make('b',item.label),paragraph(item.comparison[key]));
+      row.append(value);
+    }
+    compare.append(row);
+  }
+  const actions=partActions(variant.parts);
+  actions.classList.add('drivetrain-parts');
+  const notes=make('div',null,'brief-explanation');
+  notes.append(paragraph(drivetrainData.transitionNote),
+    paragraph('Görsel yerleşimler değerlendirme aşamasında. Kütle merkezi, fiziksel çakışmalar ve araç performansı ayrıca doğrulanacak.'),isolationButton());
+  $('mechanical-brief').replaceChildren(headline,actions,evaluationSummary,
+    disclosure('Tüm değerlendirme başlıkları',additional),
+    disclosure('Mühendislik karşılaştırması',compare),
+    disclosure('Görsel kapsam',notes));
+}
+function syncDrivetrainPanel(){
+  const variant=activeDrivetrain();
+  const pending=window.vaccino?.drivetrainTransitioning()??false;
+  $('drivetrain-selector').hidden=!variant;
+  $('drivetrain-options').querySelectorAll('input').forEach(input=>{input.checked=input.value===state.drivetrain;});
+  if(variant){
+    $('mechanical-brief').querySelectorAll('[data-inspect]').forEach(button=>{button.disabled=pending;});
+  }
+}
+for(const [id,variant] of Object.entries(drivetrainData.variants)){
+  const label=make('label');
+  const radio=make('input');
+  radio.type='radio';radio.name='drivetrain';radio.value=id;radio.checked=id===state.drivetrain;
+  radio.addEventListener('change',()=>{
+    if(!radio.checked||!activeDrivetrain())return;
+    state.drivetrain=id;
+    drivetrainBrief(activeDrivetrain());
+    window.vaccino?.applyDrivetrain({selectPart:true});
+    if(!window.vaccino)document.dispatchEvent(new Event('vaccino:drivetrain-change'));
+    syncViewerControls({closeSettings:false});
+    syncDrivetrainPanel();
+  });
+  label.append(radio,make('span',variant.label));
+  $('drivetrain-options').append(label);
+}
+document.addEventListener('vaccino:drivetrain-settled',syncDrivetrainPanel);
+
+function systemBrief(route, entry) {
+  const target=$(`${route}-brief`);
+  const title=make('h2',entry.label);title.id=`${route}-title`;
+  const actions=partActions(entry.parts);
+
+  const focus=isolationButton();
   const explanation=make('div',null,'brief-explanation');
   const source=make('div',null,'brief-source technical-only');
   source.append(make('small','KAYNAK VE DOĞRULAMA'),paragraph(`${record.source} · ${record.revision}`),paragraph('Gerçek CAD, montaj açıklıkları ve test sonuçları bekleniyor.'));
@@ -137,11 +215,6 @@ function systemBrief(route, entry) {
     flow.onclick=()=>flow.setAttribute('aria-pressed',String(window.vaccino?.toggleBrakeFlow()||false));
     actions.append(flow);
     explanation.append(paragraph('Ön devre mavi, arka devre bakır renkle gösterilir. Yerleşim ve akış temsilidir. Montaj, hareket açıklığı ve donanım seçimi mühendislik doğrulaması gerektirir.'));
-  }
-  if(entry.id==='transmission'){
-    explanation.append(paragraph(entry.conceptNote));
-    const transmission=parameters.transmission;
-    explanation.append(paragraph(`Prensip gösterimi. Kasnak yarıçapları ${format(transmission.smallRadiusMm)} / ${format(transmission.largeRadiusMm)} mm, oran ${format(transmission.ratio)}. Nihai redüksiyon seçimi değildir.`));
   }
   target.replaceChildren(title,paragraph(entry.summary,'system-lead'),actions,
     disclosure(route==='electrical'?'Teknik detaylar':'Çalışma prensibi ve kaynaklar',explanation));
@@ -168,7 +241,7 @@ function applySceneFocus() {
     }
     return;
   }
-  const entry=systems[state.route]?.find(system=>system.id===state.sub);
+  const entry=inspectionSystem();
   if(entry) api.focusSystem(entry.focus,entry.parts);
   else if(state.route==='vehicle')api.resetVehicleView();
   else api.clearFocus(state.route==='overview');
@@ -228,15 +301,16 @@ settings.addEventListener('keydown',event=>{
     settings.querySelector('summary').focus();
   }
 });
-function syncViewerControls(){
+function syncViewerControls({closeSettings=true}={}){
   const scoped=!!inspectionSystem();
   const transmission=state.route==='mechanical'&&state.sub==='transmission';
-  $('engage').hidden=!transmission;
+  const central=transmission&&state.drivetrain==='central';
+  $('engage').hidden=!central;
   $('play').hidden=scoped&&!transmission;
   $('part-open').hidden=scoped;
   viewer.querySelectorAll('[data-general-view]').forEach(button=>{button.hidden=scoped;});
-  viewer.querySelectorAll('[data-transmission-view]').forEach(button=>{button.hidden=scoped&&!transmission;});
-  settings.open=false;
+  viewer.querySelectorAll('[data-transmission-view]').forEach(button=>{button.hidden=scoped&&!central;});
+  if(closeSettings)settings.open=false;
 }
 function navigate({focusHeading=false}={}) {
   document.dispatchEvent(new Event('vaccino:inspector-close'));
@@ -250,6 +324,7 @@ function navigate({focusHeading=false}={}) {
   const requested=state.route==='autonomy'?(legacySoftware[path[1]]??path[1]):path[1];
   state.sub=entries?(entries.some(s=>s.id===requested)?requested:entries[0].id):state.route==='team'&&path[1]==='files'?'files':state.route==='team'?'goals':'';
   if(state.route==='experience')state.sub=['showroom','workshop','track'].includes(path[1])?path[1]:'showroom';
+  if(state.route!=='mechanical'||state.sub!=='transmission')state.drivetrain='central';
   document.body.dataset.route=state.route;document.body.dataset.sub=state.sub;
   document.querySelectorAll('[data-screen]').forEach(screen=>{screen.hidden=screen.dataset.screen!==state.route;});
   document.querySelectorAll('.primary-nav a').forEach(a=>{if(a.dataset.route===(['vehicle','mechanical','electrical','autonomy','experience','decisions','tests'].includes(state.route)?'garage':state.route))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
@@ -259,14 +334,17 @@ function navigate({focusHeading=false}={}) {
   else viewer.hidden=true;
   if(entries){
     const entry=entries.find(item=>item.id===state.sub);
+    const variant=activeDrivetrain();
     if(state.route==='autonomy')renderSoftware(entry);
+    else if(variant)drivetrainBrief(variant);
     else systemBrief(state.route,entry);
   }
   $('team-goals').hidden=state.sub==='files';$('files').hidden=state.sub!=='files';
   const softwareRoute=state.route==='autonomy';
   $('software-resources').open=softwareRoute&&['sensors','interfaces'].includes(path[1]);
   document.querySelector('.interface-disclosure').open=softwareRoute&&path[1]==='interfaces';
-  syncViewerControls();
+  window.vaccino?.applyDrivetrain({immediate:true});
+  syncViewerControls();syncDrivetrainPanel();
   updateHeading();applySceneFocus();closeMenu();
   window.scrollTo({top:0,behavior:'instant'});
   if(focusHeading) (state.route==='overview'?$('menu-toggle'):document.querySelector('[data-screen]:not([hidden]) .subnav a[aria-current]')??$('screen-title')).focus({preventScroll:true});
@@ -360,6 +438,7 @@ document.body.dataset.data='ready';
 const logo=loadBrandLogo();
 const finishSeasonSetup=initializeSeason(logo);
 ({inspect:inspectPart}=await import('./vehicle.js'));
+window.vaccino?.applyDrivetrain({immediate:true});
 applySceneFocus();
 const {initializePresentation}=await import('./presentation.js');initializePresentation();
 const {initializeExperienceUI}=await import('./experience-ui.js');initializeExperienceUI();

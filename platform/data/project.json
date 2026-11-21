@@ -496,6 +496,102 @@
   ],
   "parts": [
     {
+      "id": "hub-motor",
+      "label": "Sağ arka hub motor",
+      "status": "DEĞERLENDİRME AŞAMASINDA",
+      "point": [
+        0.87,
+        0.432,
+        0.69
+      ],
+      "simple": "Tek hub motor sağ arka tekerleğin içinde gösteriliyor.",
+      "desc": "Yarı saydam tekerlek, motorun tekerlek içindeki konumunu görünür kılar.",
+      "facts": [
+        "Jant ve porya kesiti, kablo güzergâhı, soğutma ve servis erişimi doğrulanacak."
+      ],
+      "scope": "drivetrain"
+    },
+    {
+      "id": "hub-battery",
+      "label": "Alternatif batarya konumu",
+      "status": "DEĞERLENDİRME AŞAMASINDA",
+      "point": [
+        1.02,
+        0.51,
+        0.016
+      ],
+      "simple": "Batarya paketi eski diferansiyel bölgesine yakın bir aday konumda.",
+      "desc": "Bu görselde mevcut temsili paket yeniden konumlandırılır. Nihai paket seçimi veya bağlantı düzeni belirlenmedi.",
+      "facts": [
+        "Şasi, süspansiyon ve koltukla çakışma, kütle merkezi, kablo güzergâhı ve bakım erişimi doğrulanacak."
+      ],
+      "scope": "drivetrain"
+    },
+    {
+      "id": "free-wheel",
+      "label": "Sol arka serbest tekerlek",
+      "status": "DEĞERLENDİRME AŞAMASINDA",
+      "point": [
+        0.87,
+        0.45,
+        -0.67
+      ],
+      "simple": "Sol arka tekerleğe motor torku aktarılmaz.",
+      "desc": "Dönüş animasyonu serbest yuvarlanmayı görselleştirir. Araç dinamiği veya yol kuvveti hesaplanmaz.",
+      "facts": [
+        "Tek taraflı tahrikin yön kararlılığına ve tutunmaya etkisi incelenecek."
+      ],
+      "scope": "drivetrain"
+    },
+    {
+      "id": "belt",
+      "label": "Kayış ve kasnaklar",
+      "status": "DEĞERLENDİRME AŞAMASINDA",
+      "point": [
+        0.68,
+        0.34,
+        0.255
+      ],
+      "simple": "Kayış iki kasnak arasında hareketi aktarır.",
+      "desc": "Görsel aktarım oranı {{transmission.ratio}}. Nihai oran seçilmedi.",
+      "facts": [
+        "Kasnak hizalaması, kayış gerginliği ve muhafaza açıklığı mühendislik doğrulaması gerektirir."
+      ],
+      "scope": "drivetrain"
+    },
+    {
+      "id": "right-axle",
+      "label": "Sağ tahrik aksı",
+      "status": "DEĞERLENDİRME AŞAMASINDA",
+      "point": [
+        0.87,
+        0.32,
+        0.47
+      ],
+      "simple": "Sağ yarım aks, diferansiyeli sağ arka tekerleğe bağlar.",
+      "desc": "Mafsal ve körükler temsili olarak yerleştirilmiştir.",
+      "facts": [
+        "Sağ aks mafsal açıları ve hareket zarfı üretim geometrisiyle doğrulanacak."
+      ],
+      "scope": "drivetrain"
+    },
+    {
+      "id": "left-axle",
+      "label": "Sol tahrik aksı",
+      "status": "DEĞERLENDİRME AŞAMASINDA",
+      "point": [
+        0.87,
+        0.32,
+        -0.45
+      ],
+      "simple": "Sol yarım aks, diferansiyeli sol arka tekerleğe bağlar.",
+      "desc": "Mafsal ve körükler temsili olarak yerleştirilmiştir.",
+      "facts": [
+        "Sol aks mafsal açıları ve hareket zarfı üretim geometrisiyle doğrulanacak."
+      ],
+      "scope": "drivetrain"
+    },
+    {
       "id": "frame",
       "label": "Şasi",
       "status": "V2 GEOMETRİSİ",
@@ -863,7 +959,6 @@
           "id": "transmission",
           "summary": "Motor torkunun ayırıcı, kayış-kasnak ve diferansiyel üzerinden arka tekerleklere iletilmesini incele.",
           "label": "Aktarma",
-          "conceptNote": "3B gösterim merkezi motorlu konseptin çalışma prensibini gösterir. Sağ arka hub motor alternatifi değerlendirme aşamasındadır.",
           "parts": [
             "motor",
             "clutch",
@@ -1031,6 +1126,126 @@
           "flow": []
         }
       ]
+    },
+    "drivetrain": {
+      "status": "DEĞERLENDİRME AŞAMASINDA",
+      "transitionNote": "Geçiş iki yerleşimin görsel karşılaştırmasıdır. Parça hareketleri montaj sürecini temsil etmez.",
+      "topics": [
+        [
+          "motor",
+          "Motor konumu"
+        ],
+        [
+          "wheels",
+          "Tahrik edilen tekerlek"
+        ],
+        [
+          "method",
+          "Güç aktarımı"
+        ],
+        [
+          "differential",
+          "Diferansiyel"
+        ],
+        [
+          "complexity",
+          "Mekanik karmaşıklık"
+        ],
+        [
+          "mass",
+          "Kütle dağılımı"
+        ],
+        [
+          "service",
+          "Bakım ve erişim"
+        ],
+        [
+          "efficiency",
+          "Verimlilik"
+        ],
+        [
+          "dynamics",
+          "Araç dinamiği"
+        ],
+        [
+          "status",
+          "Doğrulama durumu"
+        ]
+      ],
+      "variants": {
+        "hub": {
+          "label": "Hub Motor",
+          "parts": [
+            "hub-motor",
+            "hub-battery",
+            "free-wheel"
+          ],
+          "summary": "Tek hub motor sağ arka tekerleği tahrik eder. Sol arka tekerlek serbest döner. Batarya için eski diferansiyel bölgesine yakın bir yerleşim inceleniyor.",
+          "advantages": [
+            "Daha az merkezi aktarma elemanı.",
+            "Kayış-kasnak ve diferansiyelin kaldırılabilmesi.",
+            "Daha sade bir mekanik yerleşim olasılığı.",
+            "Batarya için alternatif alan kazanılması."
+          ],
+          "considerations": [
+            "Tahrikin yalnızca bir arka tekerleğe uygulanması.",
+            "Asimetrik tahrikin araç davranışına etkisi.",
+            "Tekerlek tarafındaki kütlenin süspansiyona etkisi.",
+            "Motor soğutması, kablo güzergâhı ve servis erişimi.",
+            "Motorun jant ve porya geometrisiyle uyumu."
+          ],
+          "comparison": {
+            "motor": "Sağ arka tekerleğin içinde.",
+            "wheels": "Bir. Sol arka tekerlek serbest.",
+            "method": "Sağ arka tekerleğe doğrudan tahrik.",
+            "differential": "Bulunmaz.",
+            "complexity": "Merkezi kayış, kasnak, diferansiyel ve tahrik aksları kaldırılır.",
+            "mass": "Tekerlek tarafındaki kütle ve aday batarya yerinin etkileri incelenecek.",
+            "service": "Jant içi erişim, soğutma ve hareketli kablo güzergâhı doğrulanacak.",
+            "efficiency": "Motor çalışma noktası ve ısıl koşullar testle değerlendirilecek.",
+            "dynamics": "Asimetrik çekiş, tutunma ve süspansiyon tepkisi incelenecek.",
+            "status": "Temsili hub ve batarya konumu. CAD, çakışma, erişim ve performans doğrulanmadı."
+          }
+        },
+        "central": {
+          "label": "Merkezi Aktarma",
+          "parts": [
+            "motor",
+            "belt",
+            "diff",
+            "right-axle",
+            "left-axle",
+            "battery",
+            "clutch"
+          ],
+          "summary": "Şasi içi BLDC motor, kayış-kasnak ve diferansiyel üzerinden iki arka tekerleği tahrik eder. Mevcut batarya konumu korunur.",
+          "advantages": [
+            "Torkun iki arka tekerleğe aktarılabilmesi.",
+            "Motorun şasi üzerinde konumlandırılması.",
+            "Aktarma oranının mekanik olarak seçilebilmesi.",
+            "Motor, diferansiyel ve kayış erişiminin farklı düzenlenebilmesi."
+          ],
+          "considerations": [
+            "Daha fazla mekanik bileşen.",
+            "Kayış hizalaması ve gerginliği.",
+            "Diferansiyel ve aksların ek kütlesi.",
+            "Mekanik kayıplar ve bakım ihtiyacı.",
+            "Yerleşim ve montaj karmaşıklığı."
+          ],
+          "comparison": {
+            "motor": "Şasi üzerinde, merkezi BLDC motor.",
+            "wheels": "İki arka tekerlek.",
+            "method": "Kayış-kasnak, diferansiyel ve iki tahrik aksı.",
+            "differential": "Mevcut temsili yerleşimde kullanılır.",
+            "complexity": "Ayırıcı, kasnaklar, kayış, diferansiyel ve mafsallı akslar birlikte çalışır.",
+            "mass": "Şasi üzerindeki motor ve arka aktarma bileşenlerinin kütle dağılımı incelenecek.",
+            "service": "Kayış gerginliği, muhafaza ve diferansiyel erişimi doğrulanacak.",
+            "efficiency": "Motor çalışma noktası, kayış ve diferansiyel kayıpları gerçek testlerle değerlendirilecek.",
+            "dynamics": "İki arka tekerleğe tork aktarımı ve diferansiyelin tutunma davranışı incelenecek.",
+            "status": "Mevcut görsel yerleşim ve çalışma prensibi. CAD ve performans henüz doğrulanmadı."
+          }
+        }
+      }
     },
     "software": [
       {
