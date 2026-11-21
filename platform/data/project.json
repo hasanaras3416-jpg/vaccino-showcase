@@ -861,7 +861,9 @@
       "mechanical": [
         {
           "id": "transmission",
+          "summary": "Motor torkunun ayırıcı, kayış-kasnak ve diferansiyel üzerinden arka tekerleklere iletilmesini incele.",
           "label": "Aktarma",
+          "conceptNote": "3B gösterim merkezi motorlu konseptin çalışma prensibini gösterir. Sağ arka hub motor alternatifi değerlendirme aşamasındadır.",
           "parts": [
             "motor",
             "clutch",
@@ -881,6 +883,7 @@
         },
         {
           "id": "braking",
+          "summary": "Pedaldan dört tekerleğe uzanan bağımsız ön ve arka fren devrelerinin temsili yerleşimini incele.",
           "label": "Fren",
           "parts": ["brake"],
           "focus": "braking",
@@ -888,11 +891,9 @@
         },
         {
           "id": "suspension",
-          "label": "Süspansiyon & fren",
-          "parts": [
-            "suspension",
-            "brake"
-          ],
+          "summary": "Çift salıncak, yay ve amortisörün yol hareketini şasiye nasıl aktardığını incele.",
+          "label": "Süspansiyon",
+          "parts": ["suspension"],
           "focus": "suspension",
           "decisionTeams": [
             "Mekanik"
@@ -906,6 +907,7 @@
         },
         {
           "id": "chassis",
+          "summary": "Şasinin sürücü alanını, direksiyonu ve kumanda yerleşimini nasıl bir araya getirdiğini incele.",
           "label": "Şasi & kokpit",
           "parts": [
             "frame",
@@ -1027,6 +1029,33 @@
         }
       ]
     },
+    "software": [
+      {
+        "id": "simulation",
+        "label": "Simülasyon",
+        "description": "Parkur, hareket kontrolü ve araç davranışı için geliştirilen simülasyon ortamlarını keşfet.",
+        "media": [],
+        "notes": {
+          "purpose": "Araç kontrolünü ve parkur senaryolarını gerçek araç testlerinden önce incelemek.",
+          "method": "Mevcut tarayıcı demosu temsili bir parkurda boyuna hareketi ve enerji tüketimini modeller. CARLA, ileride senaryo tabanlı doğrulama için değerlendirilecek.",
+          "result": "Tarayıcı demosu kullanılabilir. Doğrulanmış CARLA veya gerçek araç test sonucu henüz paylaşılmadı.",
+          "next": "Parkur senaryolarını ve hareket kontrolü için ölçülecek metrikleri tanımlamak."
+        }
+      },
+      {
+        "id": "vision",
+        "label": "Görüntü İşleme",
+        "description": "Kamera görüntülerinden şeritleri ve sürüş alanını anlamaya yönelik algılama çalışmalarını keşfet.",
+        "media": [],
+        "notes": {
+          "purpose": "Kamera verisinden araç kontrolünün kullanabileceği yol ve şerit bilgisi çıkarmak.",
+          "method": "Şerit tespiti ve segmentasyon yaklaşımları değerlendirilecek. OpenCV, ön işleme ve şerit tespiti prototipleri için aday araç.",
+          "result": "Doğrulanmış algılama ölçümü veya örnek test kaydı henüz paylaşılmadı.",
+          "next": "Etiketli örnek görüntüleri ve değerlendirme ölçütlerini hazırlamak."
+        }
+      }
+    ],
+    "competitionMedia": [],
     "files": [
       {
         "name": "Özgün 3B aktarma prototipi",

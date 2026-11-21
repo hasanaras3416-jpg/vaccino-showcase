@@ -42,11 +42,39 @@ export function createBodyShell(T,parent){
  const lamp=new T.MeshStandardMaterial({color:0xe3eee8,emissive:0xb3d4d3,emissiveIntensity:.7,roughness:.2});
  for(const side of [-1,1])tube([[-1.405,.35,side*.13],[-1.37,.40,side*.21],[-1.29,.43,side*.28]],.010,lamp);
  let controlled=false,mode='hidden',fade=0,hatch=0;
- function style(next){if(!['solid','transparent','hidden'].includes(next))throw Error('Geçersiz kabuk görünümü');controlled=true;mode=next;if(next!=='hidden')parent.visible=true;}
- function tick(dt,hatchOpen=false){let changed=false;const end=hatchOpen?-1.05:0;if(Math.abs(hatch-end)>.001){hatch+=(end-hatch)*(1-Math.exp(-6*dt));hinge.rotation.z=hatch;changed=true;}
-  if(controlled){const goal=mode==='hidden'?0:mode==='transparent'?.22:1;if(Math.abs(fade-goal)>.001){fade+=(goal-fade)*(1-Math.exp(-7*dt));changed=true;}else fade=goal;parent.visible=fade>.003;
-   parent.traverse(m=>{if(m.isMesh){const base=m.userData.shellBaseOpacity??1;const opacity=base*fade;if(Math.abs(m.material.opacity-opacity)>.001){m.material.opacity=opacity;m.material.transparent=opacity<.999;m.material.depthWrite=opacity>.85;m.material.needsUpdate=true;changed=true;}}});
-  }return changed;
+ const targetOpacity=()=>mode==='hidden'?0:mode==='transparent'?.22:1;
+ function applyOpacity(){
+  let changed=false;
+  parent.visible=fade>.003;
+  parent.traverse(m=>{
+   if(!m.isMesh)return;
+   const opacity=(m.userData.shellBaseOpacity??1)*fade;
+   if(Math.abs(m.material.opacity-opacity)<=.001)return;
+   m.material.opacity=opacity;
+   m.material.transparent=opacity<.999;
+   m.material.depthWrite=opacity>.85;
+   m.material.needsUpdate=true;
+   changed=true;
+  });
+  return changed;
+ }
+ function style(next,{immediate=false}={}){
+  if(!['solid','transparent','hidden'].includes(next))throw Error('Geçersiz kabuk görünümü');
+  controlled=true;mode=next;
+  if(next!=='hidden')parent.visible=true;
+  if(immediate){fade=targetOpacity();applyOpacity();}
+ }
+ function tick(dt,hatchOpen=false){
+  let changed=false;
+  const end=hatchOpen?-1.05:0;
+  if(Math.abs(hatch-end)>.001){hatch+=(end-hatch)*(1-Math.exp(-6*dt));hinge.rotation.z=hatch;changed=true;}
+  if(controlled){
+   const goal=targetOpacity();
+   if(Math.abs(fade-goal)>.001){fade+=(goal-fade)*(1-Math.exp(-7*dt));changed=true;}
+   else fade=goal;
+   if(applyOpacity())changed=true;
+  }
+  return changed;
  }
  return {style,tick,release(){controlled=false;parent.traverse(m=>{if(m.isMesh){const opacity=m.userData.shellBaseOpacity??1;m.material.opacity=opacity;m.material.transparent=opacity<1;m.material.depthWrite=opacity>.85;}});},state:()=>({mode,controlled,opacity:fade,hatchAngle:hinge.rotation.z,vertices:parent.children.filter(m=>m.isMesh).reduce((n,m)=>n+(m.geometry?.attributes.position.count||0),0)})};
 }

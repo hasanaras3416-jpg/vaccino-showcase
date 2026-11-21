@@ -1,0 +1,72 @@
+/* Driver and Nextion concept — isolated from existing CAD/vehicle renderer. */
+body[data-route=driver] .screen-heading { display:none; }
+.driver-screen { max-width:1450px; margin:auto; }
+.driver-intro { display:grid; grid-template-columns:1.25fr .75fr; gap:45px; align-items:end; margin:0 0 33px; }
+.driver-intro .v-section-number { grid-column:1/-1; }
+.driver-intro h2 { font:350 clamp(3.2rem,6vw,7rem)/.96 Arial,sans-serif; letter-spacing:-.07em; color:#f1eee9; }
+.driver-intro h2 em { display:block; color:#c2a879; font:italic 400 .74em/1.1 Georgia,serif; }
+.driver-intro p { max-width:490px; color:#b5b4b0; line-height:1.7; }
+.driver-stage { position:relative; min-height:550px; height:min(67vw,730px); max-height:780px; overflow:hidden; border:1px solid #353535; background:radial-gradient(ellipse at center,#262828 0%,#101314 62%,#0a0b0d 100%); }
+#driver-canvas { width:100%; height:100%; display:block; touch-action:none; cursor:grab; }
+#driver-canvas:active {cursor:grabbing}
+.driver-overlay-top,.driver-overlay-bottom {position:absolute; z-index:4; display:flex; justify-content:space-between; align-items:center; gap:12px; left:28px;right:28px;color:#ddd5c5; font-size:.68rem; letter-spacing:.15em; text-transform:uppercase; pointer-events:none}
+.driver-overlay-top {top:22px}.driver-overlay-bottom {bottom:18px}
+.driver-overlay-bottom button {pointer-events:auto;color:#e5decf;border:1px solid #6c6558;background:rgba(10,12,13,.7);padding:10px 15px;letter-spacing:.1em}
+.driver-hotspots {position:absolute;inset:0;pointer-events:none;z-index:5}
+.driver-dot {position:absolute; transform:translate(-50%,-50%); width:26px;height:26px; border:1px solid #eed9ad; border-radius:50%; background:rgba(171,131,65,.65); color:#fff; font-weight:bold; font-size:1rem; padding:0; box-shadow:0 0 0 5px rgba(202,167,113,.13);pointer-events:auto;transition:background .2s,transform .2s; }
+.driver-dot:hover,.driver-dot[aria-pressed=true] {background:#e5c387;color:#141413; transform:translate(-50%,-50%) scale(1.16)}
+.driver-detail {display:flex;align-items:baseline;justify-content:space-between;gap:25px; flex-wrap:wrap; margin-top:20px;border-top:1px solid #4d4942;padding-top:25px}
+.driver-detail h3 {font-weight:450;font-size:clamp(1.5rem,2.5vw,2.6rem);letter-spacing:-.035em}
+.driver-detail p {flex-basis:40%;min-width:240px;color:#d2ccc3;line-height:1.7;font-size:.95rem}
+.driver-detail .driver-caveat { flex-basis:100%; min-width:0; font-size:.75rem;color:#a7a29a }
+#season-start img {transform:scale(1);transition:transform .3s cubic-bezier(.2,.8,.2,1), filter .3s ease !important}
+#season-start:is(:hover,:focus-visible) img {transform:scale(1.095)!important;filter:drop-shadow(0 0 16px rgb(184 138 50 / 18%))!important}
+#season-start:is(:hover,:focus-visible) {background:transparent!important}
+.nextion-dialog {width:min(820px,calc(100vw - 26px));max-height:95dvh;overflow:auto;border:1px solid #4e493f;padding:clamp(18px,3vw,30px);background:#0b0d0e;color:#f2eee7;box-shadow:0 28px 100px #000b}
+.nextion-dialog::backdrop {background:rgba(0,0,0,.82);backdrop-filter:blur(7px)}
+.nextion-head {display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px;font-size:.9rem;font-weight:600;letter-spacing:.17em}
+.nextion-head small {display:block;color:#c8ad79;font-size:.65rem;margin-top:4px}
+.nextion-head button {color:#f2eee7;border:1px solid #5d5b53;background:#25282a;font-size:1.1rem;padding:8px 14px}
+.nextion-device {background:#050505;padding:clamp(10px,2vw,22px);border:7px solid #343638;border-radius:15px;box-shadow:inset 0 0 0 2px #0e0e0f,0 20px 60px #0008}
+.nextion-glass {padding:clamp(13px,2.8vw,25px);background:linear-gradient(120deg,#102229,#0a1115 75%);border:1px solid #36434a; min-height:350px}
+.nextion-status {display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid #3a5559;padding-bottom:14px;color:#c5d5d6;font-size:.7rem;letter-spacing:.09em}
+.nextion-status strong {color:#efcf89;font-size:.95rem}
+.nextion-screen {min-height:220px;display:flex;align-items:center;justify-content:center;gap:32px;}
+.nextion-speed {display:flex;align-items:baseline;gap:13px;flex-wrap:wrap}
+.nextion-speed span {font-size:.8rem;color:#87a8a5;letter-spacing:.12em}
+.nextion-speed strong {font:300 clamp(5rem,13vw,9rem)/1 Arial,sans-serif;color:#eef7f5;letter-spacing:-.08em}
+.nextion-speed small {font-size:.95rem;color:#98bbc0}
+.nextion-metrics {border-left:1px solid #385156;padding-left:28px;display:grid;gap:14px;min-width:165px}
+.nextion-metrics div small {display:block;color:#7faaa9;font-size:.7rem;letter-spacing:.12em}
+.nextion-metrics div strong {font-size:1.5rem;color:#eae8dd;font-weight:450}
+.nextion-bar {height:5px;background:#2a4543;margin-top:8px}.nextion-bar i {display:block;width:82%;height:100%;background:#c5a675}
+.nextion-tabs {display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #30484e}
+.nextion-tabs button {background:transparent;border:0;border-right:1px solid #30484e;color:#8fb1b2;padding:13px 8px;font-size:.86rem}
+.nextion-tabs button[aria-pressed=true] {color:#f4d497;background:#1e3134}
+.nextion-tabs button:last-child{border-right:0}
+.nextion-note {color:#aca8a0;font-size:.78rem;line-height:1.6;margin:20px 0 0}
+@media(max-width:700px){
+ .driver-intro {grid-template-columns:1fr;gap:10px}.driver-intro .v-section-number{grid-column:1}
+ .driver-intro h2 {font-size:3.4rem}
+ .driver-stage {height:590px;min-height:0}
+ .driver-overlay-top,.driver-overlay-bottom{left:14px;right:14px;font-size:.56rem}
+ .driver-overlay-top span:last-child{display:none}
+ .driver-overlay-bottom span {max-width:62%;line-height:1.5}
+ .driver-detail {display:block}
+ .driver-detail>* {margin:0 0 12px!important;min-width:0!important}
+ .nextion-screen {display:block;text-align:center;padding:17px 0}
+ .nextion-metrics {border:0;border-top:1px solid #385156;display:flex;justify-content:space-between;min-width:0;padding:16px 0 0}
+ .nextion-speed strong {font-size:5rem}
+}
+@media(prefers-reduced-motion:reduce){#season-start img {transition:none!important}}
+
+.nextion-entry {display:flex;align-items:center;justify-content:space-between;gap:35px;flex-wrap:wrap;
+ padding:30px; margin:28px 0; border:1px solid #484743;background:linear-gradient(110deg,#171e21,#0d1012);}
+.nextion-entry h2 {font-weight:400;letter-spacing:-.04em;font-size:clamp(1.4rem,2.5vw,2.4rem);margin:8px 0}
+.nextion-entry p {color:#bbbdbb;max-width:550px;font-size:.93rem}
+.nextion-entry button {border:1px solid #b99a61;background:transparent;color:#e4cda1;padding:14px 23px;cursor:pointer}
+.nextion-entry button:hover {background:#e4cda1;color:#171717}
+.nextion-diagnostics {padding:25px 0;color:#c8dfdb}
+.nextion-diagnostics strong {color:#e4c68b;letter-spacing:.1em}
+.nextion-diagnostics p {padding:7px 0;color:#b4c5c7}
+@media(max-width:600px){.nextion-entry{padding:21px}.driver-stage .driver-dot {width:32px;height:32px}}

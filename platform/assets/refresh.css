@@ -100,9 +100,6 @@ body:has(.season-intro[open]) .topbar { visibility: hidden; }
 #workspace :is(.stage-label,.guide) { text-shadow: 0 1px 4px var(--black); pointer-events: none; }
 #workspace .stage { min-height: 340px; }
 #workspace .tools { align-items: start; }
-.extra-tools { max-width: min(85%, 24rem); }
-.extra-tools summary { padding: .5rem .8rem; background: var(--rail); cursor: pointer; }
-.extra-tools div { display: flex; flex-wrap: wrap; gap: .25rem; background: var(--surface); padding: .5rem; }
 #part-details { margin-top: 1rem; }
 #part-details summary { cursor: pointer; color: var(--gold); }
 #workspace .technical-only { display: revert; }

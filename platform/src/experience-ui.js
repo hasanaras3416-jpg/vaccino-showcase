@@ -6,7 +6,7 @@ export function initializeExperienceUI(){
  const api=window.vaccino,$=id=>document.getElementById(id);
  const simUI=initializeSimulationUI($('simulation-panel'));initializeInventoryUI($('engineering-inventory'));
  const labels={showroom:'SHOWROOM',workshop:'ATÖLYE',track:'PİST / DEMO'};
- const nativeReset=$('reset').onclick;$('reset').onclick=()=>{nativeReset();if(state.route==='experience')api?.setShell(experienceState.bodyMode);};
+ const nativeReset=$('reset').onclick;$('reset').onclick=()=>{nativeReset?.();if(state.route==='experience')api?.setShell(experienceState.bodyMode);};
  function route(){
   const wasActive=experienceState.active,active=['experience','overview'].includes(state.route);experienceState.active=active;
   if(!active&&wasActive){simulation.pause();api?.setShell('hidden');api?.setAnimating(false);}
@@ -14,7 +14,7 @@ export function initializeExperienceUI(){
    const env=state.route==='overview'?'showroom':state.sub;
    if(experienceState.environment!==env||!api?.experienceState().active){setEnvironment(env);}
    if(state.route==='experience')document.getElementById('reset').click();
-   api?.setShell(state.route==='overview'?'hidden':experienceState.bodyMode);
+   api?.setShell(state.route==='overview'?'solid':experienceState.bodyMode);
   }
   document.querySelectorAll('[data-environment]').forEach(a=>a.setAttribute('aria-current',a.dataset.environment===experienceState.environment?'page':'false'));
   $('workshop-controls').hidden=experienceState.environment!=='workshop';$('track-controls').hidden=experienceState.environment!=='track';$('simulation-panel').hidden=experienceState.environment!=='track';
