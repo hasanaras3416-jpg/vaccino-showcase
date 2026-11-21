@@ -1,5 +1,3 @@
-const homePose = {az:-.88,el:.38,rad:3.65,target:[0,.36,0]};
-
 export async function loadBrandLogo() {
   const image=new Image();
   image.src='assets/branding/vaccino-logo.png';
@@ -30,7 +28,7 @@ export function initializeSeason(logo,openMenu=()=>{}) {
   function finish({focus=true,showMenu=false}={}) {
     clearTimeout(timeout);
     intro.close();
-    if(onHome()) window.vaccino?.setStudioPose(homePose,0);
+    if(onHome()) window.vaccino?.resetHomeView();
     const tour=document.getElementById('presentation-enter');
     if(showMenu) openMenu();
     else if(focus) (tour.disabled?document.getElementById('menu-toggle'):tour).focus({preventScroll:true});
@@ -42,7 +40,7 @@ export function initializeSeason(logo,openMenu=()=>{}) {
     intro.classList.add('season-revealing');
     start.disabled=true;
     skip.focus();
-    api.setStudioPose(homePose,3600);
+    api.resetHomeView(3600);
     timeout=setTimeout(()=>finish({showMenu:true}),3650);
   };
   skip.onclick=()=>finish();

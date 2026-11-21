@@ -14,8 +14,14 @@ A site that looks like a **premium automotive design studio made it**, not a sch
 - 3D model: dominant visual protagonist on landing; hover markers and interactions need accessible controls and explanatory labels.
 - No indiscriminate gradients, glowing neon borders, stacked generic cards, unnecessary spinners or random decorative icons.
 
+## Home hero
+- Present the inherited V2 vehicle with its existing concept body fitted. The lower front three-quarter camera reveals the nose, wheels and side profile. The home scene has a warm key light, a cool rim light and soft fill over a graphite backdrop.
+- Give the headline and vehicle separate space. Put the copy left of the vehicle on desktop and below it at 900 px and under. Fit the default vehicle pose to the scene aspect ratio and keep the full silhouette inside the frame.
+- Keep the vehicle and editorial typography as the two main elements. Use the existing Showroom and Engineering links, and reserve champagne for small accents and focus cues.
+- Keep vertical page scroll available across the mobile viewer. Use the same inspection state for mouse, touch and keyboard. Keep a static technical illustration in the vehicle area when WebGL is unavailable.
+
 ## Functional UX
-- Hero text must not overlap later sections. Dragging the main hero vehicle should hide overlaid hero copy and reveal a restore control.
+- Mouse drag, touch drag and keyboard orbit or zoom hide the hero copy and reveal the restore control. Restore returns to the composed view and focuses the viewer. Escape restores the introduction when the viewer has focus.
 - Logo hover **scales**, doesn't turn white.
 - Main nav has Driver; Driver shows rotating 3D concept mannequin on a display stand, with helmet/gloves/suit hotspots.
 - Suit styling: black, centered gold V, small Shell mark.

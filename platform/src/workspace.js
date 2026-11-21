@@ -143,7 +143,7 @@ function navigate({focusHeading=false}={}) {
   document.querySelectorAll('.primary-nav a').forEach(a=>{if(a.dataset.route===(['vehicle','mechanical','electrical','autonomy','experience','decisions','tests'].includes(state.route)?'garage':state.route))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   document.querySelectorAll('.subnav a').forEach(a=>{if(a.dataset.sub===state.sub)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   const slot=document.querySelector(`[data-slot="${state.route}"]`);
-  if(slot){slot.append(viewer);viewer.hidden=false;viewer.dataset.context=state.route;}
+  if(slot){slot.insertBefore(viewer,state.route==='overview'?$('v-hero-restore'):null);viewer.hidden=false;viewer.dataset.context=state.route;}
   else viewer.hidden=true;
   if(entries&&(state.route!=='autonomy'||state.sub==='perception')){const entry=entries.find(e=>e.id===state.sub);systemBrief(state.route,entry);}
   $('team-goals').hidden=state.sub==='files';$('files').hidden=state.sub!=='files';

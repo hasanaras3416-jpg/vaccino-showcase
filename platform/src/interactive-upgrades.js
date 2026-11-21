@@ -6,25 +6,35 @@ function ready() {
  const hero=document.querySelector('.studio-home');
  const canvas=document.getElementById('vehicle');
  const restore=document.getElementById('v-hero-restore');
- let start=null;
- if(hero&&canvas){
-   canvas.addEventListener('pointerdown',event=>{
-     if(document.body.dataset.route!=='overview')return;
-     start={x:event.clientX,y:event.clientY};
-   });
-   canvas.addEventListener('pointermove',event=>{
-     if(!start||document.body.dataset.route!=='overview')return;
-     if(Math.hypot(event.clientX-start.x,event.clientY-start.y)>8){
-       hero.classList.add('v-inspecting');start=null;
-     }
-   });
-   canvas.addEventListener('pointerup',()=>{start=null});
-   canvas.addEventListener('pointercancel',()=>{start=null});
+ const copy=hero.querySelector('.v-hero-content');
+ function setInspecting(active){
+   if(restore.hidden===!active)return;
+   restore.hidden=!active;
+   copy.inert=active;
+   hero.classList.toggle('v-inspecting',active);
  }
- restore?.addEventListener('click',()=>hero.classList.remove('v-inspecting'));
- document.addEventListener('vaccino:route',event=>{
-   if(event.detail?.route!=='overview')hero?.classList.remove('v-inspecting');
+ function restoreIntro(){
+   setInspecting(false);
+   window.vaccino?.resetHomeView(matchMedia('(prefers-reduced-motion: reduce)').matches?0:360);
+   canvas.focus({preventScroll:true});
+ }
+ function syncRoute(){
+   if(document.body.dataset.route==='overview')canvas.setAttribute('aria-describedby','v-hero-controls');
+   else{
+     canvas.removeAttribute('aria-describedby');
+     setInspecting(false);
+   }
+ }
+ canvas.addEventListener('vaccino:home-inspect',()=>setInspecting(true));
+ canvas.addEventListener('keydown',event=>{
+   if(event.key==='Escape'&&!restore.hidden&&!document.body.classList.contains('presentation-active')){
+     event.preventDefault();
+     restoreIntro();
+   }
  });
+ restore.addEventListener('click',restoreIntro);
+ document.addEventListener('vaccino:route',syncRoute);
+ syncRoute();
  // Nextion UI is a visual prototype, not a hardware-connected display.
  const dialog=document.getElementById('nextion-dialog');
  const close=document.getElementById('nextion-close');

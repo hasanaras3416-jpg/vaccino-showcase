@@ -72,21 +72,29 @@ for(const s of sections){const b=document.createElement('button');b.textContent=
 select('frame');
 try{
  const T=THREE, canvas=$('vehicle'), scene=new T.Scene();
- scene.background=new T.Color(0xf4f2ec);
- const render=new T.WebGLRenderer({canvas,antialias:true});render.setPixelRatio(Math.min(devicePixelRatio,matchMedia("(max-width:600px)").matches?1.25:2));render.outputColorSpace=T.SRGBColorSpace;
+ const sceneBackground=new T.Color(0xf4f2ec);scene.background=sceneBackground;
+ const render=new T.WebGLRenderer({canvas,antialias:true,alpha:true});render.setPixelRatio(Math.min(devicePixelRatio,matchMedia("(max-width:600px)").matches?1.25:2));render.outputColorSpace=T.SRGBColorSpace;
  const camera=new T.PerspectiveCamera(38,1,.05,250);
  const target=new T.Vector3(0,.39,0);let az=-.88,el=.50,rad=4.04;
  const readPose=()=>({az,el,rad,target:target.toArray()});
  const writePose=pose=>{az=pose.az;el=pose.el;rad=pose.rad;target.fromArray(pose.target);focusGoal=null;draw=true;};
  const cameraMotion=createCameraMotion({read:readPose,write:writePose,invalidate:()=>{draw=true}});
+ const homePose={az:-.77,el:.24,rad:4.65,target:[-.10,.38,-.10]};
+ const isHomeView=()=>workspaceState.route==='overview'&&!document.body.classList.contains('presentation-active');
+ const resetHomeView=(duration=0)=>cameraMotion.moveTo(homePose,duration);
  const steel=new T.MeshStandardMaterial({color:0xaeb8bc,metalness:.65,roughness:.32,side:T.DoubleSide});
  const white=new T.MeshStandardMaterial({color:0xdddeda,roughness:.40,metalness:.22,side:T.DoubleSide});
  const gold=new T.MeshStandardMaterial({color:0xbd8c34,roughness:.35,metalness:.27,side:T.DoubleSide});
  const glass=new T.MeshStandardMaterial({color:0x293c42,roughness:.17,metalness:.34,side:T.DoubleSide});
  const rubber=new T.MeshStandardMaterial({color:0x222729,roughness:.94});
- scene.add(new T.HemisphereLight(0xffffff,0xb4ada0,1.65));
+ const ambient=new T.HemisphereLight(0xffffff,0xb4ada0,1.65);scene.add(ambient);
  const sun=new T.DirectionalLight(0xffffff,1.75);sun.position.set(-3,6,4);scene.add(sun);
  const fill=new T.DirectionalLight(0xe8f0ff,.85);fill.position.set(4,3,-4);scene.add(fill);
+ const homeLights=new T.Group();
+ const homeKey=new T.DirectionalLight(0xfff4df,2.25);homeKey.position.set(-3,5,2);
+ const homeRim=new T.DirectionalLight(0xe2ebff,1.65);homeRim.position.set(2,3,-4);
+ const homeBounce=new T.HemisphereLight(0xf4f6ff,0x353334,.65);
+ homeLights.add(homeKey,homeRim,homeBounce);scene.add(homeLights);homeLights.visible=false;
  let exploded=false, batteryHidden=false, playing=false, lastNow=0, focusGoal=null;
  const frame=new T.Group(),body=new T.Group(),wheels=new T.Group(),rollers=[];
  const vehicleRoot=new T.Group();vehicleRoot.name='vaccino-v2-vehicle';scene.add(vehicleRoot);vehicleRoot.add(frame,body,wheels);body.visible=false;
@@ -494,7 +502,7 @@ try{
  const partGroups={frame:chassis,motor:motorGroup,clutch:clutchGroup,diff:diffGroup,battery:batterySupport,seat,pc:computer,camera:nose,hmi:panel,suspension,brake:brakes,steering,drive:motorController,power:fire};
  const raycaster=new T.Raycaster();let downPoint=null;
  canvas.addEventListener('pointerdown',e=>{downPoint=[e.clientX,e.clientY]});
- canvas.addEventListener('pointerup',e=>{if(!downPoint||Math.hypot(e.clientX-downPoint[0],e.clientY-downPoint[1])>5)return;
+ canvas.addEventListener('pointerup',e=>{if(isHomeView()||!downPoint||Math.hypot(e.clientX-downPoint[0],e.clientY-downPoint[1])>5)return;
   const r=canvas.getBoundingClientRect();raycaster.setFromCamera(new T.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),camera);
   const hit=raycaster.intersectObjects([frame,body,wheels],true).find(h=>{let n=h.object;while(n){if(!n.visible)return false;n=n.parent}return true});
   if(hit){let n=hit.object;while(n){if(n.userData.part){inspect(n.userData.part,canvas);break}n=n.parent}}
@@ -534,20 +542,38 @@ try{
  const originalReset=$('reset').onclick;$('reset').onclick=()=>{cameraMotion.cancel();focusContext=null;focusIds.clear();brakeFlow=false;isolation=true;updateHighlight();document.getElementById('brake-flow')?.setAttribute('aria-pressed','false');document.getElementById('system-isolate')?.setAttribute('aria-pressed','false');exploded=false;batteryHidden=false;playing=false;demoEnd=0;engaged=true;guardVisible=false;hideWheels=false;wheels.visible=true;setMode('frame');focusGoal=null;originalReset();$('explode').setAttribute('aria-pressed','false');$('battery-toggle').setAttribute('aria-pressed','false');$('wheel-toggle').setAttribute('aria-pressed','false');$('wheel-toggle').textContent='Tekerlekleri gizle';$('engage').setAttribute('aria-pressed','true');$('engage').textContent='Bağlı';$('play').setAttribute('aria-pressed','false');$('play').textContent='Canlandır';refreshDrive()};
  for(const id of ['rear','top','cockpit']){const old=$(id).onclick;$(id).onclick=()=>{old();focusGoal=null;draw=true};}
  const pointers=new Map();let pinch=0;
- canvas.addEventListener('pointerdown',e=>{cameraMotion.cancel();canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY])});
- const dist=()=>{const [a,b]=[...pointers.values()];return Math.hypot(a[0]-b[0],a[1]-b[1])};
+ const notifyInspection=()=>{if(isHomeView())canvas.dispatchEvent(new Event('vaccino:home-inspect'));};
+ canvas.addEventListener('pointerdown',e=>{
+  cameraMotion.cancel();canvas.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,started:false});
+ });
+ const dist=()=>{const [a,b]=[...pointers.values()];return Math.hypot(a.x-b.x,a.y-b.y)};
  canvas.addEventListener('pointermove',e=>{
   if(!pointers.has(e.pointerId))return;
-  const [x,y]=pointers.get(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);
-  if(pointers.size===1){az-=(e.clientX-x)*.009;el=Math.max(-1.54,Math.min(1.54,el+(e.clientY-y)*.009))}
-  if(pointers.size===2){const d=dist();if(pinch)rad=Math.max(rearView?1.1:2.35,Math.min(8.5,rad*pinch/d));pinch=d}
+  const pointer=pointers.get(e.pointerId);
+  const dx=e.clientX-pointer.x,dy=e.clientY-pointer.y;
+  if(pointers.size===1){
+   if(isHomeView()&&!pointer.started){
+    const verticalTouch=e.pointerType==='touch'&&Math.abs(dy)>Math.abs(dx);
+    if(verticalTouch||Math.hypot(dx,dy)<8)return;
+   }
+   if(!pointer.started)notifyInspection();
+   pointer.started=true;
+   az-=dx*.009;el=Math.max(-1.54,Math.min(1.54,el+dy*.009));
+  }
+  pointer.x=e.clientX;pointer.y=e.clientY;
+  if(pointers.size===2){
+   const d=dist();
+   if(pinch&&d){rad=Math.max(rearView?1.1:2.35,Math.min(8.5,rad*pinch/d));notifyInspection();}
+   pinch=d;
+  }
   draw=true;
  });
  for(const ev of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(ev,e=>{pointers.delete(e.pointerId);pinch=0});
- canvas.addEventListener('wheel',e=>{cameraMotion.cancel();e.preventDefault();rad=Math.max(rearView?1.1:2.35,Math.min(8.5,rad*Math.exp(e.deltaY*.001)));draw=true},{passive:false});
+ canvas.addEventListener('wheel',e=>{cameraMotion.cancel();e.preventDefault();notifyInspection();rad=Math.max(rearView?1.1:2.35,Math.min(8.5,rad*Math.exp(e.deltaY*.001)));draw=true},{passive:false});
  canvas.addEventListener('keydown',e=>{
   if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','-'].includes(e.key))return;
-  cameraMotion.cancel();e.preventDefault();if(e.key==='ArrowLeft')az+=.15;if(e.key==='ArrowRight')az-=.15;
+  cameraMotion.cancel();e.preventDefault();notifyInspection();if(e.key==='ArrowLeft')az+=.15;if(e.key==='ArrowRight')az-=.15;
   if(e.key==='ArrowUp')el=Math.min(1.54,el+.12);if(e.key==='ArrowDown')el=Math.max(-1.54,el-.12);
   if(e.key==='+')rad=Math.max(rearView?1.1:2.35,rad*.9);if(e.key==='-')rad=Math.min(8.5,rad*1.1);draw=true;
  });
@@ -560,11 +586,16 @@ try{
   if(cameraMotion.tick(now))draw=true;
   const sleeveEnd=engaged?.145:.105;if(Math.abs(sleeve.position.z-sleeveEnd)>.0001){sleeve.position.z=T.MathUtils.lerp(sleeve.position.z,sleeveEnd,.18);draw=true;}
   const dt=Math.min(.05,lastNow?(now-lastNow)/1000:0);lastNow=now;
+  scene.background=sceneBackground;
   if(world.update(dt))draw=true;
-  const inHome=workspaceState.route==='overview'&&!document.body.classList.contains('presentation-active');
+  const inHome=isHomeView();
   const inStudio=!experienceState.active||experienceState.environment==='showroom'||document.body.classList.contains('presentation-active');
-  studioFloor.visible=inStudio;
-  if(inStudio) scene.background.setHex(0x100f0e);
+  studioFloor.visible=inStudio&&!inHome;
+  homeLights.visible=inHome;
+  ambient.visible=sun.visible=fill.visible=!inHome;
+  render.toneMappingExposure=inHome?.90:1.05;
+  if(inHome)scene.background=null;
+  else if(inStudio)sceneBackground.setHex(0x100f0e);
   const showFlow=brakeFlow&&focusContext==='braking';
   for(const [index,marker] of brakeMarkers.entries()) {
    if(marker.visible!==showFlow) draw=true;
@@ -575,7 +606,7 @@ try{
     if(!reducedMotion.matches)draw=true;
    }
   }
-  if(bodyShell.tick(dt,experienceState.hatchOpen&&!document.body.classList.contains('presentation-active')))draw=true;
+  if(bodyShell.tick(dt,!inHome&&experienceState.hatchOpen&&!document.body.classList.contains('presentation-active')))draw=true;
   if(focusGoal){target.lerp(focusGoal,.12);if(target.distanceTo(focusGoal)<.001)focusGoal=null;draw=true;}
   const destination=exploded?1:0;
   for(const [g,v] of [[motorGroup,[0,.20,-.22]],[clutchGroup,[0,.10,.16]],[diffGroup,[.14,0,.30]],[axleGroup,[0,-.10,0]]]){
@@ -588,7 +619,7 @@ try{
   for(let i=0;i<72;i++){const u=((i/72-wheelSpin*largeR/beltLength)%1+1)%1;const p=beltCurve.getPointAt(u),t=beltCurve.getTangentAt(u);scratch.position.set(p.x,p.y,pulleyZ);scratch.rotation.set(0,0,Math.atan2(t.y,t.x));scratch.scale.set(1,1,1);scratch.updateMatrix();beltMarks.setMatrixAt(i,scratch.matrix);}beltMarks.instanceMatrix.needsUpdate=true;
   const w=canvas.clientWidth,h=canvas.clientHeight;
   if(renderWidth!==w||renderHeight!==h){render.setSize(w,h,false);renderWidth=w;renderHeight=h;}camera.aspect=w/h;
-  const fit=Math.max(1,(inHome?.83:document.body.classList.contains('presentation-active')?.95:rearView?.91:1.13)/camera.aspect);
+  const fit=inHome?Math.max(.86,1.08/camera.aspect):Math.max(1,(document.body.classList.contains('presentation-active')?.95:rearView?.91:1.13)/camera.aspect);
   if(!world.camera(camera,target,az,el,rad,fit)){camera.position.set(target.x+fit*rad*Math.cos(el)*Math.sin(az),target.y+fit*rad*Math.sin(el),target.z+fit*rad*Math.cos(el)*Math.cos(az));camera.lookAt(target);}camera.updateProjectionMatrix();render.render(scene,camera);
   for(const p of pins){
    const v=p.position.clone().applyMatrix4(vehicleRoot.matrixWorld).project(camera);
@@ -598,7 +629,7 @@ try{
   }
  }
  refreshDrive=()=>{simulation.coupled=engaged;if(engaged){rotor.rotation.z=smallPulley.rotation.z;sleeve.rotation.z=smallPulley.rotation.z;}$('engage').setAttribute('aria-pressed',String(engaged));$('engage').textContent=engaged?'Bağlı':'Ayrık / süzülme';batterySupport.visible=!batteryHidden&&(!rearView||chosen==="battery");fire.visible=!rearView; sleeve.position.z=T.MathUtils.lerp(sleeve.position.z,engaged?.145:.105,.25);guard.visible=guardVisible;const state=$('drive-state');state.hidden=pickMode==='body'||(!rearView&&!['motor','clutch','diff'].includes(chosen));state.textContent=engaged?'BAĞLI · Motor ve akslar':'AYRIK · Akslar dönmeye devam eder';redraw()};
- function clearFocus(wide=false){brakeFlow=false;cameraMotion.cancel();focusContext=null;focusIds.clear();isolation=true;updateHighlight();if(wide){$('reset').click();focusGoal=null;rearView=false;cockpitView=false;target.set(0,.39,0);az=-.88;el=.38;rad=3.65;$('scene-focus-label').textContent='GENEL GÖRÜNÜM';refreshDrive();}draw=true;}
+ function clearFocus(wide=false){brakeFlow=false;cameraMotion.cancel();focusContext=null;focusIds.clear();isolation=true;updateHighlight();if(wide){$('reset').click();focusGoal=null;rearView=false;cockpitView=false;resetHomeView();$('scene-focus-label').textContent='GENEL GÖRÜNÜM';refreshDrive();}draw=true;}
  function focusSystem(name){
   brakeFlow=false;
   const map={braking:{ids:['brake'],part:'brake'},transmission:{ids:['motor','clutch','diff'],part:'motor',camera:'rear'},suspension:{ids:['suspension','brake'],part:'suspension'},chassis:{ids:['frame','seat','steering','hmi'],part:'frame'},battery:{ids:['battery'],part:'battery'},control:{ids:['drive'],part:'drive'},auxiliary:{ids:['pc','power','hmi'],part:'pc'},sensors:{ids:['camera','pc'],part:'camera'}};
@@ -619,7 +650,7 @@ try{
   $('battery-toggle').setAttribute('aria-pressed',String(batteryHidden));$('explode').setAttribute('aria-pressed',String(exploded));$('play').setAttribute('aria-pressed',String(playing));$('play').textContent=playing?'Duraklat':'Canlandır';
  }
  function restoreView(view){
-  world.setPresentation(false);if(experienceState.active)bodyShell.style(workspaceState.route==='overview'?'hidden':experienceState.bodyMode);
+  world.setPresentation(false);if(experienceState.active)bodyShell.style(workspaceState.route==='overview'?'solid':experienceState.bodyMode);
   cameraMotion.cancel();pickMode=view.pickMode;hideWheels=view.hideWheels;batteryHidden=view.batteryHidden;guardVisible=view.guardVisible;exploded=view.exploded;engaged=view.engaged;playing=view.playing;wheelSpin=view.wheelSpin;brakeFlow=view.brakeFlow;focusContext=view.focusContext;focusIds=new Set(view.focusedParts);isolation=view.isolation;rearView=view.rearView;cockpitView=view.cockpitView;
   frame.visible=pickMode==='frame';body.visible=pickMode==='body';wheels.visible=pickMode==='body'||!hideWheels;
   for(const w of rollers)w.wheel.rotation.z=wheelSpin;largePulley.rotation.z=wheelSpin;smallPulley.rotation.z=wheelSpin*largeR/smallR;carrier.rotation.z=wheelSpin;for(const a of axleWitnesses)a.rotation.z=wheelSpin;
@@ -635,8 +666,8 @@ try{
  function setEngaged(value){const pose=readPose();engaged=!!value;select(chosen);writePose(pose);refreshDrive();}
  function setQuality(value){$('quality').value=value;studio.quality(value);}
  function setShadows(value){$('shadows').checked=!!value;studio.setShadows(value);}
- function setShell(mode){cameraMotion.cancel();pickMode='frame';frame.visible=true;bodyShell.style(mode);draw=true;}
+ function setShell(mode){cameraMotion.cancel();pickMode='frame';frame.visible=true;bodyShell.style(mode,{immediate:isHomeView()});draw=true;}
  function moveCamera(pose){cameraMotion.moveTo(pose,800);draw=true;}
 
- select('frame');focusGoal=null;rad=4.04;refreshDrive();document.body.dataset.webgl='ready';window.vaccino={state:()=>({shell:bodyShell.state(),world:world.state(),graphics:studio.status(),brakeFlow,cameraTransition:cameraMotion.active,layoutChecks:checkVisualEnvelopes(),focusContext,isolation,focusedParts:[...focusIds],engaged,playing,exploded,batteryHidden,hideWheels,wheelSpin,chosen,camera:{az,el,rad,target:target.toArray()},visible:{body:body.visible,frame:frame.visible,battery:batterySupport.visible,guard:guard.visible,wheels:wheels.visible},explodePosition:motorGroup.position.toArray(),rotor:rotor.rotation.z,carrier:carrier.rotation.z,sleeve:sleeve.position.z,small:smallPulley.rotation.z,large:largePulley.rotation.z,meshes:render.info.render.calls}),setStudioPose(pose,duration){cameraMotion.moveTo(pose,duration);},toggleBrakeFlow(){if(focusContext!=='braking')focusSystem('braking');brakeFlow=!brakeFlow;draw=true;return brakeFlow;},setShell,moveCamera,experienceState:()=>world.state(),shellState:()=>bodyShell.state(),captureView,restoreView,presentScene,setAnimating,setEngaged,setQuality,setShadows,select,inspect,focusSystem,clearFocus,isolate:enabled=>{isolation=enabled;updateHighlight();draw=true;}};requestAnimationFrame(loop);
+ select('frame');focusGoal=null;rad=4.04;refreshDrive();document.body.dataset.webgl='ready';window.vaccino={state:()=>({shell:bodyShell.state(),world:world.state(),graphics:studio.status(),brakeFlow,cameraTransition:cameraMotion.active,layoutChecks:checkVisualEnvelopes(),focusContext,isolation,focusedParts:[...focusIds],engaged,playing,exploded,batteryHidden,hideWheels,wheelSpin,chosen,camera:{az,el,rad,target:target.toArray()},visible:{body:body.visible,frame:frame.visible,battery:batterySupport.visible,guard:guard.visible,wheels:wheels.visible},explodePosition:motorGroup.position.toArray(),rotor:rotor.rotation.z,carrier:carrier.rotation.z,sleeve:sleeve.position.z,small:smallPulley.rotation.z,large:largePulley.rotation.z,meshes:render.info.render.calls}),setStudioPose(pose,duration){cameraMotion.moveTo(pose,duration);},resetHomeView,toggleBrakeFlow(){if(focusContext!=='braking')focusSystem('braking');brakeFlow=!brakeFlow;draw=true;return brakeFlow;},setShell,moveCamera,experienceState:()=>world.state(),shellState:()=>bodyShell.state(),captureView,restoreView,presentScene,setAnimating,setEngaged,setQuality,setShadows,select,inspect,focusSystem,clearFocus,isolate:enabled=>{isolation=enabled;updateHighlight();draw=true;}};requestAnimationFrame(loop);
 }catch(e){document.querySelector('.part-library').open=true;$('fallback').hidden=false;document.body.dataset.webgl='failed';console.error(e)}

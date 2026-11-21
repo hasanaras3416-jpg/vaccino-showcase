@@ -14,7 +14,7 @@ export function initializeExperienceUI(){
    const env=state.route==='overview'?'showroom':state.sub;
    if(experienceState.environment!==env||!api?.experienceState().active){setEnvironment(env);}
    if(state.route==='experience')document.getElementById('reset').click();
-   api?.setShell(state.route==='overview'?'hidden':experienceState.bodyMode);
+   api?.setShell(state.route==='overview'?'solid':experienceState.bodyMode);
   }
   document.querySelectorAll('[data-environment]').forEach(a=>a.setAttribute('aria-current',a.dataset.environment===experienceState.environment?'page':'false'));
   $('workshop-controls').hidden=experienceState.environment!=='workshop';$('track-controls').hidden=experienceState.environment!=='track';$('simulation-panel').hidden=experienceState.environment!=='track';
