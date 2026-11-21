@@ -73,7 +73,13 @@ export function initializeDriver() {
  const shellMaterial=drawLabel((ctx,w,h)=>{
    ctx.clearRect(0,0,w,h);ctx.fillStyle='#f3d169';ctx.font='bold 112px Arial';ctx.textAlign='center';ctx.fillText('SHELL',w/2,270);
  });
- const shellMark=new T.Mesh(new T.PlaneGeometry(.23,.13),shellMaterial);shellMark.position.set(.18,2.32,.253);pilot.add(shellMark);
+ const shellMark=new T.Mesh(new T.PlaneGeometry(.18,.16),shellMaterial);shellMark.position.set(.20,2.32,.258);pilot.add(shellMark);
+ // Replace text placeholder with the existing supplied Shell emblem when the asset is available.
+ new T.TextureLoader().load('assets/branding/shell-logo.png',texture=>{
+   texture.colorSpace=T.SRGBColorSpace;
+   shellMark.material=new T.MeshBasicMaterial({map:texture,transparent:true,depthWrite:false,side:T.DoubleSide});
+   paint=true;
+ },undefined,()=>{ /* Keep the visible wordmark fallback. */ });
  // Helmet shell, dark shield and gold piping.
  orb(pilot,0,3.02,0,.26,.33,.285,helmet);
  orb(pilot,0,3.09,.224,.233,.156,.069,visor);
