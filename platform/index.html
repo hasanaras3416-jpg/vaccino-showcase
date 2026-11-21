@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080808"><meta name="description" content="Vaccino 26/27 mühendislik platformu. Araç, sistemler ve tasarım kararları tek çalışma alanında."><title>Vaccino 26/27 — Engineering Platform</title><link rel="icon" href="assets/branding/vaccino-logo.png"><link rel="stylesheet" href="assets/workspace.css"><link rel="stylesheet" href="assets/presentation.css"><link rel="stylesheet" href="assets/experience.css"><link rel="stylesheet" href="assets/refresh.css"><link rel="stylesheet" href="assets/automotive-home.css"><link rel="stylesheet" href="assets/driver-and-dashboard.css"><link rel="stylesheet" href="assets/engineering.css"></head>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080808"><meta name="description" content="Vaccino 26/27 mühendislik platformu. Araç, sistemler ve tasarım kararları tek çalışma alanında."><title>Vaccino 26/27 — Engineering Platform</title><link rel="icon" href="assets/branding/vaccino-logo.png"><link rel="stylesheet" href="assets/workspace.css"><link rel="stylesheet" href="assets/presentation.css"><link rel="stylesheet" href="assets/experience.css"><link rel="stylesheet" href="assets/refresh.css"><link rel="stylesheet" href="assets/automotive-home.css"><link rel="stylesheet" href="assets/driver-and-dashboard.css?v=driver-studio-03"><link rel="stylesheet" href="assets/engineering.css"></head>
 <body data-route="overview"><a class="skip-link" href="#screen-title">İçeriğe geç</a><div class="menu-scrim" id="menu-scrim" hidden></div>
 <aside class="sidebar" id="sidebar" aria-label="Platform gezinmesi" inert>
 <div class="drawer-head"><a class="brand" href="#/overview" aria-label="Vaccino ana sayfa"><span class="brand-wordmark">VACCINO</span></a><button id="menu-close" type="button">Kapat</button></div>
@@ -68,15 +68,30 @@
 <a href="#/experience/showroom">Showroom</a><a href="#/experience/workshop">Atölye ve lift</a><a href="#/experience/track">Pist ve simülasyon</a><a href="#/decisions">Mühendislik kararları</a><a href="#/tests">Test planı</a>
 </nav>
 </section>
-<section class="screen driver-screen" data-screen="driver" aria-label="Driver / Pilot ekipmanı" hidden>
-<div class="driver-intro"><span class="v-section-number">VACCINO / DRIVER EXPERIENCE</span><h2>Pilot.<br><em>Bir bütünün parçası.</em></h2><p>2027 yarış ekipmanı için etkileşimli konsept stüdyo. Model ve malzemeler temsilidir; gerçek ürün seçimi ve şartname uygunluğu ayrıca doğrulanmalıdır.</p></div>
+<section class="screen driver-screen" data-screen="driver" aria-labelledby="driver-title" hidden>
+<header class="driver-intro">
+<h1 id="driver-title" lang="en" tabindex="-1">Driver<br> Studio</h1>
+<p>Kontrol, güvenlik ve insan faktörü.</p>
+</header>
 <div class="driver-stage" id="driver-stage">
-<canvas id="driver-canvas" aria-label="Fareyle döndürülebilen 3 boyutlu pilot konsepti" tabindex="0"></canvas>
-<div class="driver-overlay-top"><span>VACCINO 2027 / RACE SUIT CONCEPT</span><span>3D VIEWER</span></div>
-<div class="driver-hotspots" id="driver-hotspots"></div>
-<div class="driver-overlay-bottom"><span>Kaydırarak döndür • Tekerlekle yakınlaştır • Noktalara tıkla</span><button id="driver-reset" type="button">Görüşü sıfırla ↗</button></div>
+<canvas id="driver-canvas" aria-label="Vaccino pilotunun etkileşimli 3B görünümü" aria-describedby="driver-controls-hint" tabindex="0" hidden></canvas>
+<p id="driver-controls-hint" class="driver-visually-hidden">Döndürmek için sürükleyin veya yön tuşlarını kullanın. Yakınlaştırmak için fare tekerleğini, iki parmak hareketini ya da artı ve eksi tuşlarını kullanın. İlk görünüme dönmek için Escape tuşuna basın.</p>
+<p class="driver-render-status" id="driver-render-status" role="status">3B pilot yükleniyor…</p>
+<div class="driver-view-controls" id="driver-view-controls" role="group" aria-label="Pilot kamerası" hidden>
+<button type="button" data-driver-zoom="-1" aria-label="Uzaklaştır">−</button>
+<button type="button" data-driver-zoom="1" aria-label="Yakınlaştır">+</button>
+<button type="button" id="driver-reset">Görünümü sıfırla</button>
 </div>
-<aside class="driver-detail" aria-live="polite"><span class="v-section-number">EKİPMAN / 01—03</span><h3 id="driver-item-title">Yarış tulumu</h3><p id="driver-item-text">Siyah pilot tulumu, göğüste altın V ve Shell yerleşimi. Kesim ve logolar konsept tasarımdır.</p><p class="driver-caveat">Güvenlik sertifikası, ürün modeli, beden ve yarışma uygunluğu doğrulanmadı.</p></aside>
+</div>
+<div class="driver-equipment">
+<div class="driver-options" role="group" aria-label="Pilot ekipmanı">
+<button type="button" data-driver-focus="helmet" aria-pressed="false">Kask</button>
+<button type="button" data-driver-focus="suit" aria-pressed="false">Tulum</button>
+<button type="button" data-driver-focus="glove" aria-pressed="false">Eldiven</button>
+</div>
+<p class="driver-equipment-note" id="driver-item-text" aria-live="polite">Yakından incelemek için bir ekipman seçin.</p>
+<p class="driver-caveat">Ekipman görsel konsepttir. Ürün seçimi, güvenlik sertifikası ve yarışma uygunluğu doğrulanmadı.</p>
+</div>
 </section>
 <section class="screen" data-screen="vehicle" aria-label="3B Araç" hidden><div class="view-toolbar"><span>V2 ŞASİ / DÖRT TEKER / TEK MOTOR</span><span class="geometry-tag">Temsili yerleşim</span></div><div class="scene-slot" data-slot="vehicle"></div></section>
 <section class="screen" data-screen="mechanical" aria-label="Mekanik Sistemler" hidden><nav class="subnav" id="mechanical-tabs" aria-label="Mekanik alt sistemleri"></nav><fieldset id="drivetrain-selector" class="drivetrain-selector" hidden><legend>Aktarma mimarisi</legend><div id="drivetrain-options"></div></fieldset><div class="system-exhibit">
@@ -130,4 +145,4 @@
 <button id="season-start" type="button" aria-label="Vaccino stüdyosuna gir"></button>
 <p id="season-error" role="alert" hidden>Vaccino logosu yüklenemedi. assets/branding/vaccino-logo.png dosyasını kontrol edin.</p>
 <button id="season-skip" type="button">Animasyonu atla</button>
-</dialog><script src="src/app.js?v=engineering-021"></script></body></html>
+</dialog><script src="src/app.js?v=driver-studio-03"></script></body></html>

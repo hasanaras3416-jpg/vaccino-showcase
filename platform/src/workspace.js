@@ -75,8 +75,8 @@ function toggleMenu() {
 }
 document.querySelector('.skip-link').addEventListener('click',event=>{
   event.preventDefault();
-  const heading=state.route==='overview'?document.querySelector('.v-hero-content h2'):
-    state.route==='autonomy'?$('software-title'):$('screen-title');
+  const headingId={autonomy:'software-title',driver:'driver-title'}[state.route]??'screen-title';
+  const heading=state.route==='overview'?document.querySelector('.v-hero-content h2'):$(headingId);
   heading.tabIndex=-1;
   heading.focus({preventScroll:true});
   heading.scrollIntoView({block:'start',behavior:'instant'});
@@ -350,7 +350,11 @@ function navigate({focusHeading=false}={}) {
   syncViewerControls();syncDrivetrainPanel();
   updateHeading();applySceneFocus();closeMenu();
   window.scrollTo({top:0,behavior:'instant'});
-  if(focusHeading) (state.route==='overview'?$('menu-toggle'):document.querySelector('[data-screen]:not([hidden]) .subnav a[aria-current]')??$('screen-title')).focus({preventScroll:true});
+  if(focusHeading){
+    const tab=document.querySelector('[data-screen]:not([hidden]) .subnav a[aria-current]');
+    const heading=$(state.route==='driver'?'driver-title':'screen-title');
+    (state.route==='overview'?$('menu-toggle'):tab??heading).focus({preventScroll:true});
+  }
   document.dispatchEvent(new CustomEvent('vaccino:route',{detail:{route:state.route,sub:state.sub}}));
   document.dispatchEvent(new Event('vaccino:resize'));
 }

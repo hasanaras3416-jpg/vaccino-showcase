@@ -23,10 +23,16 @@ A site that looks like a **premium automotive design studio made it**, not a sch
 ## Functional UX
 - Mouse drag, touch drag and keyboard orbit or zoom hide the hero copy and reveal the restore control. Restore returns to the composed view and focuses the viewer. Escape restores the introduction when the viewer has focus.
 - Logo hover **scales**, doesn't turn white.
-- Main nav has Driver; Driver shows rotating 3D concept mannequin on a display stand, with helmet/gloves/suit hotspots.
-- Suit styling: black, centered gold V, small Shell mark.
 - Nextion: 3D vehicle HMI item opens an expanded UI prototype; same entry reachable from software page; labels show it's mock data.
 - Maintain keyboard focus, visible interactions and meaningful fallbacks.
+
+## Driver Studio
+
+- Keep the pilot dominant. Put the heading and three equipment choices beside the stage on desktop. On narrow screens, put the heading above the stage and the equipment choices below it.
+- Start with the entire pilot in a slightly angled portrait. Use a graphite background, a contact shadow and a warm key, cooler rim and soft fill. Keep the cloth matte, the visor dark and reflective, and the champagne V and supplied Shell mark small. Bake the marks into the cloth texture so they follow its surface.
+- Focus Kask, Tulum and Eldiven on the head, chest and left glove. New selections interrupt the current camera move. Support orbit and zoom by mouse, touch or keyboard, and provide visible zoom and reset controls. Use instant focus and reset with reduced motion.
+- Keep the equipment copy short. Identify the equipment as a visual concept and keep selection, certification and competition compliance unverified.
+- Load the scene and its model only on the Driver route. Render while the camera moves or the stage changes, and stop when the user leaves.
 
 ## Engineering exhibits
 - Give the 3D scene priority in Mechanical and Electrical. Put the active system introduction and keyboard-accessible part list beside the scene on desktop and below it on narrow screens. Put technical notes, power distribution, and battery calculations in disclosures.
@@ -45,7 +51,7 @@ A site that looks like a **premium automotive design studio made it**, not a sch
 ## Required quality checks
 1. Test 1440px and 1920px desktop, ~768px tablet and 390px mobile viewport.
 2. Verify scroll boundaries, no text overlap and no horizontal overflow.
-3. Test navigation, intro, hover, 3D drag, Driver hotspots, Nextion dialog, Escape/focus, responsive controls.
+3. Test navigation, intro, hover, 3D drag, Driver equipment focus and camera reset, Nextion dialog, Escape/focus, responsive controls.
 4. Inspect browser console/network errors. A favicon 404 does not alone invalidate functionality; any missing JS/data/3D asset does.
 5. Review screenshots before calling a visual design complete.
 6. Keep existing vehicle, routes, assets and engineering data working.

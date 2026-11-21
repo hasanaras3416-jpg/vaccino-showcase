@@ -23,10 +23,17 @@ A polished public-facing digital presentation for Vaccino, an electric student c
 - `#/autonomy/simulation` and `#/autonomy/vision`: independent software exhibits. Previous perception, sensor and interface routes open Görüntü İşleme, with the corresponding technical resources expanded for the sensor and interface links.
 - `#/team/goals`, `#/inventory`: competition context and inventory. The team photo gallery and both software media showcases currently await approved media.
 - Add media entries to `presentation.software[].media` or `presentation.competitionMedia` in `platform/data/project.json`. Each entry uses `type` (`image` or `video`), `src` relative to `platform/`, descriptive `alt` and an optional `caption`. Video entries can also reference a Turkish WebVTT file with `captions`.
-- `#/driver`: interactive **concept mannequin** on display stand; black suit, gold V, Shell branding, equipment information hotspots. Real PPE certification not verified.
+- `#/driver`: Driver Studio, a separate 3D equipment concept with a full-body view and close-ups of the helmet, suit and left glove. The pilot and equipment are visual concepts.
 - Nextion display: browser-only expandable dashboard prototype; mock data, not actual serial/Nextion firmware.
 - Intro logo hover grows rather than turning white.
 - Overview hero labels fade when dragging to inspect the vehicle, with a restore action.
+
+## Driver Studio asset
+
+- The base is [tevy Pit Crew Member v1, LOD0](https://tevy.dev/models/pit-crew) ([original GLB](https://tevy.dev/models/pit-crew/v1/lod0.glb)), published under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). CC0 permits display, modification and redistribution of the base asset with no attribution requirement. The supplied Shell logo and the Vaccino identity have separate trademark rights. The concept artwork carries no endorsement claim.
+- The repackaged `platform/assets/driver/pilot.glb` is a self-contained static pose with 27,999 triangles. It preserves the baked normal map, adds matte black and charcoal with a champagne V and the supplied Shell mark in the suit texture, and uses an adjusted roughness map. The embedded JPEG maps are 2048 px (base color), 1024 px (normal) and 512 px (roughness). No animation, skinning, texture transcoder or network dependency is required at runtime.
+- For a replacement GLB, export a standing pilot facing +Z with +Y up and feet at ground level. Set three named empty nodes in the desired camera target positions: `FocusHelmet`, `FocusSuit`, and `FocusGlove`. Review their close-up distances and camera angles in `platform/src/driver.js`.
+- The lazy GLB loader is the MIT-licensed GLTFLoader and BufferGeometryUtils from [Three.js 0.160.1](https://github.com/mrdoob/three.js/tree/r160), bundled against the application's existing Three.js global. The loader and GLB share the app release query. Automatic pixel density follows the vehicle policy of 1× at 700 px and below, capped at 1.35× above it.
 
 ## Known next step
 A **new chassis** may be provided by the actual CAD designer later. Until supplied and explicitly approved, **do not replace the current vehicle/chassis**; produce independent visual comparisons if requested.

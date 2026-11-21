@@ -23,7 +23,7 @@
     'mechanical-details.js','presentation.js','season.js','simulation-engine.js',
     'simulation-ui.js','store.js','studio.js','track-geometry.js','track-scene.js',
     'vehicle-layout.js','vehicle.js','workshop-scene.js','workspace.js',
-    '../data/geometry.js'
+    '../data/geometry.js','../vendor/driver-gltf-loader.js'
   ];
   function versioned(url) {
     const resolved=new URL(url,entry);

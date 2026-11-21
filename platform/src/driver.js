@@ -1,141 +1,293 @@
-/* Interactive Driver concept exhibit — deliberately illustrative, not PPE CAD. */
+const equipment = {
+  helmet: { node: 'FocusHelmet', radius: .19, azimuth: -.18, copy: 'Tam yüz yarış kaskı ve koyu vizör.' },
+  suit: { node: 'FocusSuit', radius: .34, azimuth: .12, copy: 'Mat siyah kumaş, antrasit paneller ve göğüste Vaccino V.' },
+  glove: { node: 'FocusGlove', radius: .16, azimuth: .72, copy: 'Sol yarış eldiveninin manşeti ve parmak yapısı.' }
+};
+
+function addStudio(T, renderer, scene) {
+  scene.add(new T.HemisphereLight(0xe4e9f6, 0x363130, 1.20));
+  for (const [color, strength, x, y, z] of [
+    [0xfff2df, 3.2, -3, 4, 4],
+    [0xe0e9fa, 3.4, 3, 3, -3],
+    [0xf1eee7, 1.25, 3, 1, 4]
+  ]) {
+    const light = new T.DirectionalLight(color, strength);
+    light.position.set(x, y, z);
+    scene.add(light);
+  }
+
+  const room = new T.Scene();
+  room.background = new T.Color(0x25282b);
+  for (const [x, y, z, w, h, color] of [
+    [-3, 3, 3, 2.6, 4, 0xe8e0d3], [3, 2, -3, 1.8, 4, 0xaabacb], [1, 3, 4, 2, .8, 0x8b9198]
+  ]) {
+    const card = new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshBasicMaterial({color}));
+    card.position.set(x, y, z);
+    card.lookAt(0, 1, 0);
+    room.add(card);
+  }
+  const generator = new T.PMREMGenerator(renderer);
+  const environment = generator.fromScene(room, .025);
+  scene.environment = environment.texture;
+  generator.dispose();
+  for (const card of room.children) {
+    card.geometry.dispose();
+    card.material.dispose();
+  }
+
+  const mapCanvas = document.createElement('canvas');
+  mapCanvas.width = mapCanvas.height = 64;
+  const ctx = mapCanvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gradient.addColorStop(0, 'rgba(0,0,0,.7)');
+  gradient.addColorStop(.48, 'rgba(0,0,0,.3)');
+  gradient.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 64, 64);
+  const shadow = new T.Mesh(
+    new T.PlaneGeometry(1.13, .75),
+    new T.MeshBasicMaterial({map: new T.CanvasTexture(mapCanvas), transparent: true, depthWrite: false})
+  );
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.z = .04;
+  scene.add(shadow);
+}
+
 export function initializeDriver() {
- const canvas=document.getElementById('driver-canvas');
- const stage=document.getElementById('driver-stage');
- const dots=document.getElementById('driver-hotspots');
- if(!canvas||!stage||!window.THREE)return;
- const T=window.THREE;
- let renderer;
- try {renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:true});}
- catch(error){stage.insertAdjacentHTML('beforeend','<p class="driver-render-fallback">3B görünüm açılamadı. WebGL desteğini kontrol edin.</p>');return;}
- renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));
- renderer.outputColorSpace=T.SRGBColorSpace;
- renderer.toneMapping=T.ACESFilmicToneMapping;
- renderer.toneMappingExposure=1.45;
- const scene=new T.Scene();
- const camera=new T.PerspectiveCamera(34,1,.1,80);
- scene.add(new T.HemisphereLight(0xeff3f9,0x534a40,2.2));
- const key=new T.DirectionalLight(0xffffff,3.1);key.position.set(-3,8,6);scene.add(key);
- const rim=new T.DirectionalLight(0xc2a979,2);rim.position.set(3,6,-4);scene.add(rim);
- const pilot=new T.Group();scene.add(pilot);
- const mat=(color,roughness=.7,metalness=.05)=>new T.MeshStandardMaterial({color,roughness,metalness});
- const suit=mat(0x161b1e,.83),suitEdge=mat(0x303436,.89),gold=mat(0xcaa365,.28,.55),
-       helmet=mat(0x171b1e,.22,.44),visor=mat(0x101d25,.07,.25),gloves=mat(0x25292b,.85),
-       boots=mat(0x101213,.86),stand=mat(0x1a1d1f,.43,.55);
- const orb=(parent,x,y,z,sx,sy,sz,material)=>{
-   const m=new T.Mesh(new T.SphereGeometry(1,24,16),material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);parent.add(m);return m;
- };
- const cyl=(parent,a,b,r1,r2,material)=>{
-   const p=new T.Vector3(...a),q=new T.Vector3(...b),v=q.clone().sub(p);
-   const m=new T.Mesh(new T.CylinderGeometry(r2,r1,v.length(),20,1),material);
-   m.position.copy(p.add(q).multiplyScalar(.5));m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),v.normalize());parent.add(m);return m;
- };
- const box=(parent,x,y,z,w,h,d,material)=>{const m=new T.Mesh(new T.BoxGeometry(w,h,d),material);m.position.set(x,y,z);parent.add(m);return m};
- // Stand and full-body race mannequin.
- const disk=new T.Mesh(new T.CylinderGeometry(.78,.83,.13,64),stand);
- disk.position.y=.065;pilot.add(disk);
- const inlay=new T.Mesh(new T.TorusGeometry(.70,.012,10,60),gold);inlay.rotation.x=Math.PI/2;inlay.position.y=.139;pilot.add(inlay);
- const plinth=new T.Mesh(new T.CylinderGeometry(.16,.20,.27,40),stand);plinth.position.y=.26;pilot.add(plinth);
- // Silhouette is intentionally simplified for concept visualization.
- orb(pilot,0,2.28,0,.38,.50,.25,suit);
- orb(pilot,0,1.86,0,.30,.25,.24,suit);
- orb(pilot,0,1.62,0,.30,.22,.24,suitEdge);
- cyl(pilot,[-.19,1.64,0],[-.19,.75,0],.145,.117,suit);
- cyl(pilot,[.19,1.64,0],[.19,.75,0],.145,.117,suit);
- orb(pilot,-.19,.73,.012,.122,.12,.13,suit);
- orb(pilot,.19,.73,.012,.122,.12,.13,suit);
- box(pilot,-.19,.39,.09,.23,.45,.40,boots);
- box(pilot,.19,.39,.09,.23,.45,.40,boots);
- orb(pilot,0,2.79,0,.14,.18,.15,suit);
- // Arms, gloves, shoulder patches.
- for(const s of [-1,1]){
-  orb(pilot,s*.40,2.57,0,.18,.16,.21,suit);
-  cyl(pilot,[s*.42,2.48,0],[s*.48,2.04,.015],.142,.113,suit);
-  orb(pilot,s*.48,2.02,.017,.124,.11,.125,suitEdge);
-  cyl(pilot,[s*.48,2.01,.017],[s*.46,1.65,.17],.115,.09,suit);
-  orb(pilot,s*.46,1.58,.17,.10,.13,.10,gloves);
-  box(pilot,s*.425,2.49,.173,.11,.035,.038,gold);
-  cyl(pilot,[s*.19,.9,.12],[s*.19,.63,.13],.03,.03,suitEdge);
- }
- // Waist detail, zip and chest insignia.
- box(pilot,0,1.81,.241,.56,.075,.025,suitEdge);
- box(pilot,0,2.32,.255,.018,.62,.026,suitEdge);
- const drawLabel=(paint,w=512,h=512)=>{
-  const el=document.createElement('canvas');el.width=w;el.height=h;
-  paint(el.getContext('2d'),w,h);
-  const tx=new T.CanvasTexture(el);tx.colorSpace=T.SRGBColorSpace;
-  return new T.MeshBasicMaterial({map:tx,transparent:true,depthWrite:false,side:T.DoubleSide});
- };
- const vMaterial=drawLabel((ctx,w,h)=>{
-   ctx.clearRect(0,0,w,h);ctx.textAlign='center';ctx.font='bold 330px Arial';ctx.fillStyle='#cda768';ctx.fillText('V',w/2,355);
- });
- const vMark=new T.Mesh(new T.PlaneGeometry(.24,.27),vMaterial);vMark.position.set(0,2.50,.265);pilot.add(vMark);
- const shellMaterial=drawLabel((ctx,w,h)=>{
-   ctx.clearRect(0,0,w,h);ctx.fillStyle='#f3d169';ctx.font='bold 112px Arial';ctx.textAlign='center';ctx.fillText('SHELL',w/2,270);
- });
- const shellMark=new T.Mesh(new T.PlaneGeometry(.18,.16),shellMaterial);shellMark.position.set(.20,2.32,.258);pilot.add(shellMark);
- // Replace text placeholder with the existing supplied Shell emblem when the asset is available.
- new T.TextureLoader().load('assets/branding/shell-logo.png',texture=>{
-   texture.colorSpace=T.SRGBColorSpace;
-   shellMark.material=new T.MeshBasicMaterial({map:texture,transparent:true,depthWrite:false,side:T.DoubleSide});
-   paint=true;
- },undefined,()=>{ /* Keep the visible wordmark fallback. */ });
- // Helmet shell, dark shield and gold piping.
- orb(pilot,0,3.02,0,.26,.33,.285,helmet);
- orb(pilot,0,3.09,.224,.233,.156,.069,visor);
- orb(pilot,0,2.92,.265,.235,.092,.066,visor);
- const trim=new T.Mesh(new T.TorusGeometry(.208,.011,8,40,Math.PI),gold);
- trim.rotation.z=Math.PI;trim.position.set(0,2.955,.280);pilot.add(trim);
- box(pilot,0,2.77,.226,.24,.05,.085,helmet);
- const anchors={
-  helmet:new T.Vector3(.19,3.17,.24),
-  gloves:new T.Vector3(-.46,1.61,.17),
-  suit:new T.Vector3(.18,2.49,.27)
- };
- const descriptions={
-  helmet:['Kask','Tam yüz korumalı yarış kaskı konsepti. Gerçek kabuk, vizör, sertifikasyon, uygun beden ve yarışma koşulları ürün seçimi sırasında doğrulanacak.'],
-  gloves:['Eldiven','Siyah yarış eldiveni konsepti. Kavrama hissi, hareket serbestliği, dayanım ve istenen standartlar gerçek ürün üzerinde incelenecek.'],
-  suit:['Tulum','Siyah pilot tulumu; göğüste altın V, küçük Shell işareti ve sade yarış çizgileri. Alev geciktiricilik ve uygunluk bu görselden çıkarılamaz.']
- };
- const buttons={};
- for(const [id,label] of [['helmet','Kask'],['gloves','Eldiven'],['suit','Tulum']]){
-   const button=document.createElement('button');button.className='driver-dot';button.type='button';button.textContent='+';button.title=label;button.setAttribute('aria-label',label+' detaylarını aç');dots.append(button);buttons[id]=button;
-   button.addEventListener('click',()=>select(id));
- }
- function select(id){
-  document.getElementById('driver-item-title').textContent=descriptions[id][0];
-  document.getElementById('driver-item-text').textContent=descriptions[id][1];
-  for(const [key,b] of Object.entries(buttons))b.setAttribute('aria-pressed',String(key===id));
- }
- select('suit');
- let az=-.16,el=.05,dist=6.9,drag=null,paint=true;
- const mouse=(e)=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag={x:e.clientX,y:e.clientY};az+=dx*.008;el=Math.max(-.35,Math.min(.4,el+dy*.003));paint=true};
- canvas.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId)});
- canvas.addEventListener('pointermove',mouse);
- canvas.addEventListener('pointerup',()=>drag=null);
- canvas.addEventListener('pointercancel',()=>drag=null);
- canvas.addEventListener('wheel',e=>{e.preventDefault();dist=Math.max(4.7,Math.min(10,dist+e.deltaY*.006));paint=true},{passive:false});
- canvas.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){az+=(e.key==='ArrowLeft'?-1:1)*.17;paint=true;e.preventDefault()}});
- document.getElementById('driver-reset').onclick=()=>{az=-.16;el=.05;dist=6.9;paint=true};
- const resize=new ResizeObserver(()=>{const r=stage.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();paint=true});
- resize.observe(stage);
- const v=new T.Vector3();
- function frame(){
-   requestAnimationFrame(frame);
-   if(document.body.dataset.route!=='driver')return;
-   if(!paint)return;
-   paint=false;
-   pilot.rotation.y=az;
-   camera.position.set(0,2.02+el*3,dist);camera.lookAt(0,1.76,0);
-   renderer.render(scene,camera);
-   for(const [id,anchor] of Object.entries(anchors)){
-     v.copy(anchor).applyMatrix4(pilot.matrixWorld).project(camera);
-     const b=buttons[id];
-     const isVisible=v.z<1&&v.z>-1;
-     b.hidden=!isVisible;
-     b.style.left=((v.x+1)*.5*stage.clientWidth)+'px';
-     b.style.top=((1-v.y)*.5*stage.clientHeight)+'px';
-   }
- }
- frame();
+  const stage = document.getElementById('driver-stage');
+  const canvas = document.getElementById('driver-canvas');
+  const status = document.getElementById('driver-render-status');
+  const controls = document.getElementById('driver-view-controls');
+  const note = document.getElementById('driver-item-text');
+  const buttons = [...document.querySelectorAll('[data-driver-focus]')];
+  const zoomButtons = [...controls.querySelectorAll('[data-driver-zoom]')];
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const mobile = matchMedia('(max-width: 700px)');
+  const T = window.THREE;
+
+  let active = false;
+  let startup, renderer, scene, camera, bounds, pose, transition, frameId;
+  let failed = false;
+  let anchors = {};
+  let selected = '';
+  const pointers = new Map();
+  const direction = new T.Vector3();
+
+  function limit(value, minimum, maximum) {
+    return Math.min(maximum, Math.max(minimum, value));
+  }
+
+  function safeDistance(radius) {
+    const vertical = T.MathUtils.degToRad(camera.fov / 2);
+    const horizontal = Math.atan(Math.tan(vertical) * camera.aspect);
+    return radius / Math.sin(Math.min(vertical, horizontal));
+  }
+
+  function overview() {
+    const size = bounds.getSize(new T.Vector3());
+    const verticalDistance = size.y * .61 / Math.tan(T.MathUtils.degToRad(camera.fov / 2)) + size.z * .5;
+    const orbitClearance = Math.hypot(size.x, size.z) * .59;
+    return {
+      target: bounds.getCenter(new T.Vector3()),
+      distance: Math.max(verticalDistance, safeDistance(orbitClearance)),
+      azimuth: -.26,
+      elevation: .085
+    };
+  }
+
+  function equipmentView(id) {
+    if (!id) return overview();
+    const {radius, azimuth} = equipment[id];
+    return {target: anchors[id].clone(), distance: safeDistance(radius), azimuth, elevation: .075};
+  }
+
+  function requestFrame() {
+    if (active && !document.hidden && renderer && pose && !frameId) frameId = requestAnimationFrame(draw);
+  }
+
+  function draw(now) {
+    frameId = 0;
+    if (!active || document.hidden) return;
+    if (transition) {
+      const {from, to, start} = transition;
+      const progress = limit((now - start) / 600, 0, 1);
+      const eased = progress * progress * (3 - 2 * progress);
+      pose.target.lerpVectors(from.target, to.target, eased);
+      pose.azimuth = T.MathUtils.lerp(from.azimuth, to.azimuth, eased);
+      pose.elevation = T.MathUtils.lerp(from.elevation, to.elevation, eased);
+      pose.distance = T.MathUtils.lerp(from.distance, to.distance, eased);
+      if (progress === 1) transition = null;
+    }
+    direction.setFromSphericalCoords(pose.distance, Math.PI / 2 - pose.elevation, pose.azimuth);
+    camera.position.copy(pose.target).add(direction);
+    camera.lookAt(pose.target);
+    renderer.render(scene, camera);
+    if (transition) requestFrame();
+  }
+
+  function resize() {
+    if (!active || !bounds || !stage.clientWidth || !stage.clientHeight) return;
+    const {clientWidth: width, clientHeight: height} = stage;
+    const aspect = width / height;
+    const aspectChanged = Math.abs(camera.aspect - aspect) > .001;
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile.matches ? 1 : 1.35));
+    renderer.setSize(width, height, false);
+    camera.aspect = aspect;
+    camera.updateProjectionMatrix();
+    if (!pose || aspectChanged) {
+      pose = equipmentView(selected);
+      transition = null;
+    }
+    requestFrame();
+  }
+
+  function select(id, animate = true) {
+    selected = id;
+    for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.driverFocus === id));
+    note.textContent = id ? equipment[id].copy : 'Yakından incelemek için bir ekipman seçin.';
+    if (!pose) return;
+    const goal = equipmentView(id);
+    if (animate && !reduceMotion.matches) {
+      const shortest = Math.atan2(Math.sin(goal.azimuth - pose.azimuth), Math.cos(goal.azimuth - pose.azimuth));
+      goal.azimuth = pose.azimuth + shortest;
+      transition = {from: {...pose, target: pose.target.clone()}, to: goal, start: performance.now()};
+    } else {
+      transition = null;
+      pose = goal;
+    }
+    requestFrame();
+  }
+
+  function rotate(dx, dy) {
+    transition = null;
+    pose.azimuth -= dx;
+    pose.elevation = limit(pose.elevation + dy, -.18, .36);
+    requestFrame();
+  }
+
+  function zoom(factor) {
+    transition = null;
+    pose.distance = limit(pose.distance * factor, safeDistance(.105), overview().distance * 1.5);
+    requestFrame();
+  }
+
+  function pinchDistance() {
+    const [one, two] = pointers.values();
+    return Math.hypot(one.x - two.x, one.y - two.y);
+  }
+
+  canvas.addEventListener('pointerdown', event => {
+    if (!pose || event.button !== 0 || pointers.size >= 2) return;
+    pointers.set(event.pointerId, {x: event.clientX, y: event.clientY});
+    canvas.setPointerCapture(event.pointerId);
+    if (event.pointerType === 'mouse') canvas.focus({preventScroll: true});
+  });
+  canvas.addEventListener('pointermove', event => {
+    const last = pointers.get(event.pointerId);
+    if (!last) return;
+    const before = pointers.size === 2 ? pinchDistance() : 0;
+    pointers.set(event.pointerId, {x: event.clientX, y: event.clientY});
+    if (pointers.size === 2) {
+      const after = pinchDistance();
+      if (before > 0 && after > 0) zoom(before / after);
+    } else {
+      rotate((event.clientX - last.x) * .008, (event.clientY - last.y) * .004);
+    }
+  });
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+    canvas.addEventListener(type, event => pointers.delete(event.pointerId));
+  }
+  canvas.addEventListener('wheel', event => {
+    if (!pose) return;
+    event.preventDefault();
+    const scale = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? stage.clientHeight : 1;
+    zoom(Math.exp(limit(event.deltaY * scale * .0015, -.25, .25)));
+  }, {passive: false});
+  canvas.addEventListener('keydown', event => {
+    if (!pose) return;
+    switch (event.key) {
+      case 'ArrowLeft': rotate(-.15, 0); break;
+      case 'ArrowRight': rotate(.15, 0); break;
+      case 'ArrowUp': rotate(0, .08); break;
+      case 'ArrowDown': rotate(0, -.08); break;
+      case '+': case '=': zoom(.84); break;
+      case '-': zoom(1.19); break;
+      case 'Escape': select(''); break;
+      default: return;
+    }
+    event.preventDefault();
+  });
+  for (const button of buttons) button.addEventListener('click', () => select(button.dataset.driverFocus));
+  for (const button of zoomButtons) button.addEventListener('click', () => zoom(button.dataset.driverZoom === '1' ? .84 : 1.19));
+  document.getElementById('driver-reset').addEventListener('click', () => select(''));
+
+  async function load() {
+    const {GLTFLoader} = await import('../vendor/driver-gltf-loader.js');
+    const url = new URL('../assets/driver/pilot.glb', import.meta.url);
+    url.search = new URL(import.meta.url).search;
+    const {scene: pilot} = await new GLTFLoader().loadAsync(url.href);
+    scene = new T.Scene();
+    scene.add(pilot);
+    bounds = new T.Box3().setFromObject(pilot);
+    anchors = Object.fromEntries(Object.entries(equipment).map(([id, part]) => {
+      const marker = pilot.getObjectByName(part.node);
+      if (!marker) throw new Error('Missing Driver camera target: ' + part.node);
+      return [id, marker.getWorldPosition(new T.Vector3())];
+    }));
+    camera = new T.PerspectiveCamera(34, 1, .03, 45);
+  }
+
+  function show() {
+    if (!renderer) {
+      renderer = new T.WebGLRenderer({canvas, antialias: !mobile.matches, alpha: true});
+      renderer.outputColorSpace = T.SRGBColorSpace;
+      renderer.toneMapping = T.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.04;
+      addStudio(T, renderer, scene);
+    }
+    status.hidden = true;
+    canvas.hidden = controls.hidden = false;
+    resize();
+  }
+
+  function showFailure(error) {
+    failed = true;
+    renderer?.dispose();
+    renderer = undefined;
+    status.textContent = '3B pilot açılamadı. Ekipman açıklamaları Kask, Tulum ve Eldiven seçeneklerinde.';
+    console.warn('Driver Studio:', error.message);
+  }
+
+  function stopFrames() {
+    cancelAnimationFrame(frameId);
+    frameId = 0;
+    pointers.clear();
+  }
+
+  function syncRoute() {
+    const next = document.body.dataset.route === 'driver';
+    if (active === next) return;
+    active = next;
+    if (!active) {
+      stopFrames();
+      select('', false);
+      return;
+    }
+    startup ??= load().catch(showFailure);
+    startup.then(() => {
+      if (active && !failed) show();
+    }).catch(showFailure);
+  }
+
+  new ResizeObserver(resize).observe(stage);
+  mobile.addEventListener('change', resize);
+  document.addEventListener('vaccino:route', syncRoute);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopFrames();
+    else requestFrame();
+  });
+  reduceMotion.addEventListener('change', () => {
+    if (reduceMotion.matches && transition) select(selected, false);
+  });
+  syncRoute();
 }
