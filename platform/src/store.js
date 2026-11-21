@@ -19,3 +19,9 @@ export const record = resolve(raw);
 export {parameters, format};
 export const state = {route:'overview', sub:''};
 export const part = id => record.parts.find(p => p.id === id);
+
+export function mechanicalSystem() {
+  if(state.route==='mechanical'&&!document.body.classList.contains('presentation-active')){
+    return record.presentation.systems.mechanical.find(entry=>entry.id===state.sub);
+  }
+}

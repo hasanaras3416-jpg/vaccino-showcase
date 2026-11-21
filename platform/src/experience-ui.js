@@ -6,7 +6,7 @@ export function initializeExperienceUI(){
  const api=window.vaccino,$=id=>document.getElementById(id);
  const simUI=initializeSimulationUI($('simulation-panel'));initializeInventoryUI($('engineering-inventory'));
  const labels={showroom:'SHOWROOM',workshop:'ATÖLYE',track:'PİST / DEMO'};
- const nativeReset=$('reset').onclick;$('reset').onclick=()=>{nativeReset();if(state.route==='experience')api?.setShell(experienceState.bodyMode);};
+ const nativeReset=$('reset').onclick;$('reset').onclick=()=>{nativeReset?.();if(state.route==='experience')api?.setShell(experienceState.bodyMode);};
  function route(){
   const wasActive=experienceState.active,active=['experience','overview'].includes(state.route);experienceState.active=active;
   if(!active&&wasActive){simulation.pause();api?.setShell('hidden');api?.setAnimating(false);}

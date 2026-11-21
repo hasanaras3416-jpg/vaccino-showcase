@@ -1,0 +1,203 @@
+/* Engineering exhibits use the workspace palette and shared viewer. */
+#workspace .mechanical-exhibit {
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) minmax(17rem, 24%);
+  gap:clamp(1.5rem, 4vw, 4.5rem);
+  align-items:start;
+}
+#workspace .mechanical-brief {
+  padding-block:clamp(1rem, 3vw, 2.5rem);
+  min-width:0;
+}
+.mechanical-brief h2, .software-heading h2 {
+  font-size:clamp(2.25rem, 4.1vw, 4rem);
+  font-weight:450;
+  line-height:1.05;
+  letter-spacing:-.055em;
+}
+.mechanical-lead, .software-heading > p:last-child {
+  margin-block:.85rem 1.4rem;
+  color:var(--muted);
+  max-width:58ch;
+}
+#workspace .mechanical-brief .system-parts { display:grid; gap:0; }
+#workspace .mechanical-brief .system-parts button {
+  text-align:left;
+  min-height:44px;
+  padding:.75rem .65rem;
+  background:transparent;
+  border:0;
+  border-bottom:1px solid var(--line);
+  border-radius:0;
+}
+#workspace .mechanical-brief .system-parts button[aria-pressed=true] {
+  color:var(--warm-white);
+  box-shadow:inset 2px 0 var(--gold);
+}
+#workspace .mechanical-exhibit .stage {
+  height:clamp(420px, 62dvh, 720px);
+  min-height:0;
+  background:radial-gradient(ellipse at 52% 43%, #272521, #151413 80%);
+}
+#workspace .mechanical-exhibit #vehicle { touch-action:pan-y; }
+#workspace .mechanical-exhibit .stage::before,
+#workspace .mechanical-exhibit .stage::after { content:none; }
+#workspace .mechanical-exhibit :is(.caption,.guide) { display:none; }
+#workspace .mechanical-exhibit .stage-label {
+  inset:auto 1rem 1rem;
+  font-size:.65rem;
+  gap:.75rem;
+}
+#workspace .mechanical-exhibit .stage-label span:first-child { display:none; }
+#workspace .mechanical-exhibit .drive-state { inset:auto 1rem 2.5rem; width:max-content; max-width:calc(100% - 2rem); }
+#workspace .mechanical-exhibit .viewer-actions:not(:has(button:not([hidden]))) { display:none !important; }
+#workspace .mechanical-exhibit .system-parts + details { margin-top:1.6rem; }
+#workspace .mechanical-brief .principle-flow {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:0;
+  margin-block:1rem;
+}
+.mechanical-brief .principle-flow li { min-width:0; padding:.35rem 0; }
+.mechanical-brief .principle-flow li::after { content:none !important; }
+.mechanical-brief .brief-explanation { display:block; }
+.mechanical-brief .brief-explanation > * + * { margin-top:1rem; }
+
+#workspace .tools:has(.viewer-settings) {
+  inset:14px 14px auto;
+  justify-content:space-between;
+  pointer-events:none;
+  z-index:8;
+}
+#workspace .tools:has(.viewer-settings) > * { pointer-events:auto; }
+#workspace .tools:has(.viewer-settings) :is(#reset,.viewer-views button) {
+  margin:0;
+  min-height:44px;
+  padding:.5rem .75rem;
+}
+.viewer-settings { position:relative; }
+#workspace .viewer-settings summary {
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  min-height:44px;
+  padding:.5rem .75rem;
+  border:1px solid var(--line);
+  border-radius:4px;
+  background:var(--surface);
+  cursor:pointer;
+}
+.viewer-settings summary svg { width:17px; height:17px; }
+#workspace .viewer-settings[open] summary { border-color:var(--gold); }
+.viewer-settings-panel {
+  position:absolute;
+  top:calc(100% + .5rem);
+  right:0;
+  display:grid;
+  gap:.6rem;
+  width:min(17rem, calc(100vw - 4.5rem));
+  max-height:15rem;
+  overflow:auto;
+  padding:.85rem;
+  background:var(--surface);
+  border:1px solid var(--line);
+}
+.viewer-settings-panel label { font-size:.875rem; color:var(--muted); }
+.viewer-shadow { display:flex; align-items:center; gap:.65rem; min-height:44px; }
+.viewer-shadow input { accent-color:var(--gold); width:1rem; height:1rem; }
+.viewer-views { display:grid; gap:.35rem; border-top:1px solid var(--line); padding-top:.6rem; }
+#workspace .viewer-views button { text-align:left; }
+#workspace .scene-shell:not([data-context=overview]) .viewer-actions {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-start;
+  gap:.65rem;
+  padding:.85rem 0 0;
+  background:transparent;
+  border:0;
+}
+#workspace .viewer-actions #play {
+  display:inline-flex;
+  gap:.55rem;
+  align-items:center;
+  background:var(--warm-white);
+  color:var(--black);
+  border-color:var(--warm-white);
+}
+#workspace .viewer-actions #play:hover { background:var(--soft-beige); }
+#workspace .viewer-actions #play svg { width:1rem; height:1rem; }
+#workspace #play[aria-pressed=true] .play-icon,
+#workspace #play[aria-pressed=false] .pause-icon { display:none; }
+
+.software-heading { padding-block:clamp(1rem, 3vw, 2.5rem) .6rem; }
+.software-heading .eyebrow {
+  color:var(--muted);
+  letter-spacing:.16em;
+  margin-bottom:.65rem;
+}
+body[data-route=autonomy] .screen-heading {
+  position:absolute;
+  clip-path:inset(50%);
+  width:1px;
+  height:1px;
+  overflow:hidden;
+}
+.engineering-media {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap:1rem;
+}
+.engineering-media figure { margin:0; min-width:0; background:var(--surface); border:1px solid var(--line); }
+.engineering-media :is(img,video) { display:block; width:100%; height:auto; max-height:35rem; object-fit:contain; }
+.engineering-media figcaption { padding:.6rem .85rem; color:var(--muted); }
+.engineering-media.media-empty {
+  display:grid;
+  place-items:center;
+  border:1px solid var(--line);
+  background:radial-gradient(ellipse at center, #241f1b, #151413 75%);
+  color:var(--muted);
+  text-align:center;
+}
+.software-media.media-empty { min-height:clamp(220px, 32vw, 460px); }
+.gallery-media.media-empty { min-height:clamp(160px, 19vw, 265px); }
+.engineering-notes { margin-block:clamp(1.8rem, 4vw, 3.5rem); }
+.engineering-notes h3, .competition-gallery h2 {
+  font-size:clamp(1.5rem, 2.2vw, 2rem);
+  font-weight:450;
+  letter-spacing:-.035em;
+}
+.engineering-notes dl { margin-block:.9rem 1.25rem; }
+.engineering-notes dl div {
+  display:grid;
+  grid-template-columns:minmax(7rem, 22%) minmax(0, 1fr);
+  gap:.75rem;
+  padding-block:.85rem;
+  border-top:1px solid var(--line);
+}
+.engineering-notes dd { margin:0; color:var(--muted); max-width:74ch; }
+.engineering-disclosure { border-block:1px solid var(--line); }
+#workspace .engineering-disclosure > summary {
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  justify-content:space-between;
+  padding:.65rem 0;
+  cursor:pointer;
+}
+.engineering-disclosure > summary::after { content:"+"; color:var(--soft-beige); }
+.engineering-disclosure[open] > summary::after { content:"−"; }
+.engineering-disclosure[open] { padding-bottom:1rem; }
+#software-resources { margin-block:1.5rem; }
+.competition-gallery { margin-top:clamp(1.5rem, 4vw, 3.5rem); }
+.competition-gallery > h2 { margin-bottom:1rem; }
+
+@media (max-width:900px) {
+  #workspace .mechanical-exhibit { grid-template-columns:minmax(0,1fr); gap:1rem; }
+  #workspace .mechanical-exhibit .stage { height:clamp(365px, 62vw, 555px); }
+  #workspace .mechanical-brief { padding-block:.5rem 0; }
+}
+@media (max-width:560px) {
+  #workspace .mechanical-exhibit .stage { height:clamp(345px, 95vw, 430px); }
+  #workspace .tools:has(.viewer-settings) { inset:10px 10px auto; }
+  .engineering-notes dl div { grid-template-columns:1fr; gap:.2rem; }
+}

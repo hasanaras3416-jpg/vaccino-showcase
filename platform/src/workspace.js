@@ -1,4 +1,4 @@
-import {record, parameters, format, state, part} from './store.js';
+import {record, parameters, format, state, part, mechanicalSystem} from './store.js';
 import {initializeSeason, loadBrandLogo} from './season.js';
 
 const $ = id => document.getElementById(id);
@@ -11,9 +11,11 @@ const make = (tag, text, className) => {
 const paragraph = (text, className) => make('p', text, className);
 const link = (text, href, className) => {const a=make('a', text, className);a.href=href;return a;};
 const routes = record.presentation.routes;
-const systems = record.presentation.systems;
+const {mechanical, electrical} = record.presentation.systems;
+const systems = {mechanical, electrical};
+const software = record.presentation.software;
 const viewer = $('viewer');
-let vehicleReady = false;
+let inspectPart;
 
 function modeText(simple, technical) {
   const section = make('div');
@@ -26,7 +28,7 @@ function modeText(simple, technical) {
   return section;
 }
 function renderTabs() {
-  for (const [route, entries] of Object.entries(systems)) {
+  for (const [route, entries] of Object.entries({...systems,autonomy:software})) {
     $(`${route}-tabs`).replaceChildren(...entries.map(entry => {
       const a = link(entry.label, `#/${route}/${entry.id}`); a.dataset.sub = entry.id; return a;
     }));
@@ -36,7 +38,8 @@ function updateHeading() {
   const route = routes.find(r => r.id === state.route);
   $('screen-title').textContent = ({overview:'Vaccino stüdyosu',vehicle:'3B Model',mechanical:'Mekanik',electrical:'Elektrik',autonomy:'Yazılım',driver:'Driver',team:'Yarışmalar',inventory:'Envanter'})[state.route] || route?.title || 'Vaccino';
   $('breadcrumb').textContent = $('screen-title').textContent;
-  $('screen-description').textContent = state.route==='overview'?'':route?.simple || (state.route==='driver'?'Pilot ekipmanı / konsept görselleştirme':'');
+  const descriptions={overview:'',autonomy:'',mechanical:'Aracı oluşturan mekanik sistemleri 3B yerleşim üzerinden incele.'};
+  $('screen-description').textContent = descriptions[state.route] ?? route?.simple ?? (state.route==='driver'?'Pilot ekipmanı / konsept görselleştirme':'');
   $('footer-context').textContent = `${record.revision} / v${record.uiVersion}`;
   document.title = `${route?.label || 'Driver'} — Vaccino 26/27`;
 }
@@ -59,6 +62,14 @@ function toggleMenu() {
   document.querySelector('.app-shell').inert = true;
   ($('sidebar').querySelector('[aria-current="page"]') || $('sidebar').querySelector('nav a')).focus();
 }
+document.querySelector('.skip-link').addEventListener('click',event=>{
+  event.preventDefault();
+  const heading=state.route==='overview'?document.querySelector('.v-hero-content h2'):
+    state.route==='autonomy'?$('software-title'):$('screen-title');
+  heading.tabIndex=-1;
+  heading.focus({preventScroll:true});
+  heading.scrollIntoView({block:'start',behavior:'instant'});
+});
 $('menu-toggle').onclick = toggleMenu;
 $('menu-close').onclick = () => closeMenu(true);
 $('menu-scrim').onclick = () => closeMenu(true);
@@ -84,33 +95,46 @@ function diagram(labels, className='principle-flow') {
 }
 function systemBrief(route, entry) {
   const target=$(`${route}-brief`); if(!target) return;
-  const head=make('div',null,'brief-heading');head.append(make('span','SİSTEMİN İZİ','eyebrow'),make('span','Yerleşim ve çalışma prensibi','muted'));
   const actions=make('div',null,'system-parts');
-  entry.parts.forEach(id=>{const info=part(id);const button=make('button',info.label);button.dataset.inspect=id;button.setAttribute('aria-pressed','false');button.onclick=()=>window.vaccino?.inspect(id,button);actions.append(button);});
+  entry.parts.forEach(id=>{const info=part(id);const button=make('button',info.label);button.dataset.inspect=id;button.setAttribute('aria-pressed','false');button.onclick=()=>inspectPart?.(id,button);actions.append(button);});
   const focus=make('button','Sistemi öne çıkar','isolate-button');focus.id='system-isolate';focus.setAttribute('aria-pressed','true');focus.onclick=()=>{
     const enabled=focus.getAttribute('aria-pressed')!=='true';focus.setAttribute('aria-pressed',String(enabled));
-    if(enabled&&window.vaccino?.state().focusContext!==entry.focus)window.vaccino?.focusSystem(entry.focus);else window.vaccino?.isolate(enabled);
+    if(enabled&&window.vaccino?.state().focusContext!==entry.focus)window.vaccino?.focusSystem(entry.focus,mechanicalSystem()?.parts);else window.vaccino?.isolate(enabled);
   };actions.append(focus);
   const explanation=make('div',null,'brief-explanation');
-  explanation.append(modeText(part(entry.parts[0]).simple,part(entry.parts[0]).desc));
-  const source=make('div',null,'brief-source technical-only');source.append(make('small','KAYNAK & DOĞRULAMA'),paragraph(`${record.source} · ${record.revision}`),paragraph('Gerçek CAD, montaj açıklıkları ve test sonuçları bekleniyor.'));
-  explanation.append(source);
-  target.replaceChildren(diagram(entry.flow),actions,explanation);
-  if (route==='mechanical' && entry.id==='braking') {
-    const flow = make('button','Fren akışını göster');
-    flow.id='brake-flow';
-    flow.setAttribute('aria-pressed','false');
-    flow.onclick=()=>flow.setAttribute('aria-pressed', String(window.vaccino?.toggleBrakeFlow() || false));
-    actions.append(flow);
-    target.append(paragraph('Ön devre: mavi. Arka devre: bakır. Yerleşim ve akış temsilidir. Montaj, hareket açıklığı ve donanım seçimi mühendislik doğrulaması gerektirir.','muted'));
+  const lead=part(entry.parts[0]);
+  const source=make('div',null,'brief-source technical-only');
+  source.append(make('small','KAYNAK VE DOĞRULAMA'),paragraph(`${record.source} · ${record.revision}`),paragraph('Gerçek CAD, montaj açıklıkları ve test sonuçları bekleniyor.'));
+
+  if(route==='mechanical'){
+    const title=make('h2',entry.label);title.id='mechanical-title';
+    const detail=make('details',null,'engineering-disclosure mechanical-detail');
+    explanation.append(paragraph(lead.desc),diagram(entry.flow),source,focus);
+    if(entry.id==='braking'){
+      const flow=make('button','Fren akışını göster');
+      flow.id='brake-flow';
+      flow.setAttribute('aria-pressed','false');
+      flow.onclick=()=>flow.setAttribute('aria-pressed', String(window.vaccino?.toggleBrakeFlow() || false));
+      actions.append(flow);
+      explanation.append(paragraph('Ön devre mavi, arka devre bakır renkle gösterilir. Yerleşim ve akış temsilidir. Montaj, hareket açıklığı ve donanım seçimi mühendislik doğrulaması gerektirir.'));
+    }
+    if(entry.id==='transmission'){
+      explanation.append(paragraph(entry.conceptNote));
+      const transmission=parameters.transmission;
+      explanation.append(paragraph(`Prensip gösterimi. Kasnak yarıçapları ${format(transmission.smallRadiusMm)} / ${format(transmission.largeRadiusMm)} mm, oran ${format(transmission.ratio)}. Nihai redüksiyon seçimi değildir.`));
+    }
+    const summary=make('summary','Çalışma prensibi ve kaynaklar');
+    detail.append(summary,explanation);
+    target.replaceChildren(title,paragraph(entry.summary,'mechanical-lead'),actions,detail);
+    return;
   }
+
+  explanation.append(modeText(lead.simple,lead.desc),source);
+  target.replaceChildren(diagram(entry.flow),actions,explanation);
   if(route==='electrical'&&entry.id==='battery'){
     const calc=make('div',null,'calculation-strip technical-only');
     const b=parameters.battery;
     calc.append(make('span','HEDEF PARAMETRELERDEN HESAP','eyebrow'),make('strong',`${format(b.nominalV)} V × ${format(b.capacityAh)} Ah = ${format(b.nominalWh)} Wh`),paragraph(`Nominal enerji hesabıdır; kullanılabilir enerji ölçümü değildir. ${b.series} × ${format(b.cellFullV)} V = ${format(b.fullV)} V tam dolu gerilim varsayımı. Hücre/BMS doğrulaması bekleniyor.`));target.append(calc);
-  }
-  if(route==='mechanical'&&entry.id==='transmission'){
-    const calc=make('p',`Prensip gösterimi: kasnak yarıçapları ${format(parameters.transmission.smallRadiusMm)} / ${format(parameters.transmission.largeRadiusMm)} mm; oran ${format(parameters.transmission.ratio)}. Nihai redüksiyon seçimi değildir.`, 'technical-only muted');target.append(calc);
   }
   if(route==='electrical'){
     const power=make('section',null,'power-diagram');
@@ -120,13 +144,83 @@ function systemBrief(route, entry) {
     power.append(make('h2','Güç dağıtımı'),trunk,branches,paragraph('Akış ve kablaj temsilidir. Koruma elemanları, DC/DC seçimi ve bağlantılar doğrulanacak.','muted'));
     target.append(power);
   }
-  if(route==='autonomy') target.append(paragraph('3B sahnede yalnızca ön stereo kamera rezervi gösterilir. Diğer sensörlerin gerçek yerleşimleri henüz modellenmedi.','geometry-note'));
 }
 function applySceneFocus() {
-  if(!vehicleReady) return;
-  const entry=systems[state.route]?.find(s=>s.id===state.sub);
-  if(entry) window.vaccino?.focusSystem(entry.focus);
-  else window.vaccino?.clearFocus(state.route==='overview');
+  const api=window.vaccino;
+  if(!api){
+    if(document.body.dataset.webgl==='failed'){
+      for(const id of ['system-isolate','brake-flow']) if($(id)) $(id).disabled=true;
+    }
+    return;
+  }
+  const entry=systems[state.route]?.find(system=>system.id===state.sub);
+  if(entry) api.focusSystem(entry.focus,mechanicalSystem()?.parts);
+  else api.clearFocus(state.route==='overview');
+}
+function mediaFrame(items, className=''){
+  const frame=make('div',null,`engineering-media ${className}`);
+  if(!items.length){
+    frame.classList.add('media-empty');
+    frame.append(paragraph('İçerik eklenecek'));
+  }
+  for(const item of items){
+    const figure=make('figure');
+    const media=make(item.type==='video'?'video':'img');
+    media.src=item.src;
+    if(item.type==='video'){
+      media.controls=true;
+      media.preload='metadata';
+      media.setAttribute('aria-label',item.alt);
+      if(item.captions){
+        const track=make('track');
+        track.kind='captions';track.src=item.captions;track.srclang='tr';track.label='Türkçe';
+        media.append(track);
+      }
+    }else{
+      media.alt=item.alt;media.loading='lazy';
+    }
+    figure.append(media);
+    if(item.caption) figure.append(make('figcaption',item.caption));
+    frame.append(figure);
+  }
+  return frame;
+}
+function renderSoftware(entry){
+  const title=make('header',null,'software-heading');
+  const heading=make('h2',entry.label);heading.id='software-title';
+  title.append(make('p','Yazılım','eyebrow'),heading,paragraph(entry.description));
+  const notes=make('section',null,'engineering-notes');
+  const list=make('dl');
+  for(const [key,label] of [['purpose','Amaç'],['method','Yöntem'],['result','Sonuç'],['next','Sıradaki adım']]){
+    const row=make('div');
+    row.append(make('dt',label),make('dd',entry.notes[key]));
+    list.append(row);
+  }
+  notes.append(make('h3','Mühendislik notları'),list);
+  if(entry.id==='simulation') notes.append(link('2B simülasyon ve 3B pist','#/experience/track','text-link'));
+  $('software-showcase').replaceChildren(title,mediaFrame(entry.media,'software-media'),notes);
+}
+const settings=$('viewer-settings');
+document.addEventListener('click',event=>{
+  if(settings.open&&!settings.contains(event.target))settings.open=false;
+});
+settings.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&settings.open){
+    event.preventDefault();
+    event.stopPropagation();
+    settings.open=false;
+    settings.querySelector('summary').focus();
+  }
+});
+function syncViewerControls(){
+  const scoped=!!mechanicalSystem();
+  const transmission=scoped&&state.sub==='transmission';
+  $('engage').hidden=!transmission;
+  $('play').hidden=scoped&&!transmission;
+  $('part-open').hidden=scoped;
+  viewer.querySelectorAll('[data-general-view]').forEach(button=>{button.hidden=scoped;});
+  viewer.querySelectorAll('[data-transmission-view]').forEach(button=>{button.hidden=scoped&&!transmission;});
+  settings.open=false;
 }
 function navigate({focusHeading=false}={}) {
   document.dispatchEvent(new Event('vaccino:inspector-close'));
@@ -135,29 +229,31 @@ function navigate({focusHeading=false}={}) {
   const alias={competitions:['team','goals'],sensors:['autonomy','sensors'],files:['team','files'],'vehicle-section':['vehicle']};
   const path=alias[raw[0]]||raw;
   state.route=(path[0]==='driver'||routes.some(r=>r.id===path[0]))?path[0]:'overview';
-  const entries=systems[state.route];
-  state.sub=entries?(entries.some(s=>s.id===path[1])?path[1]:entries[0].id):state.route==='team'&&path[1]==='files'?'files':state.route==='team'?'goals':'';
+  const entries=state.route==='autonomy'?software:systems[state.route];
+  const legacySoftware={perception:'vision',sensors:'vision',interfaces:'vision'};
+  const requested=state.route==='autonomy'?(legacySoftware[path[1]]??path[1]):path[1];
+  state.sub=entries?(entries.some(s=>s.id===requested)?requested:entries[0].id):state.route==='team'&&path[1]==='files'?'files':state.route==='team'?'goals':'';
   if(state.route==='experience')state.sub=['showroom','workshop','track'].includes(path[1])?path[1]:'showroom';
   document.body.dataset.route=state.route;document.body.dataset.sub=state.sub;
   document.querySelectorAll('[data-screen]').forEach(screen=>{screen.hidden=screen.dataset.screen!==state.route;});
   document.querySelectorAll('.primary-nav a').forEach(a=>{if(a.dataset.route===(['vehicle','mechanical','electrical','autonomy','experience','decisions','tests'].includes(state.route)?'garage':state.route))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
-  document.querySelectorAll('.subnav a').forEach(a=>{if(a.dataset.sub===state.sub)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  document.querySelectorAll('.subnav a').forEach(a=>{if(a.closest('[data-screen]')?.dataset.screen===state.route&&a.dataset.sub===state.sub)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   const slot=document.querySelector(`[data-slot="${state.route}"]`);
   if(slot){slot.insertBefore(viewer,state.route==='overview'?$('v-hero-restore'):null);viewer.hidden=false;viewer.dataset.context=state.route;}
   else viewer.hidden=true;
-  if(entries&&(state.route!=='autonomy'||state.sub==='perception')){const entry=entries.find(e=>e.id===state.sub);systemBrief(state.route,entry);}
+  if(entries){
+    const entry=entries.find(item=>item.id===state.sub);
+    if(state.route==='autonomy')renderSoftware(entry);
+    else systemBrief(state.route,entry);
+  }
   $('team-goals').hidden=state.sub==='files';$('files').hidden=state.sub!=='files';
-  $('sensors').hidden=state.route!=='autonomy'||state.sub==='perception';
-  document.querySelector('[data-slot="autonomy"]').hidden=state.route==='autonomy'&&state.sub!=='perception';
-  $('autonomy-brief').hidden=state.sub!=='perception';
-  $('autonomy-flow').hidden=state.sub!=='perception';
-  const interfaces=state.route==='autonomy'&&state.sub==='interfaces';
-  const disclosure=document.querySelector('.interface-disclosure');
-  disclosure.classList.toggle('force-visible',interfaces);disclosure.open=interfaces;
-  $('sensors').classList.toggle('interfaces-view',interfaces);
+  const softwareRoute=state.route==='autonomy';
+  $('software-resources').open=softwareRoute&&['sensors','interfaces'].includes(path[1]);
+  document.querySelector('.interface-disclosure').open=softwareRoute&&path[1]==='interfaces';
+  syncViewerControls();
   updateHeading();applySceneFocus();closeMenu();
   window.scrollTo({top:0,behavior:'instant'});
-  if(focusHeading) (state.route==='overview'?$('menu-toggle'):$('screen-title')).focus({preventScroll:true});
+  if(focusHeading) (state.route==='overview'?$('menu-toggle'):document.querySelector('[data-screen]:not([hidden]) .subnav a[aria-current]')??$('screen-title')).focus({preventScroll:true});
   document.dispatchEvent(new CustomEvent('vaccino:route',{detail:{route:state.route,sub:state.sub}}));
   document.dispatchEvent(new Event('vaccino:resize'));
 }
@@ -199,6 +295,7 @@ function filesAndTeam() {
   $('file-list').replaceChildren(...record.presentation.files.map(file=>{
     const a=link('',file.path);a.download='';const name=make('span');name.append(make('b',file.name),make('small',file.note));a.append(make('span',file.type,'file-type'),name,make('span','↗','file-arrow'));return a;
   }));
+  $('competition-media').replaceChildren(mediaFrame(record.presentation.competitionMedia,'gallery-media'));
   const rules='https://www.shellecomarathon.com/about/global-rules.html';
   const competitions=[
     ['TEKNOFEST','Robotaksi','Özgün Araç Yarışması','Özgün araçlarda otonom sürüşü sınamak.','Vaccino V2 üzerinde algılama, karar ve araç kontrolünü birleştirmek.','Kamera, araç bilgisayarı, direksiyon ve fren.','https://www.teknofest.org/tr/yarismalar/robotaksi-binek-otonom-arac-yarismasi/'],
@@ -241,13 +338,13 @@ for(const row of record.inventory[1].rows.slice(4)){
 }
 const interfaceSection=document.querySelector('.interface-disclosure');interfaceSection.insertBefore(interfaceSummary,interfaceSection.querySelector('p'));
 
-$('autonomy-flow').append(diagram(['Kamera ve sensörler','Algılama ve şerit takibi','Karar','Araç kontrolü','Gerçek araç entegrasyonu']),link('2B simülasyon ve 3B pist','#/experience/track','text-link'));
 navigate();
 window.addEventListener('hashchange',()=>navigate({focusHeading:true}));
 document.body.dataset.data='ready';
 const logo=loadBrandLogo();
 const finishSeasonSetup=initializeSeason(logo,toggleMenu);
-await import('./vehicle.js');vehicleReady=!!window.vaccino;applySceneFocus();
+({inspect:inspectPart}=await import('./vehicle.js'));
+applySceneFocus();
 const {initializePresentation}=await import('./presentation.js');initializePresentation();
 const {initializeExperienceUI}=await import('./experience-ui.js');initializeExperienceUI();
 const brandLogo=await logo;

@@ -17,8 +17,10 @@ A polished public-facing digital presentation for Vaccino, an electric student c
 - Intro uses lion/Vaccino brand asset.
 - `#/overview`: cinematic vehicle hero, editorial storytelling.
 - `#/experience/showroom`: showroom scene.
-- `#/vehicle`, `#/mechanical`, `#/electrical`, `#/autonomy`: technical exploration.
-- `#/team/goals`, `#/inventory`: competition context and inventory.
+- `#/vehicle`, `#/mechanical`, `#/electrical`: technical exploration. Mechanical offers scoped views for transmission, braking, suspension and chassis/cockpit.
+- `#/autonomy/simulation` and `#/autonomy/vision`: independent software exhibits. Previous perception, sensor and interface routes open Görüntü İşleme, with the corresponding technical resources expanded for the sensor and interface links.
+- `#/team/goals`, `#/inventory`: competition context and inventory. The team photo gallery and both software media showcases currently await approved media.
+- Add media entries to `presentation.software[].media` or `presentation.competitionMedia` in `platform/data/project.json`. Each entry uses `type` (`image` or `video`), `src` relative to `platform/`, descriptive `alt` and an optional `caption`. Video entries can also reference a Turkish WebVTT file with `captions`.
 - `#/driver`: interactive **concept mannequin** on display stand; black suit, gold V, Shell branding, equipment information hotspots. Real PPE certification not verified.
 - Nextion display: browser-only expandable dashboard prototype; mock data, not actual serial/Nextion firmware.
 - Intro logo hover grows rather than turning white.
@@ -28,8 +30,8 @@ A polished public-facing digital presentation for Vaccino, an electric student c
 A **new chassis** may be provided by the actual CAD designer later. Until supplied and explicitly approved, **do not replace the current vehicle/chassis**; produce independent visual comparisons if requested.
 
 ## Technical factual boundaries
-- Previous alternative A: one hub motor on **one rear wheel**, opposite rear wheel unpowered.
-- Alternative B: central BLDC, belt/pulley, differential and axle shafts to both rear wheels.
+- Transmission concept A under evaluation: one hub motor on the **right rear wheel**, opposite rear wheel unpowered. The battery may occupy the existing differential area.
+- Transmission concept B under evaluation: central BLDC, belt/pulley, differential and axle shafts to both rear wheels. The current 3D animation demonstrates this layout.
 - Older two-hub sketch is historical, not approved alternative A.
 - Actual material choice, finished vehicle safety, dimensions of every part, driver clothing compliance, battery packaging and performance require verification.
 - Driver scene and Nextion screens are visual demonstrations, never specification sheets.
