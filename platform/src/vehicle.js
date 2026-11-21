@@ -14,7 +14,7 @@ const drivetrainParts=new Set(sections.filter(part=>part.scope==='drivetrain').m
 let drivetrainBusy=()=>false;
 function canInspect(id){
  const scope=inspectionSystem();
- if(activeDrivetrain()&&drivetrainBusy())return false;
+ if(id==='shell'||(activeDrivetrain()&&drivetrainBusy()))return false;
  return scope?scope.parts.includes(id):!drivetrainParts.has(id);
 }
 const playLabel=document.querySelector('#play span');
@@ -402,8 +402,11 @@ try{
   for(const dx of [-.025,.025])mesh(new T.CylinderGeometry(.006,.006,.009,6),dark,frame,x+dx,.211,z);
  }
  const hubmat=new T.MeshStandardMaterial({color:0x8b9295,metalness:.55,roughness:.32});
- for(const x of [-.96,.87])for(const z of [-.66,.66]){
-  const wheel=new T.Group();wheel.position.set(x,.269,z);wheels.add(wheel);rollers.push({wheel,rear:x>0});
+ const wheelLayout=vehicleLayout.wheels;
+ for(const x of [wheelLayout.frontX,wheelLayout.rearX])for(const sign of [-1,1]){
+  const z=sign*wheelLayout.halfTrack;
+  const wheel=new T.Group();wheel.position.set(x,wheelLayout.centerY,z);wheels.add(wheel);
+  rollers.push({wheel,rear:x===wheelLayout.rearX,right:sign===wheelLayout.rightSide});
   function disk(r,len,depth,material){
    const mesh=new T.Mesh(new T.CylinderGeometry(r,r,len,40),material);mesh.rotation.x=Math.PI/2;mesh.position.z=depth;wheel.add(mesh);
   }
@@ -542,13 +545,13 @@ try{
  const bodyShell=createBodyShell(T,body);body.userData.part='shell';
  studio.apply(steel,'metal');studio.apply(machined,'metal');studio.apply(hubmat,'metal');studio.apply(anodized,'cast');studio.apply(housing,'cast');studio.apply(alloy,'metal');studio.apply(rubber,'rubber');
  addMechanicalDetails(T,{chassis,suspension,brakes,motorGroup,diffGroup,axleGroup,wheels,studio});
- const rightRearCenter=new T.Vector3(...vehicleLayout.hub.wheelCenter);
- const rightRearWheel=rollers.find(({wheel})=>wheel.position.equals(rightRearCenter)).wheel;
- const leftRearWheel=rollers.find(({wheel,rear})=>rear&&wheel.position.z<0).wheel;
+ const rightRearWheel=rollers.find(({rear,right})=>rear&&right).wheel;
+ const leftRearWheel=rollers.find(({rear,right})=>rear&&!right).wheel;
+ const wheelAnchors=new Map([['hub-motor',rightRearWheel],['free-wheel',leftRearWheel]]);
  const hubMotor=createHubMotor(T,rightRearWheel);
  rightRearWheel.userData.drivetrainPart='hub-motor';
  leftRearWheel.userData.drivetrainPart='free-wheel';
- const homeBounds=new T.Box3().setFromObject(frame).union(new T.Box3().setFromObject(wheels)).union(new T.Box3().setFromObject(body));
+ const homeBounds=new T.Box3().setFromObject(frame).union(new T.Box3().setFromObject(wheels));
  const homeCorners=boxCorners(homeBounds);
  const vehicleCorners=[];
  for(const root of [frame,wheels]){
@@ -560,15 +563,19 @@ try{
    for(const corner of boxCorners(source.boundingBox))vehicleCorners.push(corner.applyMatrix4(mesh.matrixWorld));
   });
  }
- sections.filter(s=>s.point).forEach(s=>{
-  const b=document.createElement('button');b.className='marker';b.setAttribute('aria-controls','part-inspector');b.dataset.part=s.id;b.title=s.label;b.setAttribute('aria-label',s.label);b.onclick=()=>inspect(s.id,b);$('pins').append(b);pins.push({button:b,position:new T.Vector3(...s.point),id:s.id});
+ sections.filter(s=>s.point||wheelAnchors.has(s.id)).forEach(s=>{
+  const b=document.createElement('button');b.className='marker';b.setAttribute('aria-controls','part-inspector');b.dataset.part=s.id;b.title=s.label;b.setAttribute('aria-label',s.label);b.onclick=()=>inspect(s.id,b);$('pins').append(b);pins.push({button:b,position:s.point?new T.Vector3(...s.point):null,id:s.id});
  });
  let hideWheels=false, cockpitView=false, rearView=false;
  function setMode(mode){
   bodyShell.release();
   cockpitView=false;rearView=false;pickMode=mode;frame.visible=mode==='frame';body.visible=mode==='body';wheels.visible=mode==='body'||!hideWheels; $('wheel-toggle').disabled=mode==='body';
   $('frame').setAttribute('aria-pressed',String(frame.visible));$('body').setAttribute('aria-pressed',String(body.visible));
-  if(mode==='body')select('shell');else select('frame');
+  if(mode==='body')select('shell');
+  else{
+   bodyShell.style('hidden',{immediate:true});
+   select('frame');
+  }
   refreshDrive();
  }
  $('frame').onclick=()=>setMode('frame');$('body').onclick=()=>setMode('body');
@@ -666,7 +673,7 @@ try{
  wheels.userData.part='suspension';
  onSelect=id=>{updateHighlight();$('scene-focus-label').textContent=(sections.find(s=>s.id===id)?.label||'GENEL GÖRÜNÜM').toLocaleUpperCase('tr');
   const info=sections.find(x=>x.id===id);
-  if(info?.point&&id!=='frame'){
+  if(id!=='frame'&&(info?.point||wheelAnchors.has(id))){
    focusGoal=partAnchor(id,info.point);
    rad=inspectionSystem()?3.65:['motor','clutch','diff'].includes(id)?1.85:3.2;
   }
@@ -813,6 +820,8 @@ try{
  }
  const batteryReference=new T.Vector3(...vehicleLayout.battery.position);
  function partAnchor(id,position){
+  const wheel=wheelAnchors.get(id);
+  if(wheel)return wheel.position.clone().add(new T.Vector3(0,id==='hub-motor'?.163:.18,Math.sign(wheel.position.z)*.03));
   const anchor=position.isVector3?position.clone():new T.Vector3(...position);
   if(id==='battery'||id==='hub-battery')anchor.add(batteryPack.position).sub(batteryReference);
   if(activeDrivetrain()){
@@ -860,9 +869,9 @@ try{
   $('battery-toggle').setAttribute('aria-pressed',String(batteryHidden));$('explode').setAttribute('aria-pressed',String(exploded));$('play').setAttribute('aria-pressed',String(playing));playLabel.textContent=playing?'Duraklat':'Canlandır';
  }
  function restoreView(view){
-  world.setPresentation(false);if(experienceState.active)bodyShell.style(workspaceState.route==='overview'?'solid':experienceState.bodyMode);
-  cameraMotion.cancel();pickMode=view.pickMode;hideWheels=view.hideWheels;batteryHidden=view.batteryHidden;guardVisible=view.guardVisible;exploded=view.exploded;engaged=view.engaged;playing=view.playing;wheelSpin=view.wheelSpin;brakeFlow=view.brakeFlow;focusContext=view.focusContext;focusIds=new Set(view.focusedParts);isolation=view.isolation;rearView=view.rearView;cockpitView=view.cockpitView;
-  frame.visible=pickMode==='frame';body.visible=pickMode==='body';wheels.visible=pickMode==='body'||!hideWheels;
+  world.setPresentation(false);bodyShell.style('hidden',{immediate:true});
+  cameraMotion.cancel();pickMode='frame';hideWheels=view.hideWheels;batteryHidden=view.batteryHidden;guardVisible=view.guardVisible;exploded=view.exploded;engaged=view.engaged;playing=view.playing;wheelSpin=view.wheelSpin;brakeFlow=view.brakeFlow;focusContext=view.focusContext;focusIds=new Set(view.focusedParts);isolation=view.isolation;rearView=view.rearView;cockpitView=view.cockpitView;
+  frame.visible=true;body.visible=false;wheels.visible=!hideWheels;
   for(const w of rollers)w.wheel.rotation.z=wheelSpin;largePulley.rotation.z=wheelSpin;smallPulley.rotation.z=wheelSpin*largeR/smallR;carrier.rotation.z=wheelSpin;for(const a of axleWitnesses)a.rotation.z=wheelSpin;
   applyDrivetrain({immediate:true});
   select(view.chosen);writePose(view.pose);rotor.rotation.z=view.rotor;demoEnd=0;syncControls();updateHighlight();refreshDrive();draw=true;

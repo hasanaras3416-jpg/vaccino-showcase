@@ -11,6 +11,6 @@ export function startExperienceClock(){if(clockStarted)return;clockStarted=true;
   }
  }requestAnimationFrame(frame);
 }
-export const experienceState={environment:'showroom',active:false,bodyMode:'solid',hatchOpen:false,liftRaised:false,camera:'follow',view:'3d',lift:0};
+export const experienceState={environment:'showroom',active:false,bodyMode:'hidden',hatchOpen:false,liftRaised:false,camera:'follow',view:'3d',lift:0};
 export const simulation=new SimulationEngine();
-export function setEnvironment(name){if(!['showroom','workshop','track'].includes(name))throw Error('Bilinmeyen ortam');simulation.pause();experienceState.environment=name;experienceState.hatchOpen=false;experienceState.liftRaised=false;experienceState.lift=0;experienceState.bodyMode=name==='workshop'?'hidden':'solid';}
+export function setEnvironment(name){if(!['showroom','workshop','track'].includes(name))throw Error('Bilinmeyen ortam');simulation.pause();experienceState.environment=name;experienceState.hatchOpen=false;experienceState.liftRaised=false;experienceState.lift=0;experienceState.bodyMode='hidden';}

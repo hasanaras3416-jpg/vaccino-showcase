@@ -4,8 +4,9 @@ export const vehicleLayout = Object.freeze({
   differential:{x:.87,y:.269,radiusX:.116,radiusY:.106,halfWidth:.15},
   pulley:{z:.236,halfWidth:.025,boreSmall:.0225,boreLarge:.038},
   battery:{position:[1.02,.409,.016],variants:[[.52,.09,.152],[.316,.09,.22],[.18,.235,.152]]},
-  // Positive Z is the vehicle's right side. These volumes are illustrative.
-  hub:{wheelCenter:[.87,.269,.66],batteryPosition:[.86,.215,.016]},
+  // Forward is -X and up is +Y, so forward × up points right (-Z).
+  wheels:{frontX:-.96,rearX:.87,centerY:.269,halfTrack:.66,rightSide:-1},
+  hub:{batteryPosition:[.86,.215,.016]},
   cv:{innerLeft:[.19,.28],innerRight:[.31,.40],outer:[.51,.60],endCollar:.02}
 });
 

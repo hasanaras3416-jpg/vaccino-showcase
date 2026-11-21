@@ -6,7 +6,6 @@ export function initializeExperienceUI(){
  const api=window.vaccino,$=id=>document.getElementById(id);
  const simUI=initializeSimulationUI($('simulation-panel'));initializeInventoryUI($('engineering-inventory'));
  const labels={showroom:'SHOWROOM',workshop:'ATÖLYE',track:'PİST / DEMO'};
- const nativeReset=$('reset').onclick;$('reset').onclick=()=>{nativeReset?.();if(state.route==='experience')api?.setShell(experienceState.bodyMode);};
  function route(){
   const wasActive=experienceState.active,active=['experience','overview'].includes(state.route);experienceState.active=active;
   if(!active&&wasActive){simulation.pause();api?.setShell('hidden',{immediate:true});api?.setAnimating(false);}
@@ -14,14 +13,12 @@ export function initializeExperienceUI(){
    const env=state.route==='overview'?'showroom':state.sub;
    if(experienceState.environment!==env||!api?.experienceState().active){setEnvironment(env);}
    if(state.route==='experience')document.getElementById('reset').click();
-   api?.setShell(state.route==='overview'?'solid':experienceState.bodyMode);
+   api?.setShell('hidden',{immediate:true});
   }
   document.querySelectorAll('[data-environment]').forEach(a=>a.setAttribute('aria-current',a.dataset.environment===experienceState.environment?'page':'false'));
   $('workshop-controls').hidden=experienceState.environment!=='workshop';$('track-controls').hidden=experienceState.environment!=='track';$('simulation-panel').hidden=experienceState.environment!=='track';
-  $('experience-limit').textContent=experienceState.environment==='workshop'?'Lift ve destekler görsel konsepttir. Kaldırma noktası ve taşıma kapasitesi doğrulanmadı.':experienceState.environment==='track'?'DEMO PARKUR · gerçek pist değildir. Boyuna model tahmini; CAN veya ölçülmüş telemetri yok.':'Gövde konsepttir. Gerçek CAD, CFD, direksiyon ve süspansiyon hareket zarfı doğrulanmadı.';
-  document.querySelectorAll('[data-shell]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.shell===experienceState.bodyMode)));
-  $('shell-hatch').setAttribute('aria-pressed',String(experienceState.hatchOpen));$('lift-toggle').setAttribute('aria-pressed',String(experienceState.liftRaised));$('lift-toggle').textContent=experienceState.liftRaised?'Lifti indir':'Lifti Kaldır';
-  if(state.route==='experience'&&experienceState.environment==='showroom')api?.select('shell');
+  $('experience-limit').textContent=experienceState.environment==='workshop'?'Lift ve destekler görsel konsepttir. Kaldırma noktası ve taşıma kapasitesi doğrulanmadı.':experienceState.environment==='track'?'DEMO PARKUR · gerçek pist değildir. Boyuna model tahmini; CAN veya ölçülmüş telemetri yok.':'Şasi ve bileşen yerleşimleri temsilidir. Gerçek CAD ve hareket açıklıkları doğrulanmadı.';
+  $('lift-toggle').setAttribute('aria-pressed',String(experienceState.liftRaised));$('lift-toggle').textContent=experienceState.liftRaised?'Lifti indir':'Lifti Kaldır';
   updateView();status();
  }
  function updateView(){
@@ -29,11 +26,8 @@ export function initializeExperienceUI(){
   document.querySelectorAll('[data-track-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.trackView===experienceState.view)));
   $('sim-map-wrap').hidden=!track||experienceState.view!=='2d';simUI.update();document.dispatchEvent(new Event('vaccino:resize'));
  }
- function shell(mode){experienceState.bodyMode=mode;api?.setShell(mode);document.querySelectorAll('[data-shell]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.shell===mode)));}
- document.querySelectorAll('[data-shell]').forEach(b=>b.onclick=()=>shell(b.dataset.shell));
- $('shell-hatch').onclick=()=>{experienceState.hatchOpen=!experienceState.hatchOpen;$('shell-hatch').setAttribute('aria-pressed',String(experienceState.hatchOpen));};
  $('lift-toggle').onclick=()=>{experienceState.liftRaised=!experienceState.liftRaised;$('lift-toggle').setAttribute('aria-pressed',String(experienceState.liftRaised));$('lift-toggle').textContent=experienceState.liftRaised?'Lifti indir':'Lifti Kaldır';};
- document.querySelectorAll('[data-workshop-focus]').forEach(b=>b.onclick=()=>{shell('hidden');if(b.dataset.workshopFocus==='under'){experienceState.liftRaised=true;$('lift-toggle').textContent='Lifti indir';$('lift-toggle').setAttribute('aria-pressed','true');api?.moveCamera({az:-.9,el:-.16,rad:3.8,target:[0,.25,0]});}else api?.focusSystem(b.dataset.workshopFocus);});
+ document.querySelectorAll('[data-workshop-focus]').forEach(b=>b.onclick=()=>{api?.setShell('hidden',{immediate:true});if(b.dataset.workshopFocus==='under'){experienceState.liftRaised=true;$('lift-toggle').textContent='Lifti indir';$('lift-toggle').setAttribute('aria-pressed','true');api?.moveCamera({az:-.9,el:-.16,rad:3.8,target:[0,.25,0]});}else api?.focusSystem(b.dataset.workshopFocus);});
  document.querySelectorAll('[data-track-view]').forEach(b=>b.onclick=()=>{experienceState.view=b.dataset.trackView;updateView();});
  $('track-camera').onchange=event=>{experienceState.camera=event.target.value;document.dispatchEvent(new Event('vaccino:resize'));};
  function status(){if(state.route!=='experience')return;const s=simulation.snapshot(),core=api?.state(),track=experienceState.active&&experienceState.environment==='track';
@@ -45,5 +39,5 @@ export function initializeExperienceUI(){
  $('simulation-panel').addEventListener('click',status);
  $('sim-form').addEventListener('submit',status);
  document.addEventListener('vaccino:route',route);document.addEventListener('vaccino:simulation',status);startExperienceClock();route();
- window.vaccinoExperience={state:()=>({...experienceState,world:api?.experienceState(),shell:api?.shellState(),simulation:simulation.snapshot()}),environment(name){location.hash='#/experience/'+name;},shell,update:status};
+ window.vaccinoExperience={state:()=>({...experienceState,world:api?.experienceState(),shell:api?.shellState(),simulation:simulation.snapshot()}),environment(name){location.hash='#/experience/'+name;},update:status};
 }

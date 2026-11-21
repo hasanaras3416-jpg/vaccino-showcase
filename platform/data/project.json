@@ -499,11 +499,6 @@
       "id": "hub-motor",
       "label": "Sağ arka hub motor",
       "status": "DEĞERLENDİRME AŞAMASINDA",
-      "point": [
-        0.87,
-        0.432,
-        0.69
-      ],
       "simple": "Tek hub motor sağ arka tekerleğin içinde gösteriliyor.",
       "desc": "Yarı saydam tekerlek, motorun tekerlek içindeki konumunu görünür kılar.",
       "facts": [
@@ -531,11 +526,6 @@
       "id": "free-wheel",
       "label": "Sol arka serbest tekerlek",
       "status": "DEĞERLENDİRME AŞAMASINDA",
-      "point": [
-        0.87,
-        0.45,
-        -0.67
-      ],
       "simple": "Sol arka tekerleğe motor torku aktarılmaz.",
       "desc": "Dönüş animasyonu serbest yuvarlanmayı görselleştirir. Araç dinamiği veya yol kuvveti hesaplanmaz.",
       "facts": [

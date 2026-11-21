@@ -6,6 +6,7 @@ export function createHubMotor(T,rightWheel) {
   motor.userData.drivetrainPart='hub-motor';
   motor.visible=false;
   rightWheel.add(motor);
+  const outward=Math.sign(rightWheel.position.z);
 
   const graphite=new T.MeshStandardMaterial({color:0x313a40,metalness:.60,roughness:.38});
   const alloy=new T.MeshStandardMaterial({color:0x9aa8ae,metalness:.72,roughness:.29});
@@ -13,7 +14,7 @@ export function createHubMotor(T,rightWheel) {
   function cylinder(radius,depth,z,material){
     const piece=new T.Mesh(new T.CylinderGeometry(radius,radius,depth,32),material);
     piece.rotation.x=Math.PI/2;
-    piece.position.z=z;
+    piece.position.z=z*outward;
     motor.add(piece);
     return piece;
   }
@@ -22,10 +23,10 @@ export function createHubMotor(T,rightWheel) {
   cylinder(.129,.014,-.040,alloy);
   cylinder(.061,.016,.058,graphite);
   const ring=new T.Mesh(new T.TorusGeometry(.122,.008,8,40),brass);
-  ring.position.z=.052;
+  ring.position.z=.052*outward;
   motor.add(ring);
   const innerRing=ring.clone();
-  innerRing.position.z=-.050;
+  innerRing.position.z=-.050*outward;
   motor.add(innerRing);
   for(let i=0;i<8;i++){
     const angle=i*Math.PI/4;

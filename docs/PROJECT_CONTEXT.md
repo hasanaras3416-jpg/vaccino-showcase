@@ -16,7 +16,7 @@ A polished public-facing digital presentation for Vaccino, an electric student c
 - Three.js/WebGL vehicle scene is a **representative** design; its mechanics are not physical validation.
 - Intro uses lion/Vaccino brand asset.
 - `#/overview`: full-viewport interactive vehicle hero, lion-triggered camera approach and editorial storytelling.
-- `#/experience/showroom`: showroom scene.
+- `#/experience/showroom`: chassis showroom. The draft exterior source remains available for future integration, while default public routes and Reset show the chassis.
 - `#/vehicle`: dedicated front three-quarter view of the chassis and wheels, with responsive framing and a matching reset.
 - `#/mechanical` and `#/electrical`: scoped 3D exhibits of each system. Electrical groups battery calculations and power distribution under separate disclosures.
 - `#/mechanical/transmission`: compare the Hub Motor and Merkezi Aktarma concepts in the shared Three.js scene. Part labels and comparison data are kept in `platform/data/project.json`.

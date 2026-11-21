@@ -15,7 +15,7 @@ A site that looks like a **premium automotive design studio made it**, not a sch
 - No indiscriminate gradients, glowing neon borders, stacked generic cards, unnecessary spinners or random decorative icons.
 
 ## Home hero
-- Present the inherited V2 vehicle with its existing concept body fitted. The lower front three-quarter camera reveals the nose, wheels and side profile. The home scene has a warm key light, a cool rim light and soft fill over a graphite backdrop.
+- Present the inherited V2 chassis and wheels in the lower front three-quarter view. The home scene has a warm key light, a cool rim light and soft fill over a graphite backdrop. Keep the draft exterior shell and its controls out of the default views until the exterior design is ready.
 - Render the hero in a single viewport-wide canvas. Compose the vehicle to the right of the copy on desktop and above it at 900 px and under by shifting the camera projection and fitting the model bounds. Copy is an overlay. Only its links and the restore button capture pointer input.
 - Keep the vehicle and editorial typography as the two main elements. Use the existing Showroom and Engineering links, and reserve champagne for small accents and focus cues.
 - The lion reveal moves from a distant pose to the composed home view. Close the intro after the last camera frame and leave navigation closed. Keep vertical scrolling available on touch screens, share the inspection state across mouse, touch and keyboard, and show the static illustration when WebGL is unavailable.
@@ -38,7 +38,7 @@ A site that looks like a **premium automotive design studio made it**, not a sch
 
 ## Drivetrain configurator
 - Keep a single vehicle canvas in Mechanical › Aktarma. Give Hub Motor and Merkezi Aktarma a compact keyboard-operable selector. Show the selected concept and its evaluation status above its component links and keep the detailed comparison in a disclosure.
-- Preserve the user's camera when switching concepts. Fade and restore the existing central motor, belt, differential and shafts as a group. Reveal the hub inside the translucent right rear wheel and interpolate the battery between visual reserves. With reduced motion, apply the target state immediately.
+- Preserve the user's camera when switching concepts. Fade and restore the existing central motor, belt, differential and shafts as a group. Reveal the hub inside the translucent right rear wheel in the vehicle reference frame (forward −X, up +Y, right −Z). Use that wheel as the common anchor for the motor, translucency and hotspot, and interpolate the battery between visual reserves. With reduced motion, apply the target state immediately.
 - The selection drives the part list, hotspot and mesh eligibility, comparison and visible assemblies together. Suspend 3D picking during transitions. Keep textual part notes and comparison available without WebGL. Route changes outside Aktarma restore the central layout, and the presentation uses the central geometry.
 - Keep the visual reserves in `vehicle-layout.js` and the existing shaft motion intact. Any future CAD fit, weight distribution or service access requires independent verification.
 
