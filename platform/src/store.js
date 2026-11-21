@@ -1,5 +1,5 @@
 // One revisioned record serves both narration modes and the vehicle geometry.
-const response = await fetch('data/project.json');
+const response = await fetch('data/project.json?v=engineering-01', {cache:'no-store'});
 if (!response.ok) throw new Error('Platform kaydı açılamadı. Yerel sunucuyu kontrol edin.');
 const raw = await response.json();
 const parameters = structuredClone(raw.parameters);
