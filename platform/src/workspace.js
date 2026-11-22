@@ -394,7 +394,7 @@ function tests() {
 }
 function filesAndTeam() {
   $('file-list').replaceChildren(...record.presentation.files.map(file=>{
-    const a=link('',file.path);a.download='';const name=make('span');name.append(make('b',file.name),make('small',file.note));a.append(make('span',file.type,'file-type'),name,make('span','↗','file-arrow'));return a;
+    const a=link('',file.path);if(file.download)a.download='';const name=make('span');name.append(make('b',file.name),make('small',file.note));a.append(make('span',file.type,'file-type'),name,make('span','↗','file-arrow'));return a;
   }));
   $('competition-media').replaceChildren(mediaFrame(record.presentation.competitionMedia,'gallery-media'));
   const rules='https://www.shellecomarathon.com/about/global-rules.html';

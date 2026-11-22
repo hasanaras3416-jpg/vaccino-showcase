@@ -1266,34 +1266,36 @@
     "competitionMedia": [],
     "files": [
       {
-        "name": "Özgün 3B aktarma prototipi",
-        "type": "HTML",
-        "note": "V2 şasi ve özgün etkileşimler",
-        "path": "../inputs/Vaccino_26-27_Aktarma_3B.html"
+        "name": "Şasi çizimi",
+        "type": "SVG",
+        "note": "Temsili statik şasi görünümü",
+        "path": "assets/fallback.svg"
       },
       {
-        "name": "Sensör envanteri",
-        "type": "XLSX",
-        "note": "Sensörler ve veri arayüzleri",
-        "path": "../inputs/Vaccino_26-27_Sensor_Envanteri.xlsx"
+        "name": "Sensörler ve veri arayüzleri",
+        "type": "WEB",
+        "note": "Platformdaki teknik envanter",
+        "path": "#/autonomy/interfaces"
       },
       {
-        "name": "Ana gereksinim belgesi",
+        "name": "Proje bağlamı",
         "type": "MD",
-        "note": "Tasarım yönü ve doğrulama kapsamı",
-        "path": "../inputs/Vaccino_ATLAS_Web_Sitesi_ve_3B_Model_Promptu.md"
+        "note": "Tasarım hedefleri ve teknik kapsam",
+        "path": "../docs/PROJECT_CONTEXT.md",
+        "download": true
       },
       {
         "name": "Platform kaydı",
         "type": "JSON",
         "note": "Tek kaynak · parametreler, kararlar, sensörler",
-        "path": "data/project.json"
+        "path": "data/project.json",
+        "download": true
       },
       {
-        "name": "Pist simülasyonu mimarisi ve sınırları",
-        "type": "MD",
-        "note": "İlk boyuna demo model · gerçek pist bekleniyor",
-        "path": "../docs/simulation-architecture.md"
+        "name": "Pist simülasyonu",
+        "type": "DEMO",
+        "note": "2B simülasyon ve 3B örnek parkur",
+        "path": "#/experience/track"
       }
     ],
     "interfaceSummaries": {
