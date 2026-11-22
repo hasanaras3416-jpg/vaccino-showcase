@@ -64,15 +64,16 @@ def material(name, color, roughness, metal=0, weave=False):
     return mat
 
 
-black = material('Suit | matte carbon', (.014, .016, .020), .76, weave=True)
-panel = material('Suit | graphite panels', (.030, .034, .040), .79, weave=True)
-thread = material('Thread | smoke', (.093, .096, .103), .81)
+black = material('Suit | matte carbon', (.007, .008, .010), .82, weave=True)
+panel = material('Suit | graphite panels', (.022, .026, .031), .81, weave=True)
+thread = material('Thread | smoke', (.043, .048, .053), .85)
 trim = material('Rubber & stretch knit', (.012, .014, .017), .83)
-shell = material('Helmet | satin carbon black', (.012, .015, .020), .49, .10)
-glass = material('Visor | smoked polycarbonate', (.015, .022, .033), .25, .46)
+shell = material('Helmet | satin carbon black', (.006, .007, .009), .57, 0)
+glass = material('Visor | smoked polycarbonate', (.009, .012, .016), .27, 0)
+glass.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.36
 gold = material('Vaccino | champagne embroidery', (.55, .383, .186), .5, .25)
 skin = material('Anatomy reference', (.31, .179, .125), .7)
-stage = material('Cyclorama', (.021, .023, .027), .92)
+stage = material('Cyclorama', (.014, .016, .019), .92)
 
 
 def mesh(name, vertices, faces, mat, collection):
@@ -122,9 +123,9 @@ def loft(name, rings, mat, collection, steps=24, level=1, fold=0):
 def trace(name, points, radius, mat, collection, graphic=False):
     data = bpy.data.curves.new(name, 'CURVE')
     data.dimensions = '3D'
-    data.resolution_u = 5
+    data.resolution_u = 1 if graphic else 5
     data.bevel_depth = radius
-    data.bevel_resolution = 1
+    data.bevel_resolution = 0 if graphic else 1
     spline = data.splines.new('BEZIER')
     spline.bezier_points.add(len(points)-1)
     for handle, point in zip(spline.bezier_points, points):
@@ -152,7 +153,7 @@ def fuse(name, objects, voxel=.004, ratio=.48):
     bpy.ops.object.voxel_remesh()
     smoothing = root.modifiers.new('Relax joined surfaces', 'SMOOTH')
     smoothing.factor = .8
-    smoothing.iterations = 5
+    smoothing.iterations = 16 if voxel > .003 else 5
     apply(root, smoothing)
     reduction = root.modifiers.new('Reduce triangles', 'DECIMATE')
     reduction.ratio = ratio
@@ -173,9 +174,9 @@ torso = [
 arm = [
     (.240,-.020,.833,.032,.025),(.239,-.017,.856,.035,.029),
     (.239,-.012,.893,.036,.032),(.235,-.004,.943,.043,.037),
-    (.231,.007,.991,.048,.042),(.225,.014,1.035,.047,.044),
-    (.223,.016,1.070,.046,.047),(.220,.016,1.106,.047,.049),
-    (.211,.016,1.173,.053,.054),(.202,.018,1.246,.060,.063),
+    (.231,.007,.991,.048,.042),(.224,.025,1.035,.047,.044),
+    (.221,.033,1.070,.046,.047),(.218,.029,1.106,.047,.049),
+    (.210,.023,1.173,.053,.054),(.202,.018,1.246,.060,.063),
     (.192,.017,1.313,.068,.069),(.174,.014,1.365,.067,.069),
     (.149,.012,1.403,.049,.053),(.137,.012,1.412,.028,.037)
 ]
@@ -201,9 +202,9 @@ def base_body(collection, mat, clothed):
     for name, rings in segments:
         if not clothed:
             rings = [(x,y,z,rx*.91,ry*.91) for x,y,z,rx,ry in rings]
-        parts.append(loft(name, rings, mat, collection, fold=.024 if clothed else 0))
+        parts.append(loft(name, rings, mat, collection, fold=.008 if clothed else 0))
     return fuse('One-piece racing suit' if clothed else 'Proportional anatomy blockout',
-                parts, .0054, .24)
+                parts, .0048, .19)
 
 
 anatomy = base_body(body, skin, False)
@@ -216,6 +217,22 @@ loft('Head | anatomical volume', [
 loft('Neck | anatomy', [(0,.005,1.409,.044,.046),(0,.008,1.460,.050,.049),
     (0,.009,1.513,.053,.052),(0,.009,1.531,.039,.040)], skin, body)
 garment = base_body(suit, black, True)
+# Broad compression folds, localized to the flex zones of the established pose.
+folds = [
+    (0,1.037,.13,.013,.0019,.052),(0,1.060,.13,.015,-.0013,-.034),
+    (.22,1.041,.042,.011,.0020,.16),(.22,1.060,.045,.012,-.0015,.12),
+    (.22,1.077,.042,.012,.0021,.17),(.12,.434,.056,.012,.0025,-.13),
+    (.12,.456,.053,.013,-.0016,-.16),(.12,.478,.054,.012,.0023,-.17),
+]
+for vertex in garment.data.vertices:
+    x,y,z=vertex.co
+    if y>=0:
+        continue
+    for center_x,center_z,width,height,depth,slope in folds:
+        dx=abs(x)-center_x
+        dz=z-center_z-slope*dx
+        vertex.co.y-=depth*math.exp(-(dx/width)**2-(dz/height)**2)*min(1,-y/.035)
+garment.data.update()
 loft('Low neoprene collar',[(0,.009,1.424,.059,.056),(0,.009,1.436,.064,.061),
     (0,.009,1.464,.062,.058),(0,.009,1.476,.058,.055)],trim,suit)
 def cloth_point(x, z, front=True, offset=.001):
@@ -226,38 +243,52 @@ def cloth_point(x, z, front=True, offset=.001):
     return (x, point.y-direction*offset, z)
 
 
-def cloth_trace(name, profile, radius, mat, front=True):
-    return trace(name,[cloth_point(x,z,front,radius*.81) for x,z in profile],radius,mat,suit)
+def profile_samples(profile, spacing=.0035):
+    for a,b in zip(profile,profile[1:]):
+        steps=max(1,math.ceil(math.dist(a,b)/spacing))
+        for i in range(steps):
+            yield tuple(x+(y-x)*i/steps for x,y in zip(a,b))
+    yield profile[-1]
 
 
-def side_panel(side):
-    bounds=[(1.032,.115,.129),(1.065,.109,.139),(1.113,.107,.141),
-            (1.177,.115,.151),(1.239,.124,.165),(1.292,.143,.170),(1.333,.158,.173)]
-    vertices=[]
-    for a,b in zip(bounds,bounds[1:]):
-        for i in range(5):
-            z,inner,outer=[low+(high-low)*i/5 for low,high in zip(a,b)]
-            for j in range(9):
-                vertices.append(cloth_point(side*(inner+(outer-inner)*j/8),z,offset=.0018))
-    for j in range(9):
-        z,inner,outer=bounds[-1]
-        vertices.append(cloth_point(side*(inner+(outer-inner)*j/8),z,offset=.0018))
-    faces=[(i*9+j,i*9+j+1,(i+1)*9+j+1,(i+1)*9+j) for i in range(30) for j in range(8)]
-    if side<0:
+def cloth_trace(name, profile, radius, mat, front=True, lift=None):
+    points=[cloth_point(x,z,front,radius*.67 if lift is None else lift)
+            for x,z in profile_samples(profile)]
+    return trace(name,points,radius,mat,suit,graphic=True)
+
+
+def fabric_panel(name, side, bounds, front=True, welt=False):
+    rows=list(profile_samples(bounds,.005))
+    vertices=[cloth_point(side*(inner+(outer-inner)*j/8),z,front,.00135)
+              for z,inner,outer in rows for j in range(9)]
+    faces=[(i*9+j,i*9+j+1,(i+1)*9+j+1,(i+1)*9+j)
+           for i in range(len(rows)-1) for j in range(8)]
+    if (side<0)==front:
         faces=[tuple(reversed(face)) for face in faces]
-    mesh(f'Graphite side panel {side:+d}',vertices,faces,panel,suit)
-    for tag,index in [('inner',1),('outer',2)]:
-        trace(f'Panel {tag} welt {side:+d}',
-              [cloth_point(side*row[index],row[0],offset=.0021) for row in bounds],.00078,trim,suit)
+    mesh(f'{name} {side:+d}',vertices,faces,panel,suit)
+    if welt:
+        for edge,index in [('inner',1),('outer',2)]:
+            cloth_trace(f'{name} {edge} stitch {side:+d}',
+                        [(side*row[index],row[0]) for row in bounds],.00053,thread,front,.00165)
 
 
 for side in (-1,1):
-    side_panel(side)
+    fabric_panel('Graphite side insert',side,[
+        (1.026,.122,.126),(1.061,.109,.135),(1.131,.108,.141),
+        (1.197,.116,.149),(1.249,.132,.159),(1.291,.157,.173),(1.32,.178,.181)
+    ],welt=True)
+    shoulder=[
+        (1.355,.183,.207),(1.382,.159,.201),(1.408,.116,.175),
+        (1.430,.082,.145),(1.446,.061,.111),(1.454,.052,.079),
+    ]
+    fabric_panel('Layered shoulder facing',side,shoulder,welt=True)
+    fabric_panel('Rear shoulder facing',side,shoulder,front=False,welt=True)
 zipper=[(0,z) for z in (.957,1.015,1.071,1.132,1.197,1.264,1.325,1.373,1.413,1.44)]
-cloth_trace('Center zipper tape',zipper,.0032,trim)
-trace('Zipper teeth',[cloth_point(x,z,offset=.0047) for x,z in zipper],.0011,thread,suit)
-trace('Zipper pull',[cloth_point(x,z,offset=.0055) for x,z in [(0,1.438),(.003,1.430),(.002,1.424)]],
-      .0015,thread,suit)
+cloth_trace('Recessed zipper tape',zipper,.0023,trim)
+for edge in (-1,1):
+    cloth_trace(f'Zipper edge {edge:+d}',[(edge*.0011,z) for _,z in zipper],
+                .0005,thread,lift=.0018)
+cloth_trace('Zipper pull',[(0,1.431),(.003,1.425),(.003,1.418)],.00135,thread,lift=.0027)
 for side in (-1,1):
     def seam(name, points, radius=.00105, mat=thread, collection=suit):
         return trace(f'{name} {side:+d}',[(side*x,y,z) for x,y,z in points],radius,mat,collection)
@@ -265,18 +296,14 @@ for side in (-1,1):
     def suited_seam(name, points, radius=.00105, mat=thread, front=True):
         cloth_trace(f'{name} {side:+d}',[(side*x,z) for x,z in points],radius,mat,front)
 
-    suited_seam('Shoulder stitch',[(.047,1.449),(.078,1.446),(.112,1.437),(.147,1.422),
-        (.170,1.404),(.188,1.387)],.0012)
-    suited_seam('Rear shoulder stitch',[(.047,1.448),(.090,1.441),(.124,1.430),(.158,1.410),
-        (.187,1.387)],.0010,thread,False)
-    suited_seam('Chest yoke',[(.009,1.286),(.052,1.291),(.109,1.306),(.158,1.325),(.201,1.346)])
-    suited_seam('Back yoke',[(.005,1.318),(.060,1.320),(.113,1.332),(.154,1.352),(.184,1.375)],
-        .00115,thread,False)
-    suited_seam('Lower back gather',[(.006,1.055),(.053,1.05),(.096,1.051),(.134,1.061)],
-        .00135,thread,False)
-    suited_seam('Waist stitching',[(.007,1.021),(.066,1.019),(.118,1.025)])
-    suited_seam('Outer knee articulation',[(.149,.437),(.159,.445),(.167,.461),(.170,.476)],.0010)
-    suited_seam('Upper sleeve accent',[(.190,1.365),(.210,1.352),(.230,1.332)],.00155,gold)
+    suited_seam('Chest yoke',[(.004,1.291),(.052,1.294),(.105,1.310),(.151,1.332),(.176,1.349)],.00068)
+    suited_seam('Back yoke',[(.0,1.317),(.060,1.321),(.111,1.338),(.145,1.356),(.167,1.374)],
+        .00072,thread,False)
+    suited_seam('Lower back gather',[(.0,1.052),(.053,1.051),(.096,1.052),(.134,1.061)],
+        .00072,thread,False)
+    suited_seam('Waist stitching',[(.004,1.021),(.062,1.018),(.111,1.023)],.00068)
+    suited_seam('Outer knee articulation',[(.148,.437),(.159,.447),(.167,.464),(.168,.480)],.00075)
+    suited_seam('Upper sleeve accent',[(.207,1.358),(.222,1.349),(.231,1.339)],.0010,gold)
 
     # Finger bases overlap the metacarpal volume. Their tips retain separate silhouettes.
     hand = [
@@ -302,7 +329,21 @@ for side in (-1,1):
         (.132,-.035,.053,.043,.087),(.132,.009,.081,.040,.057),
         (.132,.020,.109,.038,.044)
     ],side),skin,body,16)
-    fuse(f'Racing glove {side:+d}',parts,.0022,.38)
+    glove=fuse(f'Racing glove {side:+d}',parts,.0018,.31)
+    for finger_index,(offset,length) in enumerate([(-.020,.059),(-.006,.069),(.008,.066),(.022,.052)]):
+        z_base=.760-abs(offset)*.17
+        for joint,center in enumerate((.33,.62)):
+            at=z_base-length*center
+            points=[]
+            for dx in (-.0029,0,.0029):
+                x=side*(.248+offset-.003+dx)
+                hit,point,_,_=glove.ray_cast(Vector((x,-1,at)),Vector((0,1,0)))
+                if hit:
+                    points.append((x,point.y-.00055,at-.0003*abs(dx)/.0029))
+            if len(points)==3:
+                trace(f'Finger hinge stitching {side:+d} {finger_index}.{joint}',points,
+                      .00046,thread,gloves)
+
     loft(f'Glove cuff {side:+d}',mirror([(.240,-.018,.809,.031,.024),
         (.240,-.017,.815,.036,.029),(.239,-.017,.851,.037,.029),
         (.238,-.015,.861,.032,.026)],side),panel,gloves)
@@ -318,75 +359,159 @@ for side in (-1,1):
           (.132,-.005,.071,.047,.069),(.132,.014,.095,.046,.055),
           (.132,.020,.122,.047,.052),(.132,.020,.149,.046,.050),
           (.132,.021,.153,.041,.046)]
-    loft(f'Ankle racing boot {side:+d}',mirror(shoe,side),black,boots,28,1)
-    seam('Boot outer contrast stitching',[(.164,-.122,.041),(.177,-.081,.045),
-        (.177,-.034,.060),(.177,.001,.088)],.0014,thread,boots)
-    seam('Boot closure',[(.095,-.019,.115),(.131,-.037,.121),(.166,-.020,.115)],.0028,panel,boots)
+    shoe_surface=loft(f'Ankle racing boot {side:+d}',mirror(shoe,side),black,boots,28,1)
+    # Closure straps follow the instep and sit above the low-profile sole.
+    for index,(z,width) in enumerate([(.063,.026),(.081,.032),(.101,.034)]):
+        ribbon=[]
+        for height in (z-.004,z+.004):
+            for j in range(13):
+                x=side*(.132+width*(j/6-1))
+                hit,point,_,_=shoe_surface.ray_cast(Vector((x,-1,height)),Vector((0,1,0)))
+                if not hit:
+                    raise ValueError('Boot strap left its host surface')
+                ribbon.append((x,point.y-.001,height))
+        faces=[(j,j+1,14+j,13+j) for j in range(12)]
+        if side<0:
+            faces=[tuple(reversed(face)) for face in faces]
+        mesh(f'Instep strap {side:+d}.{index}',ribbon,faces,panel,boots)
 
-# Sculpted helmet cross-sections control the chin guard and back separately.
-helmet_sections = [
-    (1.463,.058,-.058,.068),(1.472,.079,-.108,.087),(1.483,.095,-.128,.101),
-    (1.496,.103,-.134,.105),(1.529,.106,-.130,.114),(1.565,.110,-.122,.121),
-    (1.608,.111,-.117,.124),(1.644,.109,-.111,.122),(1.680,.102,-.101,.114),
-    (1.713,.087,-.085,.098),(1.738,.068,-.068,.081),(1.755,.042,-.039,.053),
-    (1.761,.003,.003,.012)
+# Section profile references generic closed-cockpit motorsport helmets:
+# extended lower chin, steep brow, rounded crown and compact rear overhang.
+helmet_sections=[
+    (1.462,.050,-.071,.066),(1.469,.071,-.112,.085),(1.482,.091,-.142,.102),
+    (1.497,.099,-.158,.111),(1.516,.103,-.157,.117),(1.536,.106,-.143,.120),
+    (1.552,.108,-.125,.121),(1.573,.110,-.121,.122),(1.607,.110,-.119,.120),
+    (1.625,.110,-.123,.119),(1.641,.108,-.116,.116),(1.666,.103,-.110,.110),
+    (1.693,.096,-.099,.101),(1.718,.084,-.083,.091),(1.738,.066,-.065,.077),
+    (1.752,.042,-.041,.055),(1.758,.020,-.015,.031),(1.760,.003,.003,.014),
 ]
 
 
-def shell_radius(z):
-    for a,b in zip(helmet_sections,helmet_sections[1:]):
+def shell_section(z):
+    for i,(a,b) in enumerate(zip(helmet_sections,helmet_sections[1:])):
         if a[0] <= z <= b[0]:
-            t=(z-a[0])/(b[0]-a[0])
-            return [lo+(hi-lo)*t for lo,hi in zip(a[1:],b[1:])]
+            previous=helmet_sections[max(i-1,0)]
+            following=helmet_sections[min(i+2,len(helmet_sections)-1)]
+            h=b[0]-a[0]
+            t=(z-a[0])/h
+            result=[]
+            for j in (1,2,3):
+                m0=(b[j]-previous[j])/(b[0]-previous[0])
+                m1=(following[j]-a[j])/(following[0]-a[0])
+                value=((2*t**3-3*t*t+1)*a[j]+(t**3-2*t*t+t)*h*m0
+                       +(-2*t**3+3*t*t)*b[j]+(t**3-t*t)*h*m1)
+                result.append(value)
+            return result
     raise ValueError(z)
 
 
-def helmet_point(angle, z, offset=0):
-    width, front, rear = shell_radius(z)
+def helmet_point(angle,z,offset=0):
+    width,front,rear=shell_section(z)
+    cosine=math.cos(angle)
+    if cosine>0:
+        cosine=cosine*(1+.18*(1-cosine*cosine))
     return ((width+offset)*math.sin(angle),
-            (rear+front)/2 - ((rear-front)/2+offset)*math.cos(angle), z)
+            (rear+front)/2-((rear-front)/2+offset)*cosine,z)
 
 
-loft('Full-face helmet | chin and crown',
-     [(0,(front+rear)/2,z,w,(rear-front)/2) for z,w,front,rear in helmet_sections],
-     shell,helmet,56,1)
+columns=96
+cut_columns=21
+eye_extent=math.tau*cut_columns/columns
 
 
-def shield(name, mat, extent, offset, margin):
-    columns, rows = 56, 12
-    points = []
-    for i in range(columns+1):
-        u=2*i/columns-1
-        angle=u*extent
-        lower=1.549+.024*abs(u)**2.1-margin
-        upper=1.636-.017*abs(u)**2.2+margin
-        rounded=.009*max(0,(abs(u)-.87)/.13)**2
-        for j in range(rows+1):
-            z=lower+rounded+(upper-lower-2*rounded)*j/rows
-            points.append(helmet_point(angle,z,offset))
-    faces=[]
-    for i in range(columns):
-        for j in range(rows):
-            a=i*(rows+1)+j
-            faces.append((a,a+rows+1,a+rows+2,a+1))
-    obj=mesh(name,points,faces,mat,visor)
-    thickness=obj.modifiers.new('Molded thickness','SOLIDIFY')
-    thickness.thickness=.0016
-    apply(obj,thickness)
+def eye_bounds(angle):
+    u=min(1,abs(angle)/eye_extent)
+    return (1.554+.019*u**1.9,1.626-.015*u**2.4)
 
 
-shield('Visor gasket',trim,1.48,.0034,.0034)
-shield('Curved smoke visor',glass,1.39,.0058,0)
+chin_steps,eye_steps,crown_steps=17,8,23
+
+
+def shell_rows(angle):
+    lower,upper=eye_bounds(angle)
+    levels=(helmet_sections[0][0],lower,upper,helmet_sections[-1][0])
+    steps=(chin_steps,eye_steps,crown_steps)
+    return [left+(right-left)*i/count
+            for left,right,count in zip(levels,levels[1:],steps)
+            for i in range(count)]+[levels[-1]]
+
+
+angles=[math.tau*i/columns-math.pi for i in range(columns)]
+row_size=len(shell_rows(0))
+vertices=[helmet_point(angle,z) for angle in angles for z in shell_rows(angle)]
+faces=[]
+for i in range(columns):
+    for j in range(row_size-1):
+        if columns//2-cut_columns<=i<columns//2+cut_columns and chin_steps<=j<chin_steps+eye_steps:
+            continue
+        a=i*row_size+j
+        b=((i+1)%columns)*row_size+j
+        faces.append((a,b,b+1,a+1))
+faces.extend([tuple(i*row_size for i in range(columns-1,-1,-1)),
+              tuple(i*row_size+row_size-1 for i in range(columns))])
+helmet_shell=mesh('Full-face composite shell | open eyeport',vertices,faces,shell,helmet)
+wall=helmet_shell.modifiers.new('Eyeport return and shell wall','SOLIDIFY')
+wall.thickness=.0019
+apply(helmet_shell,wall)
+
+
+def optical_skin(name,mat,extent,offset,margin,eye_trim=False):
+    width,height=52,10
+    if eye_trim:
+        perimeter=[(i/width,0) for i in range(width)]+[(1,j/height) for j in range(height)]
+        perimeter += [(1-i/width,1) for i in range(width)]+[(0,1-j/height) for j in range(height)]
+        def frame_point(u,v,rim):
+            angle=(2*u-1)*(extent+rim*.044)
+            lower,upper=eye_bounds(angle)
+            return helmet_point(angle,lower+(upper-lower)*v+rim*margin*(2*v-1),offset)
+        points=[frame_point(u,v,rim) for rim in (0,1) for u,v in perimeter]
+        n=len(perimeter)
+        quads=[(i,(i+1)%n,(i+1)%n+n,i+n) for i in range(n)]
+    else:
+        points=[]
+        for i in range(width+1):
+            angle=(2*i/width-1)*extent
+            lower,upper=eye_bounds(angle)
+            corner=.006*(abs(angle)/extent)**7
+            for j in range(height+1):
+                v=j/height
+                z=lower+(upper-lower)*v+(margin-corner)*(2*v-1)
+                points.append(helmet_point(angle,z,offset))
+        quads=[(i*(height+1)+j,(i+1)*(height+1)+j,(i+1)*(height+1)+j+1,i*(height+1)+j+1)
+               for i in range(width) for j in range(height)]
+    obj=mesh(name,points,quads,mat,visor)
+    solid=obj.modifiers.new('Molded edge','SOLIDIFY')
+    solid.thickness=.0018
+    apply(obj,solid)
+
+
+optical_skin('Black eyeport gasket',trim,eye_extent-.034,.0017,.0053,eye_trim=True)
+optical_skin('Smoked visor | nonmetallic polycarbonate',glass,eye_extent+.024,.0032,.0016)
 for side in (-1,1):
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=24,ring_count=12,location=(side*.110,-.026,1.594))
-    pivot=place(bpy.context.object,helmet)
-    pivot.name=f'Visor hinge {side:+d}'
-    pivot.scale=(.005,.017,.015)
-    pivot.data.materials.append(shell)
-    for poly in pivot.data.polygons:
-        poly.use_smooth=True
-    trace(f'Chin vent {side:+d}',[helmet_point(side*t,1.515+.005*t,.0023) for t in (.12,.24,.36,.48,.60)],.0022,trim,helmet)
-    trace(f'Fine lower shell accent {side:+d}',[helmet_point(side*t,1.489+.005*t,.0018) for t in (.62,.79,.98,1.19,1.40)],.00115,gold,branding)
+    pos=helmet_point(side*1.452,1.593,.003)
+    for name,scale,mat in [('Low-profile hinge',(.007,.017,.014),trim),
+                           ('Captive hinge fastener',(.008,.006,.0055),shell)]:
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=20,ring_count=10,location=pos)
+        part=place(bpy.context.object,helmet)
+        part.name=f'{name} {side:+d}'
+        part.scale=scale
+        part.data.materials.append(mat)
+        for face in part.data.polygons:
+            face.use_smooth=True
+    for i in range(3):
+        start=.24+.18*i
+        points=[]
+        for j in range(12):
+            angle=math.tau*j/12
+            u=start+.073*math.cos(angle)
+            points.append(helmet_point(side*u,1.519+.007*u+.0036*math.sin(angle),.00125))
+        mesh(f'Flush chin vent {side:+d}.{i}',points,
+             [tuple(range(len(points))) if side>0 else tuple(reversed(range(len(points))))],
+             trim,helmet)
+    angles_detail=[.66+.53*i/30 for i in range(31)]
+    trace(f'Inlaid lower shell accent {side:+d}',
+          [helmet_point(side*t,1.493+.009*t,.00074) for t in angles_detail],
+          .00076,gold,branding,graphic=True)
 
 # The two polylines retain the coordinates of the V in platform/assets/mark.svg.
 def mark_stroke(name, points):
@@ -395,10 +520,10 @@ def mark_stroke(name, points):
         for i in range(7):
             u=i/7
             x,z=(a[j]+(b[j]-a[j])*u for j in range(2))
-            projected.append(cloth_point(-.072+(x-32)*.00118,1.247+(32-z)*.00118,offset=.0036))
+            projected.append(cloth_point(-.072+(x-32)*.00124,1.247+(32-z)*.00124,offset=.00165))
     x,z=points[-1]
-    projected.append(cloth_point(-.072+(x-32)*.00118,1.247+(32-z)*.00118,offset=.0036))
-    return trace(name,projected,.00235,gold,branding,graphic=True)
+    projected.append(cloth_point(-.072+(x-32)*.00124,1.247+(32-z)*.00124,offset=.00165))
+    return trace(name,projected,.00185,gold,branding,graphic=True)
 
 
 # Straight segments retain the corners of the logo paths.
@@ -422,7 +547,7 @@ floor.data.materials.append(stage)
 scene.world=bpy.data.worlds.new('Graphite ambient')
 scene.world.use_nodes=True
 scene.world.node_tree.nodes.get('Background').inputs[0].default_value=(.15,.175,.21,1)
-scene.world.node_tree.nodes.get('Background').inputs[1].default_value=.27
+scene.world.node_tree.nodes.get('Background').inputs[1].default_value=.19
 
 
 def aim(obj, target):
@@ -442,11 +567,11 @@ def light(name,loc,target,power,color,width,height):
     aim(obj,target)
 
 
-light('Soft key',(-2.4,-3.5,3.4),(0,0,1.0),410,(1,.89,.75),3,4)
-light('Front fill',(2.8,-2.6,2.2),(0,0,1.1),300,(.77,.87,1),2,3.2)
-light('Cool rim',(1.4,2.3,2.8),(0,0,1.1),490,(.69,.80,1),2.2,3)
-light('Back bounce',(-2.7,2.5,1.8),(0,0,1.0),175,(1,.92,.8),2,3)
-light('Overhead strip',(-.4,-.6,3),(0,0,1.48),83,(1,.97,.93),1.7,.42)
+light('Soft key',(-2.4,-3.5,3.4),(0,0,1.0),340,(1,.92,.82),2.45,3.5)
+light('Front fill',(2.8,-2.6,2.2),(0,0,1.1),128,(.82,.90,1),2.5,3.35)
+light('Cool rim',(1.4,2.3,2.8),(0,0,1.1),380,(.71,.82,1),1.65,2.8)
+light('Back bounce',(-2.7,2.5,1.8),(0,0,1.0),126,(1,.93,.85),2,3)
+light('Overhead strip',(-.4,-.6,3),(0,0,1.48),42,(1,.97,.93),1.7,.70)
 
 
 def camera(name, position, target, scale):
@@ -467,11 +592,12 @@ views=[
     ('03-rear',(0,5,1.13),(0,0,.89),2.03),
     ('04-helmet',(1.25,-3.8,1.96),(0,-.028,1.595),.46),
     ('05-suit',(.75,-3.8,1.47),(0,-.035,1.246),.67),
+    ('06-three-quarter',(2.42,-4.35,1.24),(0,0,.89),2.03),
 ]
 cameras=[camera(*view) for view in views]
 scene.render.engine='CYCLES'
-scene.cycles.samples=18 if args.draft else 88
-scene.cycles.adaptive_threshold=.021
+scene.cycles.samples=18 if args.draft else 60
+scene.cycles.adaptive_threshold=.031
 scene.cycles.max_bounces=5
 scene.cycles.diffuse_bounces=2
 scene.cycles.glossy_bounces=3
@@ -495,7 +621,7 @@ for screen in bpy.data.screens:
         if area.type=='VIEW_3D':
             area.spaces.active.region_3d.view_perspective='CAMERA'
 bpy.context.preferences.filepaths.save_version=0
-bpy.ops.wm.save_as_mainfile(compress=True,filepath=str(out/'vaccino-driver-3-1a.blend'))
+bpy.ops.wm.save_as_mainfile(compress=True,filepath=str(out/'vaccino-driver-3-1b.blend'))
 
 visible_meshes=[obj for obj in driver.all_objects if obj.type=='MESH' and body not in obj.users_collection]
 for obj in visible_meshes:

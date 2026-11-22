@@ -1,56 +1,54 @@
-# Vaccino 2027 · Driver Studio 3.1A
+# Vaccino 2027 · Driver Studio 3.1B
 
-Blender 4.3.2 ile üretilen özgün yarış pilotu prototipi. Sahne statik bir stüdyo pozu ve görsel ekipman konsepti içerir. Ekipman için sertifikasyon veya yarışma uygunluğu değerlendirilmedi.
+3.1A'daki özgün yarış pilotunun görsel revizyonu. Model statik bir stüdyo pozu ve görsel ekipman konseptidir. Güvenlik sertifikasyonu veya yarışma uygunluğu değerlendirilmedi.
 
-## Önizlemeler
+[Blender sahnesi](vaccino-driver-3-1b.blend) · [Üretim betiği](build_driver.py) · [Geometri ölçümleri](geometry.json) · [Aynı açılardan 3.1A / 3.1B karşılaştırması](comparison-3-1a-3-1b.jpg)
 
-| Görünüm | Dosya |
+| Render | Görünüm |
 | --- | --- |
-| Önden, tam boy | [01-front.png](01-front.png) |
-| Yandan, tam boy | [02-side.png](02-side.png) |
-| Arkadan, tam boy | [03-rear.png](03-rear.png) |
-| Kask yakın planı | [04-helmet.png](04-helmet.png) |
-| Tulum yakın planı | [05-suit.png](05-suit.png) |
+| [01-front.png](01-front.png) | Önden, tam boy |
+| [02-side.png](02-side.png) | Yandan, tam boy |
+| [03-rear.png](03-rear.png) | Arkadan, tam boy |
+| [04-helmet.png](04-helmet.png) | Kask yakın planı |
+| [05-suit.png](05-suit.png) | Tulum yakın planı |
+| [06-three-quarter.png](06-three-quarter.png) | Ön-yan, tam boy |
 
-Tam boy çekimler aynı 2,03 m ortografik ölçeği, kamera yüksekliğini ve stüdyo ışıklarını kullanır. Beş PNG 840 × 1050 pikseldir. Antrasit zemin üzerinde geniş, sıcak ana ışık, soğuk kenar ışığı ve düşük dolgular kullanıldı.
+Altı render da 840 × 1050 pikseldir. İlk beş çekim 3.1A ile aynı kamera konumlarını, dönüşlerini ve ortografik ölçekleri kullanıyor. Stüdyo ışığı revizyonun parçası.
 
-## Model ve üretim
+## 3.1A ile görsel karşılaştırma
 
-- Boy yaklaşık **1,761 m**, toplam genişlik **0,556 m**, derinlik **0,300 m**. Görünür modelde **77.630 üçgen**, **54 mesh nesnesi** ve **7 malzeme** var. Ölçüler poz verilmiş görsel modelin sınırlarıdır.
-- Önce düzenlenebilir bir anatomik hacim referansı oluşturuldu. Tulumun gövde, kollar ve paçaları değişken kesitlerden oluşturuldu, voxel remesh ile birleştirildi, yumuşatıldı ve üçgen sayısı düşürüldü. Grafik yan paneller ve dikişler gövde yüzeyine izdüşürülüyor. Fermuar şeridi, yaka, bel, manşetler ve diz biçimi ayrı okunuyor.
-- Kaskta çene ve arka kabuk derinlikleri kesitlerle kontrol ediliyor. Koyu kavisli vizör, conta ve menteşeler ayrı geometri. Eldivenlerde dört parmak ve başparmak, botlarda taban ve bilek üstü ayrı biçimlendirildi.
-- Tulumda prosedürel, düşük genlikli kumaş pürüzü ve mat malzeme kullanıldı. Göğüsteki Vaccino V, deponun marka çizgisindeki iki yolu kumaşa oturtan ayrı geometridir. Shell varlığı kullanılmadı.
-- Blender koleksiyonları **Driver → Body, RacingSuit, Helmet, Visor, Gloves, Boots, Branding**. Stüdyo ayrı koleksiyonda. Gizli Body koleksiyonu bir oran referansı ve dışa aktarım seçiminden çıkarılıyor. Odak nesneleri Driver koleksiyonunun kökünde.
+| Alan | 3.1A | 3.1B |
+| --- | --- | --- |
+| Kask | Yuvarlak profil ve geniş, metalik yansımalı vizör. Alt süslemenin ucu yakın planda kabuktan ayrılıyor. | Yandan öne uzayan çene ve daha dik kaş geçişi. Kabuğa açılan vizör yuvası, çevre contası ve alçak yan menteşeler. Daha ince, metalik olmayan füme vizör. Çene havalandırmaları sığ biçim detayları. |
+| Tulum | Griye yaklaşan siyah, ince yan paneller ve kesik görünen dikişler. | Daha koyu mat siyah gövde, antrasit omuz ve yan katmanları. Dikiş eğrilerinin ara noktaları kumaşa izdüşürülüyor. İnceltilen fermuar şeridi, bel, dirsek ve dizde kontrollü hacim değişimi. |
+| Omuz ve kol | Oranlar dengeli. Yan görünümde kol oldukça düz, arka birleşimde yüzey dalgası görülüyor. | Aynı yetişkin boyu ve temel poz. Dirsek hafifçe geriye alındı, omuz-kol birleşimi daha ince voxel örneklemesi ve yüzey yumuşatmasıyla düzenlendi. |
+| Eldiven ve ayakkabı | Parmak silueti var. Mafsal ve bağlama detayları sınırlı. | Parmak eklemlerinde düşük profilli dikişler ve daha ince voxel örneklemesi. Ayakkabıda bombe yüzeyine oturan antrasit kapama şeritleri ve alçak yarış tabanı. |
+| Genel görünüm | Sade stüdyo prototipi. | Kaskın çene ve vizör çizgisi ile tulum panelleri birlikte daha belirgin bir yarış ekipmanı silueti veriyor. Ön-yan görsel bu ayrımı en açık gösteren açı. Küçük şampanya Vaccino V korundu. |
 
-[Blender sahnesi](vaccino-driver-3-1a.blend) · [Tekrarlanabilir üretim betiği](build_driver.py) · [Geometri ölçümleri](geometry.json)
+Kask görsel kontrolünde kapalı kokpit kasklarının vizör yuvası, çene profili ve yan mekanizma düzeni incelendi. Modelde üreticiye özgü logo veya kabuk tasarımı kullanılmadı. [Bell GT6 Pro](https://www.bellracing.com/p/gt6-pro/) · [Arai GP-7](https://www.araiamericas.com/gp-7-technology)
+
+## Teknik doğrulama
+
+| Ölçüm | 3.1A | 3.1B |
+| --- | ---: | ---: |
+| Yükseklik | 1,761 m | 1,760 m |
+| Görünür üçgen | 77.630 | 101.542 |
+| Görünür mesh nesnesi | 54 | 87 |
+| Görünür malzeme | 7 | 7 |
+| Geçici GLB | 1,44 MB | 1,95 MB |
+
+Üçgen sayısı yaklaşık %31 arttı. Artış ağırlıklı olarak çift yüzeyli kask kabuğu, bağlantı elemanları ve ekipman detaylarından geliyor. Kumaşa izdüşürülen ince hatlar tek örnekli eğri parçaları olarak dışa aktarılıyor. Geçici GLB, Driver Studio ile aynı GLTFLoader kullanılarak izole Chromium sayfasında açıldı. Modelin zemin konumu ve odak düğümleri doğrulandı. GLB seçimi görünür Driver nesneleriyle sınırlı. Blender'da ön yön `−Y`, taban `Z=0`. Y Up glTF dışa aktarımıyla web önü `+Z` ve yükseklik `+Y` oluyor. `FocusHelmet`, `FocusSuit` ve `FocusGlove` konumları 3.1A ile aynı. Body, RacingSuit, Helmet, Visor, Gloves, Boots ve Branding koleksiyonları ayrı.
 
 ```sh
 blender -b -t 4 --python-exit-code 1 -P build_driver.py -- --output ./driver-output
 ```
 
-`--draft` parametresi daha küçük ve az örnekli renderlar üretir. Üretim betiği Cycles kullanır. Bu ortamın Blender derlemesinde OpenImageDenoise bulunmadığı için denoising kapalı çalıştırıldı.
+Blender 4.3.2 ve Cycles kullanıldı. `--draft` ile küçük önizlemeler alınabilir. 3.1A dosyaları ve üretim betiği [kaynak commit’te](https://github.com/hasanaras3416-jpg/vaccino-showcase/tree/daa885c4a0040d3c7e04a0b99c2212b7c27125f0/assets-production/driver-character) geri alınabilir.
 
-## Render değerlendirmesi
+## Açık noktalar
 
-| Ölçüt | Gözlem |
-| --- | --- |
-| İnsan silueti | Önden omuz, bel ve kalça birbirinden okunuyor. Yandan göğüs, kalça ve diz hacimleri ayrılıyor. Poz simetrik ve durağan. |
-| Kask ölçeği | Omuzlara göre ölçülü. Yan görünüşte çene koruması seçiliyor. Tepe formu yakın planda hâlâ yuvarlak ve siluette küçük kesit izleri seçiliyor. |
-| Kollar | Omuz ve kol kesintisiz birleşiyor. Dirsek bükümü yandan hafif görünüyor. |
-| Eller | Eldivenler bileğe orantılı. Parmak uçları ayrılıyor, parmak araları ve eklem kırışıklıkları yakın planda geliştirilebilir. |
-| Tulum | Kask ve vizöre göre düşük parlaklıkta. Yan panel ve dikişler yakın planda okunuyor. Kıvrım ve kumaş tensiyonu simülasyonu yok. Göğüs ve bel dikişleri panel geçişlerinde yer yer kesik görünüyor. |
-| Oyuncak hissi | Mat yüzey, ince taban ve ölçülü el/kask hacimleri oyuncak hissini azaltıyor. Simetri ve sade kabuk prototip karakterini koruyor. |
-| Marka | Küçük göğüs V’si ve kısa şampanya renkli çizgiler ekipman parçalarını gölgelemiyor. |
-| Tam boy sunum | Üç görünümde kıyafet ve kask silueti okunuyor. Arka görünümde koltuk altına yakın birleşim çizgisinde hafif yüzey dalgalanması görülüyor. |
-| Yakın plan | Vizör ve çene koruması okunuyor. Havalandırmalar sığ yüzey detayları, vizör kapalı bir kabuk üzerinde, alt kask şeridinin ucu yakın planda yüzeyden hafif ayrılıyor. Cycles örnek gürültüsü koyu bölgelerde görülebilir. |
-| Web potansiyeli | Geçici glTF 2.0 dışa aktarımı yaklaşık 1,44 MB ve üç odak nesnesini içeriyor. Mobil performansı ve stüdyo ışığında materyal görünümü henüz ölçülmedi. |
-
-## GLB hazırlığı ve sonraki adım
-
-Blender'da yükseklik `+Z`, ön `−Y` ve taban `Z=0`. Blender glTF dışa aktarımında **Y Up** etkinse web modelinin yüksekliği `+Y`, önü `+Z` olur. Driver'ın görünür mesh nesnelerini ve `FocusHelmet`, `FocusSuit`, `FocusGlove` boş nesnelerini seçerek dışa aktar. Body ve Studio koleksiyonlarını seçim dışında bırak. Geçici GLB’nin düğüm adları ve üçgen sayısı doğrulandı.
-
-Web aşamasında kumaş pürüzü normal haritasına alınabilir, dikiş ve panel mesh'leri malzeme bazında birleştirilebilir ve mobil cihazlarda kare süresi ölçülebilir. Bir sonraki görsel revizyonda kaskın havalandırmaları, eldiven eklemleri, koltuk altındaki yüzey geçişi ve dirsek/diz kırışıklıkları öncelikli. Karakter statik pozlu ve rigsizdir. Mevcut web uygulamasına entegrasyon yapılmadı.
+Kumaş kıvrımları elle biçimlendirilmiş yüzey değişimleridir. Eldiven mafsal ayrıntıları tam boyda ince kalıyor. Kask havalandırmaları yakın planda sığ, kapalı yüzey detayları olarak okunuyor. Kask tepesinin siluetinde küçük kesit izleri kalıyor. Model rigsiz ve statik. Koyu yakın planlarda az miktarda Cycles örnek gürültüsü görülebilir. Kumaşın prosedürel pürüzü Blender sahnesinde çalışıyor. Web aşamasında bunu normal haritasına almak, küçük ekipman mesh'lerini malzemeye göre birleştirmek ve mobil kare süresini ölçmek uygun olur. Mevcut web pilotu bu görevde değiştirilmedi.
 
 ## Dosya boyutları
 
-Blender sahnesi 2.34 MiB. Render dosyaları 01-front 915 KiB · 02-side 885 KiB · 03-rear 944 KiB · 04-helmet 1003 KiB · 05-suit 1119 KiB.
+Blender sahnesi 2.64 MiB. Render dosyaları 01-front 925 KiB · 02-side 893 KiB · 03-rear 941 KiB · 04-helmet 1005 KiB · 05-suit 1076 KiB · 06-three-quarter 958 KiB.
