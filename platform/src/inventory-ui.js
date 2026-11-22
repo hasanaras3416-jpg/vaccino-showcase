@@ -1,5 +1,5 @@
 import {record} from './store.js';
-import {InventoryStore,seedInventory,browserInventoryAdapter,exportCSV,inventoryStatuses} from './inventory-store.js';
+import {InventoryStore,seedInventory,browserInventoryAdapter,exportCSV,inventoryStatuses,inventoryDocumentPath} from './inventory-store.js';
 export function initializeInventoryUI(parent){
  const store=new InventoryStore(seedInventory(record),browserInventoryAdapter());
  parent.innerHTML=`<div class="inventory-intro"><p>Başlangıç kayıtları sensör envanteri ve tasarım kararlarından gelir. Stok/sipariş, fiyat ve tedarikçi bilgisi sağlanmadı. Düzenlemeler yalnızca bu tarayıcıda saklanır; ortak senkronizasyon yoktur.</p><output id="inventory-message" aria-live="polite"></output></div><div class="inventory-controls"><label>Ara <input id="inventory-search" type="search" placeholder="Parça, ekip veya açıklama…"></label><label>Kategori <select id="inventory-category"><option value="">Tümü</option><option>Mekanik</option><option>Elektrik & Elektronik</option><option>Sensörler</option></select></label><label>Durum <select id="inventory-status"><option value="">Tümü</option></select></label><label><input type="checkbox" id="inventory-missing"> Eksik / stok teyidi bekleyen</label></div><div class="inventory-actions"><button id="inventory-add">Kayıt ekle</button><button id="inventory-csv">CSV raporu</button><button id="inventory-json">JSON dışa aktar</button><label class="file-import">CSV / JSON içe aktar <input type="file" id="inventory-import" accept=".csv,.json"></label><button id="inventory-print">Yazdır</button><output id="inventory-count"></output></div><p class="muted">Eksik filtresi ihtiyaç/tedarik durumuna göre çalışır; fiziksel stok sayımı değildir. CSV ve yazdırma geçerli filtreyi, JSON tam kaydı kapsar.</p><div class="table-wrap inventory-table" tabindex="0" role="region" aria-label="Envanter kayıtları"><table><thead><tr><th scope="col">Parça</th><th scope="col">Kategori</th><th scope="col">Adet</th><th scope="col">Durum</th><th scope="col">İşlem</th></tr></thead><tbody id="inventory-rows"></tbody></table></div><dialog id="inventory-editor"><form id="inventory-edit-form"><div class="editor-head"><h2>Envanter kaydı</h2><button type="button" id="inventory-cancel" aria-label="Düzenlemeyi kapat">×</button></div><input type="hidden" name="id"><div id="inventory-editor-fields"></div><div class="editor-actions"><button type="submit">Bu tarayıcıya kaydet</button><output id="inventory-edit-message"></output></div></form></dialog>`;
@@ -21,7 +21,8 @@ export function initializeInventoryUI(parent){
    ]) properties.append(make('dt',label),make('dd',value||'Belirtilmedi'));
    details.append(properties);
    if(row.document){
-    const link=make('a','Teknik belge');link.href=row.document;link.target='_blank';link.rel='noopener noreferrer';
+    const path=inventoryDocumentPath(row.document);
+    const link=make('a',path==='../docs/PROJECT_CONTEXT.md'?'Proje bağlamı':'Teknik belge');link.href=path;link.target='_blank';link.rel='noopener noreferrer';
     details.append(link);
    }
    name.append(details);
