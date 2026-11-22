@@ -1,0 +1,28 @@
+{
+  "blender": "4.3.2",
+  "visible_meshes": 54,
+  "triangles": 77630,
+  "materials": [
+    "Helmet | satin carbon black",
+    "Rubber & stretch knit",
+    "Suit | graphite panels",
+    "Suit | matte carbon",
+    "Thread | smoke",
+    "Vaccino | champagne embroidery",
+    "Visor | smoked polycarbonate"
+  ],
+  "bounds_m": [
+    [
+      -0.27782583236694336,
+      0.2778605818748474
+    ],
+    [
+      -0.17682728171348572,
+      0.12291516363620758
+    ],
+    [
+      0.0,
+      1.7609281539916992
+    ]
+  ]
+}
