@@ -8,14 +8,27 @@ from mathutils.bvhtree import BVHTree
 
 argv = sys.argv[sys.argv.index('--') + 1:]
 ASSETS, OUT = argv[0], argv[1]
-PREVIEW = len(argv) > 2 and argv[2] == 'preview'
+OPTS = dict(a.split('=', 1) for a in argv[2:] if '=' in a)
+PREVIEW = 'preview' in argv[2:]
+POSE = OPTS.get('pose', 'adc')                 # adc | mileage
+HIP_X = float(OPTS.get('hip', 1550))           # Varsayım: kalça noktası x 1450–1600 (STEP mm)
+HIP_Y = float(OPTS.get('hipy', 200))           # Varsayım: kalça noktası yüksekliği (STEP mm, boru ekseni y=0)
+FOOT_X = float(OPTS.get('footx', 565))         # Varsayım: ayak merkezi x
+FOOT_Z = float(OPTS.get('footz', 100))         # Varsayım: ayak merkezi z = ±100 (aralık 150–200 mm)
+FRAME_GLB = OPTS.get('frame')                  # Ø30 şasi GLB (kontrol ve render için; GLB'ye girmez)
 os.makedirs(OUT, exist_ok=True)
+
+def D(x, y, z):
+    """STEP mm → sürücü sahnesi (m): sürücü −Y'ye bakar; şasi GLB +90° Z döndürülerek aynı eksene oturur."""
+    return Vector((z, x - 1400, y + 135)) / 1000
+def STEP(v):
+    return Vector((v.y * 1000 + 1400, v.z * 1000 - 135, v.x * 1000))
 
 from bl_ext.user_default.mpfb.services.humanservice import HumanService
 from bl_ext.user_default.mpfb.services.targetservice import TargetService
 
 HEIGHT = 1.74
-RECLINE = 34.0  # derece, dikeyden geriye (Tahmin)
+RECLINE = float(OPTS.get('recline', 34.0))  # derece, dikeyden geriye (Tahmin)
 
 # ---------------------------------------------------------------- sahne
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -180,30 +193,71 @@ for b in ('spine04', 'spine03', 'spine02', 'spine01'):
     aim(b, (0, math.sin(r), math.cos(r)))
 aim('neck01', (0, math.sin(r - rad(20)), math.cos(r - rad(20))))   # baş öne, yola bakar
 aim('head', (0, math.sin(r - rad(28)), math.cos(r - rad(28))))
+# Kalça noktası hedefe taşınır (yalnız öteleme); bacak ve kollar iki kemikli IK ile hedef noktalara.
+hip_now = (P['upperleg01.L'].head + P['upperleg01.R'].head) / 2
+OFFSET = D(HIP_X, HIP_Y, 0) - (rig.matrix_world @ hip_now)
+def T_(x, y, z): return D(x, y, z) - OFFSET          # STEP mm → iskelet uzayı
+IK_LOG = {}
+
+def aim_vec(name, cur_vec, target_vec):
+    pb = P[name]
+    q = cur_vec.normalized().rotation_difference(target_vec.normalized())
+    head = pb.matrix.translation.copy()
+    pb.matrix = Matrix.Translation(head) @ q.to_matrix().to_4x4() @ Matrix.Translation(-head) @ pb.matrix
+    bpy.context.view_layer.update()
+
+def two_bone(root, mid, end, target, pole, key):
+    """root/mid/end: kemik adları (başları eklem). target: uç eklemin hedefi. pole: dirsek/diz yönü."""
+    H, K, A0 = P[root].head.copy(), P[mid].head.copy(), P[end].head.copy()
+    L1, L2 = (K - H).length, (A0 - K).length
+    d_vec = target - H; d = d_vec.length; dirn = d_vec.normalized()
+    short = max(0.0, d - (L1 + L2) * .999)
+    d = min(d, (L1 + L2) * .999)
+    a_ = (L1 * L1 - L2 * L2 + d * d) / (2 * d); h_ = math.sqrt(max(L1 * L1 - a_ * a_, 0))
+    perp = (pole - dirn * pole.dot(dirn)).normalized()
+    knee = H + dirn * a_ + perp * h_
+    aim_vec(root, P[mid].head - P[root].head, knee - H)
+    aim_vec(mid, P[end].head - P[mid].head, (H + dirn * d) - knee)
+    IK_LOG[key] = {'reach_short_mm': round(short * 1000), 'L1_mm': round(L1 * 1000), 'L2_mm': round(L2 * 1000)}
+
+WHEEL_C = (HIP_X - 200, 540, 0)                         # Mileage: simit merkezi (Temsili)
+DEVICE = lambda sg: (HIP_X - 120, 150, sg * 255)        # ADC: güvenlik cihazı tabanı (Aday konum)
 for s, sign in (('L', 1), ('R', -1)):
-    aim(f'upperleg01.{s}', (sign * .10, -math.cos(rad(14)), math.sin(rad(14))))   # uyluk öne, diz hafif yukarı
-    aim(f'lowerleg01.{s}', (sign * .02, -math.cos(rad(22)), -math.sin(rad(22))))  # baldır pedala
-    aim(f'foot.{s}', (0, -math.cos(rad(62)), math.sin(rad(62))))                  # ayak pedal üstünde
-    aim(f'upperarm01.{s}', (-sign * .06, -.80, -.42))                              # kol direksiyona
-    aim(f'lowerarm01.{s}', (-sign * .16, -.95, .10))
-    aim(f'wrist.{s}', (-sign * .10, -.95, .25))
-    # parmaklar: simidi kavrayacak şekilde hafif bük
+    # Bacak: ayak merkezi (FOOT_X, z=±FOOT_Z); ayak bileği 23 mm geride, 125 mm yukarıda (ayakkabı merkezine göre ayarlı)
+    ankle = T_(FOOT_X + 23, 125, sign * FOOT_Z)   # ölçülen ayakkabı merkezi ≈ FOOT_X olacak şekilde
+    two_bone(f'upperleg01.{s}', f'lowerleg01.{s}', f'foot.{s}', ankle, Vector((sign * .12, 0, 1)), f'leg.{s}')
+    aim(f'foot.{s}', (0, -math.cos(rad(60)), math.sin(rad(60))))                       # ayak pedal açısında
+    if POSE == 'mileage':
+        grip = T_(WHEEL_C[0] + 35, WHEEL_C[1] - 10, sign * 150)
+        two_bone(f'upperarm01.{s}', f'lowerarm01.{s}', f'wrist.{s}', grip, Vector((sign * .6, .1, -1)), f'arm.{s}')
+        aim(f'wrist.{s}', (-sign * .10, -.95, .25))
+        curl = (38, 25)
+    else:
+        dev = DEVICE(sign)
+        grip = T_(dev[0] + 30, dev[1] + 105, dev[2])
+        two_bone(f'upperarm01.{s}', f'lowerarm01.{s}', f'wrist.{s}', grip, Vector((sign * .5, .7, -.4)), f'arm.{s}')
+        aim(f'wrist.{s}', (sign * .05, -.55, -.85))
+        curl = (55, 35)
     for f in range(2, 6):
         for seg in (1, 2, 3):
             pb = P.get(f'finger{f}-{seg}.{s}')
             if pb:
-                pb.rotation_mode = 'XYZ'; pb.rotation_euler.x += rad(38 if seg > 1 else 25)
+                pb.rotation_mode = 'XYZ'; pb.rotation_euler.x += rad(curl[0] if seg > 1 else curl[1])
     bpy.context.view_layer.update()
+print('VACCINO_IK', IK_LOG)
 bpy.ops.object.mode_set(mode='OBJECT')
 # gövde ekseni: pozlanmış kemik başları (kemer ve V yerleşimi için)
 J = {n: rig.matrix_world @ P[n].head for n in ('spine05', 'spine03', 'neck01', 'clavicle.L', 'clavicle.R') + tuple(f'{b}.{s}' for b in ('upperleg01', 'lowerleg01', 'foot', 'upperarm01', 'lowerarm01', 'wrist') for s in 'LR')}
+J = {k: v + OFFSET for k, v in J.items()}
 print('VACCINO_JOINTS', {k: tuple(round(c, 3) for c in v) for k, v in J.items()})
 
 # pozu sabitle, iskeleti kaldır
 for obj in (body, suit, gloves, shoes):
     apply_modifiers(obj)
     obj.parent = None
+    obj.matrix_world = Matrix.Identity(4)
     obj.vertex_groups.clear()
+    obj.data.transform(Matrix.Translation(OFFSET)); obj.data.update()
 bpy.data.objects.remove(rig)
 
 
@@ -300,7 +354,7 @@ def tube(name, pts, radius, seg=10, closed=True):
     ob = bpy.data.objects.new(name, me); bpy.context.collection.objects.link(ob); return ob
 
 # Conta (HelmetSeal): açıklık kenarında kauçuk halka
-seal_pts = [on_shell(x, ay, z + EYE_Z, .0015)[0] for x, z in rounded_rect(VW + .006, VH + .006, VR + .003, 12)]
+seal_pts = [on_shell(x, ay, z + EYE_Z, .0035)[0] for x, z in rounded_rect(VW + .022, VH + .022, VR + .011, 12)]   # vizörün dış kenarı
 seal = tube('HelmetSeal', seal_pts, .0045, 10)
 
 # Şerit (HelmetStripe): tepe orta hattı boyunca ince bant (site tarafında şampanya)
@@ -480,6 +534,10 @@ def limb_strip(name, path, outward, width, n=14, out=.0016, thick=.0012):
         if loc_ is None: continue
         if nor_.dot(outward) < 0: nor_ = -nor_
         hits.append((loc_ + nor_ * out, nor_))
+    # yol ve normalleri yumuşat (buruşukluk olmasın); uçlar sabit
+    for _ in range(4):
+        hits = [hits[0]] + [(((hits[i - 1][0] + hits[i][0] * 2 + hits[i + 1][0]) / 4), (hits[i - 1][1] + hits[i][1] * 2 + hits[i + 1][1]).normalized())
+                            for i in range(1, len(hits) - 1)] + [hits[-1]] if len(hits) > 2 else hits
     me = bpy.data.meshes.new(name); bm2 = bmesh.new(); rows = []
     for i, (p, nn) in enumerate(hits):
         tng = (hits[min(i + 1, len(hits) - 1)][0] - hits[max(i - 1, 0)][0]).normalized()
@@ -497,12 +555,28 @@ for sgn, sd in ((1, 'L'), (-1, 'R')):
     strips.append(limb_strip(f'LegStripe{sd}', [J[f'foot.{sd}'], J[f'lowerleg01.{sd}'], J[f'upperleg01.{sd}']], lat, .030))
     strips.append(limb_strip(f'TorsoStripe{sd}', [axis_lo.lerp(axis_hi, .04), axis_lo.lerp(axis_hi, .72)], lat, .030))
     strips.append(limb_strip(f'ArmStripe{sd}', [J[f'upperarm01.{sd}'], J[f'lowerarm01.{sd}'], J[f'wrist.{sd}']], lat, .024))
-    strips.append(limb_strip(f'ShoulderPanel{sd}', [neck_c + lat * .07, J[f'upperarm01.{sd}'] + lat * .02], axis_up, .055))
+    strips.append(limb_strip(f'ShoulderPanel{sd}', [neck_c + lat * .075, J[f'upperarm01.{sd}'] + lat * .015], axis_up, .05, n=10, out=.0022))
 select_only(panels)
 for st in strips: st.select_set(True)
 bpy.context.view_layer.objects.active = panels
 bpy.ops.object.join()
 print('VACCINO_PANELS faces', len(panels.data.polygons))
+
+# ---------------------------------------------------------------- ADC güvenlik cihazları (Madde 412f; Aday konum)
+devices = None
+if POSE == 'adc':
+    bm_d = bmesh.new()
+    for sg in (1, -1):
+        bx, by, bz = DEVICE(sg)
+        base = D(bx, by, bz)
+        ret = bmesh.ops.create_cone(bm_d, cap_ends=True, segments=20, radius1=.013, radius2=.013, depth=.06)
+        bmesh.ops.translate(bm_d, verts=ret['verts'], vec=base + Vector((0, 0, .03)))
+        ret = bmesh.ops.create_uvsphere(bm_d, u_segments=20, v_segments=12, radius=.024)
+        bmesh.ops.translate(bm_d, verts=ret['verts'], vec=base + Vector((0, 0, .075)))
+        ret = bmesh.ops.create_cone(bm_d, cap_ends=True, segments=20, radius1=.03, radius2=.03, depth=.008)
+        bmesh.ops.translate(bm_d, verts=ret['verts'], vec=base)
+    me_d = bpy.data.meshes.new('SafetyDevices'); bm_d.to_mesh(me_d); bm_d.free()
+    devices = bpy.data.objects.new('SafetyDevices', me_d); bpy.context.collection.objects.link(devices)
 
 # ---------------------------------------------------------------- malzemeler
 def material(name, color, rough, metal=0.0, clearcoat=0.0, alpha=1.0, sheen=0.0):
@@ -534,8 +608,9 @@ mats = {
     'Visor': material('M_Visor', srgb('0A0B0C'), .05, alpha=.88),
     'Harness': material('M_Harness', srgb('8A8D90'), .7),
     'Emblem': material('M_Emblem', srgb('C8C8C8'), .4),
+    'SafetyDevices': material('M_SafetyDevices', srgb('C0392B'), .5),
 }
-for ob in (body, suit, panels, gloves, shoes, helmet, seal, stripe, visor, harness, emblem):
+for ob in [o for o in (body, suit, panels, gloves, shoes, helmet, seal, stripe, visor, harness, emblem, devices) if o]:
     ob.data.materials.clear(); ob.data.materials.append(mats[ob.name])
     select_only(ob); bpy.ops.object.shade_smooth()
 for ob in (helmet, seal, stripe, visor, harness, emblem, panels):
@@ -544,48 +619,97 @@ for ob in (helmet, seal, stripe, visor, harness, emblem, panels):
     try: bpy.ops.object.shade_smooth_by_angle(angle=rad(40))
     except Exception: pass
 
-# ---------------------------------------------------------------- dışa aktarım (iskeletsiz sabit GLB)
+# ---------------------------------------------------------------- dışa aktarım (iskeletsiz sabit GLB, yalnız sürücü)
 for ob in [o for o in bpy.data.objects if o.type == 'MESH' and o.name not in mats]:
     bpy.data.objects.remove(ob)
+driver_objs = [o for o in bpy.data.objects if o.type == 'MESH']
 bpy.ops.object.select_all(action='DESELECT')
-for ob in bpy.data.objects: ob.select_set(True)
-bpy.ops.export_scene.gltf(filepath=os.path.join(OUT, 'driver.glb'), export_format='GLB', use_selection=True,
+for ob in driver_objs: ob.select_set(True)
+glb_path = os.path.join(OUT, f'driver-{POSE}.glb')
+bpy.ops.export_scene.gltf(filepath=glb_path, export_format='GLB', use_selection=True,
                           export_apply=True, export_yup=True, export_texcoords=True, export_normals=True,
                           export_materials='EXPORT', export_animations=False, export_skins=False, export_morph=False)
 
-# ---------------------------------------------------------------- inceleme renderı: açık nötr gri, üç açı
+# ---------------------------------------------------------------- şasi (yalnız kontrol ve render için)
+import json
+frame_objs = []
+if FRAME_GLB:
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=FRAME_GLB)
+    frame_objs = [o for o in bpy.data.objects if o not in before and o.type == 'MESH']
+    for o in [o for o in bpy.data.objects if o not in before and o.type != 'MESH']:
+        bpy.data.objects.remove(o)
+    for o in frame_objs:
+        o.matrix_world = Matrix.Rotation(math.pi / 2, 4, 'Z') @ o.matrix_world
+        select_only(o); bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    print('VACCINO_FRAME_OBJS', [o.name for o in frame_objs])
+
+checks = {'recline_deg': RECLINE, 'pose': POSE, 'hip_x': HIP_X, 'hip_y': HIP_Y, 'foot_x_target': FOOT_X, 'foot_z_target': FOOT_Z, 'ik': IK_LOG}
+def step_pts(ob): return [STEP(ob.matrix_world @ v.co) for v in ob.data.vertices]
+sh = step_pts(shoes)
+checks['toe_min_x'] = round(min(p.x for p in sh))
+checks['toe_to_nose_mm'] = round(min(p.x for p in sh) - (-15))                       # (a) ≥ 100, Madde 25a-ii
+left = [p for p in sh if p.z > 0]; right = [p for p in sh if p.z < 0]
+fc = lambda ps: Vector((sum(p.x for p in ps), sum(p.y for p in ps), sum(p.z for p in ps))) / len(ps)
+checks['foot_center_L'] = [round(c) for c in fc(left)]; checks['foot_center_R'] = [round(c) for c in fc(right)]
+checks['foot_center_spacing_mm'] = round(fc(left).z - fc(right).z)
+checks['feet_inner_gap_mm'] = round(min(p.z for p in left) - max(p.z for p in right))
+hl = step_pts(helmet)
+checks['helmet_top_y'] = round(max(p.y for p in hl)); checks['helmet_back_x'] = round(max(p.x for p in hl))
+checks['helmet_to_roof_plane_mm'] = round(935 - max(p.y for p in hl))                 # (b1) çatı borusu altı y = 950 − 15
+checks['helmet_to_rear_hoop_mm'] = round(2135 - max(p.x for p in hl))                # (b2) arka halka ön yüzü x = 2150 − 15
+kn = [STEP(J[f'lowerleg01.{sd}']) for sd in 'LR']
+checks['knee_L'] = [round(c) for c in kn[0]]; checks['knee_R'] = [round(c) for c in kn[1]]
+frame = next((o for o in frame_objs if o.name.startswith('Frame')), None)
+if frame:
+    tree = BVHTree.FromObject(frame, bpy.context.evaluated_depsgraph_get())
+    def clearance(obs, xmax=None, xmin=None):
+        best = (1e9, None)
+        for ob in obs:
+            for v in ob.data.vertices:
+                w = ob.matrix_world @ v.co; sp = STEP(w)
+                if xmax is not None and sp.x > xmax: continue
+                if xmin is not None and sp.x < xmin: continue
+                loc_, nor_, _, dist = tree.find_nearest(w)
+                if loc_ is None: continue
+                sd = dist if (w - loc_).dot(nor_) >= 0 else -dist
+                if sd < best[0]: best = (sd, sp)
+        return round(best[0] * 1000), [round(c) for c in best[1]] if best[1] else None
+    checks['legs_min_clearance_mm'], checks['legs_min_at'] = clearance([suit, shoes], xmax=HIP_X - 150)  # (c) diz/bacak–boru
+    checks['helmet_min_clearance_mm'], checks['helmet_min_at'] = clearance([helmet])
+    checks['driver_min_clearance_mm'], checks['driver_min_at'] = clearance([o for o in driver_objs if o.name not in ('Body',)])
+    checks['knee_vs_nose_post_x770'] = 'önünde değil' if min(k.x for k in kn) > 800 else 'yakın, kontrol et'
+json.dump(checks, open(os.path.join(OUT, f'checks-{POSE}.json'), 'w'), indent=1, ensure_ascii=False)
+print('VACCINO_CHECKS', json.dumps(checks, ensure_ascii=False))
+
+# ---------------------------------------------------------------- inceleme renderı: önden ve yandan, şasinin içinde
+for o in frame_objs:
+    o.data.materials.clear()
+    o.data.materials.append(material('M_F_' + o.name, srgb('C9CDD0') if o.name.startswith('Frame') else srgb('9AA0A6'), .4, metal=.5))
+    if o.name.startswith('RepShell'): o.hide_render = True
 cam_data = bpy.data.cameras.new('Cam'); cam = bpy.data.objects.new('Cam', cam_data); bpy.context.collection.objects.link(cam)
-cam_data.lens = 62
-allv = [v.co for ob in (body, shoes, helmet) for v in ob.data.vertices]
-lo = Vector((min(c.x for c in allv), min(c.y for c in allv), min(c.z for c in allv)))
-hi = Vector((max(c.x for c in allv), max(c.y for c in allv), max(c.z for c in allv)))
-bbox_c = (lo + hi) / 2; radius = (hi - lo).length / 2
+cam_data.lens = 50
 scene.camera = cam
-wheel_c = (sum((v.co for v in gloves.data.vertices), Vector()) / len(gloves.data.vertices))
-bpy.ops.mesh.primitive_torus_add(major_radius=.15, minor_radius=.012, location=wheel_c)
-tor = bpy.context.active_object; tor.rotation_euler = (rad(90) - rad(25), 0, 0)
-tor.data.materials.append(material('M_Prop', srgb('6A6E72'), .5))
-bpy.ops.mesh.primitive_plane_add(size=12, location=(0, 0, min(v.co.z for v in shoes.data.vertices) - .02))
+target = D(1300, 450, 0)
+bpy.ops.mesh.primitive_plane_add(size=14, location=(0, 0, 0))
 floor = bpy.context.active_object; floor.data.materials.append(material('M_Floor', srgb('C9CBCD'), .85))
 world = bpy.data.worlds.new('W'); scene.world = world; world.use_nodes = True
 world.node_tree.nodes['Background'].inputs['Color'].default_value = (.55, .56, .57, 1)
 world.node_tree.nodes['Background'].inputs['Strength'].default_value = .9
-for lpos, energy, size in (((3.0, -1.2, 2.6), 380, .5), ((-2.6, -2.8, 1.6), 120, 3.0), ((-0.6, 2.8, 2.8), 150, 1.5)):
+for lpos, energy, size in (((3.0, -2.5, 3.2), 520, 1.0), ((-3.0, -1.0, 2.0), 200, 3.0), ((0.5, 3.0, 3.0), 200, 2.0)):
     bpy.ops.object.light_add(type='AREA', location=lpos); Lt = bpy.context.active_object
     Lt.data.energy = energy; Lt.data.size = size
-    Lt.rotation_euler = (bbox_c - Vector(lpos)).to_track_quat('-Z', 'Y').to_euler()
+    Lt.rotation_euler = (target - Vector(lpos)).to_track_quat('-Z', 'Y').to_euler()
 scene.render.engine = 'CYCLES'; scene.cycles.device = 'CPU'
-scene.cycles.samples = 24 if PREVIEW else 80; scene.cycles.use_denoising = True
-scene.render.resolution_x = scene.render.resolution_y = 640 if PREVIEW else 1000
+scene.cycles.samples = 24 if PREVIEW else 64; scene.cycles.use_denoising = True
+scene.render.resolution_x, scene.render.resolution_y = (960, 640) if PREVIEW else (1400, 900)
 scene.view_settings.view_transform = 'AgX'; scene.view_settings.exposure = 0.0
-dist = radius / math.tan(math.atan(18 / cam_data.lens)) * 1.12
-views = {'front34': Vector((-.62, -.72, .30)), 'side': Vector((-1.0, .02, .12)), 'front': Vector((0, -1.0, .16))}
-for name, d in views.items():
-    cam.location = bbox_c + d.normalized() * dist
-    cam.rotation_euler = (bbox_c - cam.location).to_track_quat('-Z', 'Y').to_euler()
-    scene.render.filepath = os.path.join(OUT, f'render_{name}.png')
+for name, dvec, dist in ((('front', Vector((.18, -1.0, .32)), 4.6), ('side', Vector((1.0, .0, .12)), 5.2)) if OPTS.get('render', '1') != '0' else ()):
+    cam.location = target + dvec.normalized() * dist
+    cam.rotation_euler = (target - cam.location).to_track_quat('-Z', 'Y').to_euler()
+    scene.render.filepath = os.path.join(OUT, f'render_{POSE}_{name}.png')
     bpy.ops.render.render(write_still=True)
-bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, 'driver.blend'))
+if OPTS.get('render', '1') != '0': bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, f'driver-{POSE}.blend'))
 
 stats = {ob.name: len(ob.data.vertices) for ob in bpy.data.objects if ob.type == 'MESH'}
 print('VACCINO_STATS', stats, 'height_scale', HEIGHT / h)
