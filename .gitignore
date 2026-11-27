@@ -30,3 +30,9 @@ screenshots/
 
 # Local Playwright MCP output
 .playwright-mcp/
+
+# Private CAD inputs (STEP/STL/F3D) stay local; only generated GLB files are committed
+inputs/
+*.step
+*.stp
+*.f3d

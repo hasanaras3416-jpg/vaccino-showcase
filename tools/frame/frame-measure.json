@@ -1,0 +1,29 @@
+{
+ "extent_mm": {
+  "x_length": 2830,
+  "y_height": 980,
+  "z_width": 1230
+ },
+ "nose_width_outer_mm": 530,
+ "frame_min": [
+  -15,
+  -15,
+  -615
+ ],
+ "frame_max": [
+  2815,
+  965,
+  615
+ ],
+ "parts_faces": {
+  "Frame": 51711,
+  "UnknownPartL": 4492,
+  "UnknownPartR": 4492,
+  "BatteryBox": 12,
+  "RepWheels": 400,
+  "RepSuspension": 192,
+  "RepDrivetrain": 30,
+  "RepSeat": 12,
+  "RepShell": 150
+ }
+}

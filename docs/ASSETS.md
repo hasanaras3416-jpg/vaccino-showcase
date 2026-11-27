@@ -44,3 +44,17 @@ Betik: `tools/driver/build_driver.py`. Çıktı: iskeletsiz, sabit pozlu `driver
 
 ### Önceki model
 `pilot.glb` (tevy — Pit Crew Member v1, CC0 1.0, https://tevy.dev/models/pit-crew) kaldırıldı. Lisans CC0 olduğundan atıf zorunlu değildir; alt bilgide ayrıca atıf gerekmez.
+
+## Ø30 boru şasi — STEP'ten GLB (Faz 4)
+
+Durum: önizleme (`platform/preview/frame-compare.html`, menüye bağlı değil). Araç sahnesindeki eski V2 şasi onay gelene kadar yerinde duruyor.
+
+| Öğe | Ayrıntı |
+|---|---|
+| Kaynak | Takımın kendi STEP çizimi `shell eco çizim 30luk boru.step` (27 Kasım 2026 21:33, SHA-256 `79cc49e4…`). STEP dosyası depoya **eklenmez** (`.gitignore`: `inputs/`, `*.step`). |
+| Dönüştürücü | `cascadio` 0.1.1 (MIT, Michael Dawson-Haggerty, https://github.com/trimesh/cascadio), scratchpad'de ayrı bir venv'de. Yalnız derlenmiş çekirdek (`_core`) kullanıldı; numpy gerektiren yardımcı modüller yüklenmedi. Tolerans 0,5 mm / 0,35 rad. |
+| İşleme | Blender 4.2: parçalara ayırma (iskelet, akü kutusu, iki belirsiz parça), metreye çevirme, merkezleme (zemin y = 0), Y-yukarı GLB. Betikler: `tools/frame/step2glb.py`, `tools/frame/build_frame.py`. |
+| Çıktı | `platform/assets/vehicle/frame-step.glb` (≈ 1,3 MB). Ölçüler: `tools/frame/frame-measure.json`. |
+| Temsili katmanlar | Tekerlek 16″, çift salıncak, motor + diferansiyel ve akslar, koltuk, kabuk: çizimde yok, basit geometri. Konumlar devir kaydındaki aday değerlerden (ön dingil x≈550, arka x≈2825, iz 1010 / 875, teker merkezi Y=115 mm). |
+
+Borular STEP'te dolu çubuk olarak çizildiğinden bu model kütle hesabında kullanılmaz (iskelet ≈ 17 kg, Tahmin).
