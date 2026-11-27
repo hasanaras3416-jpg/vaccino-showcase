@@ -328,7 +328,8 @@ export const acikSorular = [
   {soru: 'Şasi imalat tarihi', not: 'İmalatçı Şahinler Metal; bağlantı noktaları kilitlenmeden imalat yok.'},
   {soru: 'Jant ve lastik', not: '16 inç hedef; henüz alınmadı.'},
   {soru: 'Fren diski ve kaliper', not: 'Seçilmedi.'},
-  {soru: 'Motor sürücüsü', not: 'Seçilmedi; Mileage için amaca özel sürücü gerekir.'}
+  {soru: 'Motor sürücüsü', not: 'Seçilmedi; Mileage için amaca özel sürücü gerekir.'},
+  {soru: 'Ön cam direkleri', not: 'Ön cam direklerinin görüş (Madde 28) ve roll-bar hesabına etkisi doğrulanacak.'}
 ];
 
 /* Bırakılan planlar. Arayüzde yalnızca "Eski plan arşivi" içinde ve "Eski plan" rozetiyle görünür. */
