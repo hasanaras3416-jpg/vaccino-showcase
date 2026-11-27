@@ -70,11 +70,10 @@ function select(id){
  }
  if(['motor','clutch','diff'].includes(id)){
   const buttons=[
-   ['Kısa animasyon',null,()=>{demoEnd=performance.now()+4500;redraw()}],
-   ['Kayış muhafazası',guardVisible,()=>{guardVisible=!guardVisible;refreshDrive();select(id)}]
+   ['Kısa animasyon',null,()=>{demoEnd=performance.now()+4500;redraw()}]
   ];
   for(const [label,pressed,action] of buttons){const b=document.createElement('button');b.textContent=label;if(pressed!==null)b.setAttribute('aria-pressed',String(pressed));b.onclick=action;$('variants').append(b)}
-  $('variant-note').textContent=engaged?'Bağlı · Motor torku akslara aktarılır.':'Ayrık · Motor durabilir. Tekerlekler, akslar, diferansiyel ve kayış dönmeye devam eder.';
+  $('variant-note').textContent=engaged?'Bağlı · Motor torku akslara aktarılır.':'Ayrık · Motor durabilir. Tekerlekler, akslar ve diferansiyel dönmeye devam eder.';
  }
  refreshDrive();onSelect(id);redraw();document.dispatchEvent(new CustomEvent('vaccino:part',{detail:id}));
 }
@@ -538,6 +537,11 @@ try{
  const guard=mesh(new T.ExtrudeGeometry(guardShape,{depth:.064,bevelEnabled:false,curveSegments:24}),guardMat,diffGroup,0,0,pulleyZ-.032);
  for(const piece of [smallPulley,largePulley,belt,beltMarks,guard])piece.userData.drivetrainPart='belt';
  guard.visible=false;
+ // 27 Kasım 2026: zincir/kayış planı bırakıldı. Kayış ve kasnaklar gizlenir (animasyon kodu aynı kalır);
+ // yerine motor ile diferansiyeli birleştiren temsili dişli kutusu gösterilir.
+ for(const piece of [smallPulley,largePulley,belt,beltMarks])piece.visible=false;
+ const gearCase=rounded(axleX-motorX+.25,.25,.05,.02,housing,diffGroup,(motorX+axleX)/2,axleY,pulleyZ);
+ gearCase.userData.drivetrainPart='belt';
  for(const x of [.42,.58,.83,.94])for(const z of [-.10,.08]){
   box(.046,.018,.048,x,.165,z,alloy,driveline);
   rod([x,.16,z],[x,.212,z],.011,housing,driveline);

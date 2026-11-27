@@ -142,7 +142,8 @@ function drivetrainBrief(variant){
 function syncDrivetrainPanel(){
   const variant=activeDrivetrain();
   const pending=vehicleApi?.drivetrainTransitioning()??false;
-  $('drivetrain-selector').hidden=!variant;
+  // Hub motor seçeneği 27 Kasım 2026'da bırakıldı (eski plan); karşılaştırma seçicisi gösterilmez.
+  $('drivetrain-selector').hidden=true;
   $('drivetrain-options').querySelectorAll('input').forEach(input=>{
     input.checked=input.value===state.drivetrain;
     input.disabled=!inspectPart;

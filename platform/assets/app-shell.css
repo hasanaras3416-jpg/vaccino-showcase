@@ -417,3 +417,21 @@ body[data-route=overview] .presentation-enter { letter-spacing: .01em; }
 /* Sürücü sayfası düzeni: küçük başlık üstte, ekipman altında, sahne sağda. */
 .driver-screen { grid-template-rows: auto 1fr; row-gap: 24px; }
 .driver-intro { align-self: start; padding-bottom: 0; }
+
+/* ---------- Doğruluk rozetleri (vaccino-data.js · rozetler) ---------- */
+.badge-karar { border-color: rgb(245 242 237 / 55%); color: var(--ivory); }
+.badge-aday { border-color: rgb(203 185 139 / 70%); color: var(--champagne); background: rgb(203 185 139 / 8%); }
+.badge-tahmin { border-style: dashed; border-color: rgb(179 173 163 / 80%); color: #D8D2C8; }
+.badge-dogrula { border-color: rgb(203 185 139 / 55%); color: var(--champagne); }
+.badge-eski { border-color: #5A6066; color: #C9C4BB; background: #22272B; }
+.stat-source { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.drawer-section li .badge-verify { margin-left: 2px; }
+.chip.status-old { background: #22272B; color: #C9C4BB; }
+.question-card { min-height: 0; }
+.question-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.question-list li { display: grid; gap: 4px; padding: 12px 0; border-bottom: 1px solid var(--hairline); }
+.question-list li:last-child { border-bottom: 0; }
+.question-list strong { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; }
+.question-list span { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+.archive { margin-top: 24px; }
+.archive .question-list { padding-bottom: 8px; }

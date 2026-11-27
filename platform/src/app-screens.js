@@ -1,6 +1,6 @@
 /* Uygulama ekranları: Genel, Araç parça listesi, Sistemler, Yarışlar, Envanter, Takım ve Destek.
    Tüm içerik ../data/vaccino-data.js dosyasından okunur. 3B sahneye yalnızca window.vaccino API'si ile dokunulur. */
-import {site, stats, parts, systems, tests, races, inventory, inventoryCategories, inventoryStatuses, team, interfaces} from '../data/vaccino-data.js';
+import {site, stats, parts, systems, tests, races, inventory, inventoryCategories, inventoryStatuses, team, interfaces, rozetler, acikSorular, eskiPlan} from '../data/vaccino-data.js';
 
 const $ = id => document.getElementById(id);
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -19,7 +19,12 @@ function h(tag, props = {}, ...children) {
   for (const child of children.flat()) if (child != null && child !== false) node.append(child);
   return node;
 }
-const verifyBadge = () => h('span', {class: 'badge-verify', text: 'Doğrulanacak'});
+/* Doğruluk rozetleri: Ekip kararı, Aday, Tahmin, Doğrulanacak (+ arşiv için Eski plan). */
+const badge = key => key && rozetler[key] ? h('span', {class: `badge-verify badge-${key}`, text: rozetler[key]}) : null;
+const verifyBadge = () => badge('dogrula');
+const rozetOf = item => item?.rozet ?? (item?.dogrula ? 'dogrula' : null);
+/* Satır: düz metin ya da {metin, rozet}. */
+const lineItem = item => typeof item === 'string' ? h('li', {text: item}) : h('li', {}, h('span', {text: item.metin + ' '}), badge(item.rozet));
 const nonEmpty = list => Array.isArray(list) && list.length > 0;
 
 /* ---------- Ayrıntı çekmecesi ---------- */
@@ -29,7 +34,7 @@ let drawerTrigger = null, drawerTimer = 0;
 function drawerSection(title, content) {
   if (content == null || (Array.isArray(content) && !content.length)) return null;
   let body;
-  if (Array.isArray(content)) body = h('ul', {}, content.map(item => h('li', {text: item})));
+  if (Array.isArray(content)) body = h('ul', {}, content.map(lineItem));
   else if (typeof content === 'string') body = h('p', {text: content});
   else body = content;
   return h('section', {class: 'drawer-section'}, h('h3', {text: title}), body);
@@ -40,11 +45,11 @@ function definitionList(rows) {
   return h('dl', {class: 'drawer-facts'}, filtered.map(([label, value]) => h('div', {}, h('dt', {text: label}), h('dd', {}, value))));
 }
 
-export function openDrawer({eyebrow = '', title, verify = false, sections = [], trigger = document.activeElement}) {
+export function openDrawer({eyebrow = '', title, verify = false, rozet = null, sections = [], trigger = document.activeElement}) {
   clearTimeout(drawerTimer);
   drawerTrigger = trigger instanceof HTMLElement ? trigger : null;
   $('drawer-eyebrow').textContent = eyebrow;
-  $('drawer-title').replaceChildren(title, verify ? verifyBadge() : '');
+  $('drawer-title').replaceChildren(title, badge(rozet ?? (verify ? 'dogrula' : null)) ?? '');
   $('drawer-body').replaceChildren(...sections.filter(Boolean));
   $('drawer-body').scrollTop = 0;
   drawer.hidden = false;
@@ -124,12 +129,12 @@ function card(item, {eyebrow = '', extra = []} = {}) {
     item.deger ? h('span', {class: 'card-title', text: item.baslik}) : null,
     h('strong', {class: 'card-value', text: item.deger || item.baslik}),
     item.not ? h('span', {class: 'card-note', text: item.not}) : null,
-    h('span', {class: 'card-foot'}, item.dogrula ? verifyBadge() : h('span'), hasDetail ? h('span', {class: 'card-more', 'aria-hidden': 'true', text: 'Ayrıntı →'}) : null)
+    h('span', {class: 'card-foot'}, badge(rozetOf(item)) ?? h('span'), hasDetail ? h('span', {class: 'card-more', 'aria-hidden': 'true', text: 'Ayrıntı →'}) : null)
   ];
   if (!hasDetail) return h('div', {class: 'card'}, content);
   return h('button', {type: 'button', class: 'card is-interactive', 'aria-haspopup': 'dialog',
     onclick: event => openDrawer({
-      eyebrow, title: item.baslik, verify: item.dogrula, trigger: event.currentTarget,
+      eyebrow, title: item.baslik, rozet: rozetOf(item), trigger: event.currentTarget,
       sections: [
         definitionList([['Değer', item.deger], ['Not', item.not]]),
         drawerSection('Ayrıntı', item.ayrinti),
@@ -149,7 +154,7 @@ function renderHome() {
   $('home-stats').replaceChildren(...stats.map(stat => h('li', {class: 'stat'},
     h('span', {class: 'stat-value'}, stat.deger, stat.birim ? h('small', {text: ` ${stat.birim}`}) : null),
     h('span', {class: 'stat-label', text: stat.etiket}),
-    h('span', {class: 'stat-source', text: stat.kaynak})
+    h('span', {class: 'stat-source'}, h('span', {text: stat.kaynak}), badge(stat.rozet))
   )));
 }
 
@@ -159,7 +164,7 @@ function partSections(part) {
   return [
     drawerSection('Görevi', part.gorev),
     drawerSection('Ölçü ve model', part.olcu),
-    drawerSection('Durum', h('p', {class: 'drawer-status'}, h('span', {class: 'chip', text: part.durum}), part.dogrula ? verifyBadge() : null)),
+    drawerSection('Durum', h('p', {class: 'drawer-status'}, h('span', {class: 'chip', text: part.durum}), badge(rozetOf(part)))),
     drawerSection('Ayrıntı', part.ayrinti),
     h('p', {class: 'drawer-caveat', text: '3B geometri temsilidir; üretim çizimi değildir.'})
   ];
@@ -169,7 +174,7 @@ function showPart(id, trigger) {
   if (!part) return;
   try { window.vaccino?.select?.(id); } catch (error) { console.warn(error); }
   document.querySelectorAll('[data-pick]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.pick === id)));
-  openDrawer({eyebrow: part.grup, title: part.ad, verify: part.dogrula, sections: partSections(part), trigger});
+  openDrawer({eyebrow: part.grup, title: part.ad, rozet: rozetOf(part), sections: partSections(part), trigger});
 }
 function renderVehicle() {
   const groups = ['Tümü', ...new Set(parts.map(part => part.grup))];
@@ -192,7 +197,7 @@ document.addEventListener('vaccino:part', event => {
   setTimeout(() => {
     document.dispatchEvent(new Event('vaccino:inspector-close'));
     const part = parts.find(item => item.id === id);
-    if (part) openDrawer({eyebrow: part.grup, title: part.ad, verify: part.dogrula, sections: partSections(part), trigger: document.querySelector(`#pins [data-part="${id}"]`)});
+    if (part) openDrawer({eyebrow: part.grup, title: part.ad, rozet: rozetOf(part), sections: partSections(part), trigger: document.querySelector(`#pins [data-part="${id}"]`)});
   });
 });
 
@@ -218,6 +223,14 @@ function renderSystems(sub) {
   if (planned.length) blocks.push(section('Planlanan testler', h('div', {class: 'card-grid'}, planned.map(test => h('div', {class: 'card'},
     h('span', {class: 'card-title', text: test.durum}), h('strong', {class: 'card-value small', text: test.baslik}), h('span', {class: 'card-note', text: test.yontem}),
     h('span', {class: 'card-foot'}, h('span', {class: 'chip', text: 'Sonuç bekleniyor'})))))));
+  if (key === 'mekanik') {
+    if (nonEmpty(acikSorular)) blocks.push(section('Açık sorular', h('div', {class: 'card question-card'},
+      h('ul', {class: 'question-list'}, acikSorular.map(item => h('li', {}, h('strong', {text: item.soru}), h('span', {text: item.not})))))));
+    if (nonEmpty(eskiPlan?.maddeler)) blocks.push(h('details', {class: 'quiet-disclosure archive'},
+      h('summary', {}, `Eski plan arşivi (${eskiPlan.maddeler.length})`),
+      h('p', {class: 'section-note'}, `${eskiPlan.tarih} itibarıyla bırakıldı. ${eskiPlan.not}`),
+      h('ul', {class: 'question-list'}, eskiPlan.maddeler.map(item => h('li', {}, h('strong', {}, item.baslik + ' ', badge('eski')), h('span', {text: item.not}))))));
+  }
   if (data.not) blocks.push(h('p', {class: 'section-note', text: data.not}));
   blocks.push(h('nav', {class: 'related-links', 'aria-label': 'İlgili sayfalar'},
     h('a', {href: '#/decisions', text: 'Mühendislik kararları'}), h('a', {href: '#/tests', text: 'Test planı'}), h('a', {href: '#/experience/track', text: 'Pist ve simülasyon'})));
@@ -250,7 +263,8 @@ function renderRaces(sub) {
   if (tab === 'kurallar') {
     blocks.push(h('p', {class: 'section-note'}, race.kuralNotu + ' ', verifyBadge()));
     blocks.push(h('div', {class: 'card-grid'}, race.kurallar.map(rule => h('div', {class: 'card'},
-      h('span', {class: 'card-title', text: rule.baslik}), h('strong', {class: 'card-value', text: rule.deger}), h('span', {class: 'card-note', text: rule.not})))));
+      h('span', {class: 'card-title', text: rule.baslik}), h('strong', {class: 'card-value', text: rule.deger}), h('span', {class: 'card-note', text: rule.not}),
+      h('span', {class: 'card-foot'}, badge(rule.rozet ?? 'dogrula'))))));
     if (nonEmpty(race.acikKontrol)) blocks.push(section('Kontrol edilecek', h('ul', {class: 'tag-list'}, race.acikKontrol.map(item => h('li', {text: item})))));
   }
   if (tab === 'takvim') {
@@ -293,11 +307,11 @@ function renderInventory() {
   }
   body.replaceChildren(...rows.map(item => h('tr', {},
     h('td', {}, h('button', {type: 'button', class: 'inv-open', 'aria-haspopup': 'dialog',
-      onclick: event => openDrawer({eyebrow: `${item.id} · ${item.kategori}`, title: item.ad, verify: true, sections: inventorySections(item), trigger: event.currentTarget})},
+      onclick: event => openDrawer({eyebrow: `${item.id} · ${item.kategori}`, title: item.ad, rozet: item.durum === 'Eski plan' ? 'eski' : 'dogrula', sections: inventorySections(item), trigger: event.currentTarget})},
       h('span', {class: 'inv-name', text: item.ad}), h('span', {class: 'inv-model-inline', text: item.model}))),
     h('td', {class: 'inv-model', text: item.model}),
     h('td', {class: 'inv-category', text: item.kategori}),
-    h('td', {}, h('span', {class: `chip status-${item.durum === 'Elde' ? 'ok' : item.durum === 'Arızalı' ? 'bad' : 'open'}`, text: item.durum}))
+    h('td', {}, h('span', {class: `chip status-${item.durum === 'Elde' ? 'ok' : item.durum === 'Arızalı' ? 'bad' : item.durum === 'Eski plan' ? 'old' : 'open'}`, text: item.durum}))
   )));
 }
 
