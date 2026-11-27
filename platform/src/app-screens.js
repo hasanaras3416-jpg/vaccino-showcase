@@ -341,7 +341,9 @@ function renderSupport() {
       h('ul', {class: 'talk-list'}, team.gorusmeler.map(item => h('li', {}, h('strong', {text: item.ad}), h('span', {class: 'talk-meta'}, h('span', {class: 'chip', text: item.durum}), h('span', {text: item.not}))))),
       h('p', {class: 'drawer-caveat', text: 'Hiçbiri onaylı sponsor değildir. Her ilişki kendi teyit düzeyinde.'})]})},
     h('span', {text: `${team.gorusmeler.length} görüşme kaydı`}), h('span', {class: 'card-more', 'aria-hidden': 'true', text: 'Listeyi aç →'}))) : null;
-  const contact = section('İletişim', h('dl', {class: 'contact-list'}, team.iletisim.map(item => h('div', {}, h('dt', {text: item.etiket}), h('dd', {text: item.deger})))));
+  // İletişim: yer tutucu ("[...]") ya da boş değerler gösterilmez; gerçek bilgi girilince bölüm kendiliğinden görünür.
+  const realContacts = (team.iletisim || []).filter(item => item.deger && !/^\s*\[.*\]\s*$/.test(item.deger));
+  const contact = realContacts.length ? section('İletişim', h('dl', {class: 'contact-list'}, realContacts.map(item => h('div', {}, h('dt', {text: item.etiket}), h('dd', {text: item.deger}))))) : null;
   $('support-panel').replaceChildren(...[hero, section('Takım', h('div', {class: 'card-grid'}, team.bilgiler.filter(item => !item.hidden).map(item => card({...item, dogrula: false})))), needs, talks, contact].filter(Boolean));
 }
 

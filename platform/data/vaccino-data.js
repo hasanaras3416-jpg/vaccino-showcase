@@ -412,6 +412,7 @@ export const team = {
     {ad: 'Monster', durum: 'Aday', not: 'Bilgisayar desteği'},
     {ad: 'Yeşilova, T-Kare, Ford Otosan, Mercedes Hasmer, Akıltar, Merksen, Köritsan, Camsan Alüminyum, Beyçelik', durum: 'Konuşulan bağlantı', not: 'Teyit düzeyi belirsiz'}
   ],
+  /* Değer "[...]" biçiminde yer tutucu ya da boşsa sitede gösterilmez; gerçek bilgi girilince bölüm görünür. */
   iletisim: [
     {etiket: 'Takım kaptanı', deger: '[ad soyad]'},
     {etiket: 'E-posta', deger: '[takım e-postası]'},
