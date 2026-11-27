@@ -1,6 +1,6 @@
 /* Uygulama ekranları: Genel, Araç parça listesi, Sistemler, Yarışlar, Envanter, Takım ve Destek.
    Tüm içerik ../data/vaccino-data.js dosyasından okunur. 3B sahneye yalnızca window.vaccino API'si ile dokunulur. */
-import {site, stats, parts, systems, tests, races, inventory, inventoryCategories, inventoryStatuses, team, interfaces, rozetler, acikSorular, eskiPlan} from '../data/vaccino-data.js';
+import {site, stats, parts, systems, tests, races, inventory, inventoryCategories, inventoryStatuses, team, interfaces, rozetler, acikSorular, eskiPlan, chassisStatus} from '../data/vaccino-data.js';
 
 const $ = id => document.getElementById(id);
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -176,6 +176,18 @@ function showPart(id, trigger) {
   document.querySelectorAll('[data-pick]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.pick === id)));
   openDrawer({eyebrow: part.grup, title: part.ad, rozet: rozetOf(part), sections: partSections(part), trigger});
 }
+/* Araç ekranı: Şasi durumu kartı (bir kez eklenir) */
+function renderChassisStatus() {
+  const screen = document.querySelector('[data-screen=vehicle]');
+  if (!screen || document.getElementById('chassis-status') || !chassisStatus) return;
+  const card = h('section', {class: 'card chassis-status', id: 'chassis-status', 'aria-labelledby': 'chassis-status-title'},
+    h('h2', {class: 'section-heading', id: 'chassis-status-title', text: chassisStatus.baslik}),
+    h('ul', {class: 'status-lines'}, chassisStatus.satirlar.map(lineItem)),
+    h('h3', {class: 'status-subhead'}, chassisStatus.eklenecek.baslik + ' ', badge(chassisStatus.eklenecek.rozet)),
+    h('ul', {class: 'tag-list'}, chassisStatus.eklenecek.maddeler.map(item => h('li', {text: item}))),
+    h('p', {class: 'section-note', text: chassisStatus.not}));
+  screen.append(card);
+}
 function renderVehicle() {
   const groups = ['Tümü', ...new Set(parts.map(part => part.grup))];
   $('part-filter').replaceChildren(...groups.map(group => h('button', {type: 'button', class: 'chip-button', 'aria-pressed': String(group === partGroup), text: group,
@@ -229,6 +241,8 @@ function renderSystems(sub) {
     if (nonEmpty(eskiPlan?.maddeler)) blocks.push(h('details', {class: 'quiet-disclosure archive'},
       h('summary', {}, `Eski plan arşivi (${eskiPlan.maddeler.length})`),
       h('p', {class: 'section-note'}, `${eskiPlan.tarih} itibarıyla bırakıldı. ${eskiPlan.not}`),
+      eskiPlan.gorsel ? h('figure', {class: 'archive-figure'}, h('img', {src: eskiPlan.gorsel.src, alt: eskiPlan.gorsel.alt, loading: 'lazy', width: '901', height: '440'}),
+        h('figcaption', {}, eskiPlan.gorsel.baslik + ' ', badge('eski'))) : null,
       h('ul', {class: 'question-list'}, eskiPlan.maddeler.map(item => h('li', {}, h('strong', {}, item.baslik + ' ', badge('eski')), h('span', {text: item.not}))))));
   }
   if (data.not) blocks.push(h('p', {class: 'section-note', text: data.not}));
@@ -341,6 +355,7 @@ function onRoute() {
 }
 renderHome();
 renderVehicle();
+renderChassisStatus();
 renderInventoryControls();
 renderInventory();
 renderSupport();

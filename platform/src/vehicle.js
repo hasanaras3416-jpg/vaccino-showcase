@@ -7,6 +7,7 @@ import {addMechanicalDetails} from './mechanical-details.js';
 import {createCameraMotion} from './camera-motion.js';
 import {createHubMotor,createDrivetrainTransition} from './drivetrain-configurator.js';
 import {vehicleLayout,checkVisualEnvelopes} from './vehicle-layout.js';
+import {buildRepresentativeParts,repLayout} from './rep-parts.js';
 import {record, parameters, state as workspaceState, inspectionSystem, activeDrivetrain} from './store.js';
 export let vehicleApi;
 const sections=record.parts;
@@ -151,6 +152,10 @@ try{
  const homeBounce=new T.HemisphereLight(0xf4f6ff,0x353334,.65);
  homeLights.add(homeKey,homeRim,homeBounce);scene.add(homeLights);homeLights.visible=false;
  let exploded=false, batteryHidden=false, playing=false, lastNow=0, focusGoal=null;
+ // Ø30 boru şasi (STEP çizimi, 28 Kasım 2026): V2 yerleşiminin yerine geçer. V2 görseli yalnız Eski plan arşivinde.
+ const {GLTFLoader}=await import('../vendor/driver-gltf-loader.js');
+ const frameUrl=new URL('../assets/vehicle/frame-step.glb',import.meta.url);frameUrl.search=new URL(import.meta.url).search;
+ const frameGltf=await new GLTFLoader().loadAsync(frameUrl.href);
  const frame=new T.Group(),body=new T.Group(),wheels=new T.Group(),rollers=[];
  const vehicleRoot=new T.Group();vehicleRoot.name='vaccino-v2-vehicle';scene.add(vehicleRoot);vehicleRoot.add(frame,body,wheels);body.visible=false;
  const studio=createStudio(T,render,scene,vehicleRoot,()=>{draw=true});
@@ -555,6 +560,43 @@ try{
  const hubMotor=createHubMotor(T,rightRearWheel);
  rightRearWheel.userData.drivetrainPart='hub-motor';
  leftRearWheel.userData.drivetrainPart='free-wheel';
+ // ---------------- V2 → Ø30 şasi değişimi. Grup yapısı (parça kimlikleri, vurgu, animasyon) korunur; içerik yenilenir.
+ const stepMeshes={};frameGltf.scene.traverse(o=>{if(o.isMesh)stepMeshes[o.name]=o;});
+ const toStep=(x,y,z)=>new T.Vector3((x-1400)/1000,(y+135)/1000,z/1000);        // STEP mm → sahne (m), bkz. rep-parts.js
+ const rep=buildRepresentativeParts(T);
+ // V2 iskelet boruları ve gruplanmamış V2 parçaları (koltuk rayları, kremayer, mil, pedallar, bağlantı plakaları)
+ chassis.clear();
+ for(const c of [...frame.children])if(c.isMesh||c.isInstancedMesh)frame.remove(c);
+ const pillarMat=new T.MeshStandardMaterial({color:0xE9A85B,metalness:.45,roughness:.38});
+ for(const name of ['Frame','UnknownPartL','UnknownPartR']){const m=stepMeshes[name];if(!m)continue;m.material=name==='Frame'?steel:pillarMat;m.name=name==='Frame'?'Frame':'WindshieldPillar';chassis.add(m);}
+ // Akü kutusu: çizimdeki 9×5 kutu; arka halkayla (x=2150) çakışan 50 mm bölge kırmızı işaretlenir (Madde 66e: ön yüz x ≥ 2190)
+ batterySupport.clear();
+ if(stepMeshes.BatteryBox){stepMeshes.BatteryBox.material=blue;batterySupport.add(stepMeshes.BatteryBox);}
+ const clash=new T.Mesh(new T.BoxGeometry(.05,.094,.32),new T.MeshStandardMaterial({color:0xd8433a,transparent:true,opacity:.55,depthWrite:false}));
+ clash.position.copy(toStep(2125,60,8));clash.name='BatteryClash';batterySupport.add(clash);
+ // Koltuk, direksiyon, süspansiyon: V2 geometrisi yeni yerleşimde (rep-parts.js, Temsili)
+ seat.clear();seat.position.set(0,0,0);seat.rotation.set(0,0,0);seat.add(rep.seat);
+ steering.clear();steering.position.set(0,0,0);steering.rotation.set(0,0,0);steering.add(rep.steering);
+ suspension.clear();suspension.add(rep.suspension);
+ // V2 fren boruları/pedal/kaliperler V2 tekerlek konumundaydı; diskler tekerleklerde kalır
+ brakes.clear();brakeLines.length=0;for(const m of brakeMarkers)m.removeFromParent();brakeMarkers.length=0;
+ // Tekerlekler: V2 jantlı lastik 16″ Ø500 × 90 mm'ye ölçeklenir, aday dingil ve izlere taşınır (dönme animasyonu korunur)
+ const kr=repLayout.wheelR/1000/.269,kw=repLayout.wheelW/1000/.134;
+ for(const r of rollers){
+  const side=Math.sign(r.wheel.position.z),half=(r.rear?repLayout.track.rear:repLayout.track.front)/2;
+  r.wheel.position.copy(toStep(r.rear?repLayout.axles.rear:repLayout.axles.front,repLayout.wheelY,side*half));
+  r.wheel.scale.set(kr,kr,kw);
+ }
+ // Tahrik: eski merkezi motor/kayış görseli kaldırılır; temsili orta motor + diferansiyel ve akslar
+ for(const g of [motorGroup,clutchGroup,diffGroup,axleGroup])g.clear();
+ for(const c of [...driveline.children])if(c.isMesh)driveline.remove(c);
+ if(stepMeshes.RepDrivetrain){stepMeshes.RepDrivetrain.material=housing;motorGroup.add(stepMeshes.RepDrivetrain);}
+ // Elektronik ve yardımcı parçalar: V2 konumundan yeni yerleşimde temsili konuma (STEP mm)
+ const relocate=(group,[x,y,z])=>{const b=new T.Box3().setFromObject(group);if(b.isEmpty())return;const c=b.getCenter(new T.Vector3());group.position.add(toStep(x,y,z).sub(c));};
+ relocate(nose,[40,330,0]);relocate(computer,[1700,180,360]);relocate(panel,[1200,620,210]);relocate(motorController,[2420,170,-200]);relocate(fire,[2420,170,200]);
+ // Kabuk: temsili dış zarf (yarı saydam)
+ body.clear();
+ if(stepMeshes.RepShell){stepMeshes.RepShell.material=new T.MeshStandardMaterial({color:0xe9ecef,transparent:true,opacity:.22,roughness:.25,depthWrite:false,side:T.DoubleSide});body.add(stepMeshes.RepShell);}
  const homeBounds=new T.Box3().setFromObject(frame).union(new T.Box3().setFromObject(wheels));
  const homeCorners=boxCorners(homeBounds);
  const vehicleCorners=[];
@@ -583,9 +625,9 @@ try{
   refreshDrive();
  }
  $('frame').onclick=()=>setMode('frame');$('body').onclick=()=>setMode('body');
- $('rear').onclick=()=>{if(pickMode==='body')setMode('frame');rearView=true;cockpitView=false;target.set(.73,.30,.02);az=1.06;el=.76;rad=1.78;select('diff');refreshDrive()};
- $('top').onclick=()=>{rearView=false;refreshDrive();cockpitView=false;target.set(0,.39,0);rad=4.5;el=1.52;az=-Math.PI/2;draw=true};
- $('cockpit').onclick=()=>{if(pickMode==='body')setMode('frame');rearView=false;refreshDrive();cockpitView=true;target.set(-.085,.48,.03);az=1.22;el=.71;rad=2.35;select('hmi');draw=true};
+ $('rear').onclick=()=>{if(pickMode==='body')setMode('frame');rearView=true;cockpitView=false;target.set(1.12,.32,.02);az=1.06;el=.70;rad=2.1;select('motor');refreshDrive()};
+ $('top').onclick=()=>{rearView=false;refreshDrive();cockpitView=false;target.set(0,.39,0);rad=5.4;el=1.52;az=-Math.PI/2;draw=true};
+ $('cockpit').onclick=()=>{if(pickMode==='body')setMode('frame');rearView=false;refreshDrive();cockpitView=true;target.set(.02,.52,.03);az=1.22;el=.71;rad=2.6;select('hmi');draw=true};
  $('wheel-toggle').onclick=()=>{hideWheels=!hideWheels;wheels.visible=!hideWheels;$('wheel-toggle').setAttribute('aria-pressed',String(hideWheels));$('wheel-toggle').textContent=hideWheels?'Tekerlekleri göster':'Tekerlekleri gizle';draw=true};
  $('reset').onclick=()=>{
   rearView=false;cockpitView=false;
@@ -606,6 +648,8 @@ try{
   if(hit){const id=owner(hit.object,variant);if(id)inspect(id,canvas);}
  });
  for(const [id,g] of Object.entries(partGroups))g.userData.part=id;
+ // İğneler yeni parça konumlarına (grup sınır kutusu merkezi); geometrisi olmayan parçanın iğnesi gizli kalır
+ for(const p of pins){const g=partGroups[p.id];if(!g)continue;const b=new T.Box3().setFromObject(g);if(!b.isEmpty())p.position=b.getCenter(new T.Vector3());else p.button.remove();}
  axleGroup.userData.part='diff';
  const materialState=new Map();
  function registerMaterials(){
@@ -635,7 +679,8 @@ try{
   central:driveline,hub:hubMotor,batteryPack,batteryMount,rightWheel:rightRearWheel,
   onFrame(meshes){
    const variant=activeDrivetrain(),dimOpacity=inspectionSystem()?.075:.16;
-   for(const mesh of meshes)opacity(mesh,materialState.get(mesh),owner(mesh,variant)||'frame',dimOpacity);
+   // Ø30 değişiminde sahneden çıkarılan V2 parçaları (eski akü paketi vb.) atlanır
+   for(const mesh of meshes){const base=materialState.get(mesh);if(base)opacity(mesh,base,owner(mesh,variant)||'frame',dimOpacity);}
    draw=true;
   },
   onSettled(){

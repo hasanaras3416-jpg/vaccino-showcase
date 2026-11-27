@@ -40,7 +40,7 @@ export const parts = [
   {id: 'frame', ad: 'Şasi', grup: 'Mekanik', durum: 'Ø30 boru çizimi', rozet: 'aday',
     gorev: 'Tüm parçaları bir arada tutan alüminyum boru iskelet (space frame).',
     olcu: [r('2.830 × 1.230 × 980 mm (boy × genişlik × yükseklik; tekerlek ve kabuk hariç)', 'aday'), r('Ø30 × 2 mm alüminyum 6061-T6 boru', 'beyan'), r('İskelet ≈ 17 kg (plaka ve kaynak hariç)', 'tahmin'), r('Tekerleklerle toplam boy ≈ 3,1–3,2 m', 'tahmin')],
-    ayrinti: ['Ön ve arka çift salıncak. Koltuk ve direksiyon kutusunun mil çıkışı araç ortasında.', 'İmalatçı Şahinler Metal; imalat tarihi belli değil.', 'Bağlantı noktaları kilitlenmeden imalata verilmeyecek.', '3B görünüm hâlâ eski V2 yerleşimini gösterir; Ø30 çizimiyle güncellenecek.']},
+    ayrinti: ['Ön ve arka çift salıncak. Koltuk ve direksiyon kutusunun mil çıkışı araç ortasında.', 'İmalatçı Şahinler Metal; imalat tarihi belli değil.', 'Bağlantı noktaları kilitlenmeden imalata verilmeyecek.', 'Çizimde olmayan tekerlek, süspansiyon, tahrik, koltuk, direksiyon ve kabuk 3B’de temsilidir.', r('Ön cam direkleri şasi gövdesinden ayrı çizilmiş; kaynakla bağlanıp bağlanmayacağı ve yük taşıyıp taşımadığı doğrulanacak.', 'beyan')]},
   {id: 'suspension', ad: 'Süspansiyon', grup: 'Mekanik', durum: 'Çift salıncak · ön ve arka', rozet: 'beyan',
     gorev: 'Tekerlekleri şasiye bağlar, yol hareketini karşılar.',
     olcu: [r('Göbek rulmanı adayı DAC35680037 (35 × 68 × 37 mm)', 'aday')],
@@ -72,7 +72,7 @@ export const parts = [
   {id: 'battery', ad: 'Batarya', grup: 'Elektrik', durum: 'Aday', rozet: 'aday',
     gorev: 'Motoru ve elektroniği besleyen enerji paketi.',
     olcu: [r('15S3P LiFePO₄ · 48 V · 18 Ah · 864 Wh', 'aday'), r('Tam dolu 54,75 V (3,65 V/hücre)', 'aday'), r('Şimdilik 9×5 kutu ≈ 316 × 220 × 90 mm', 'tahmin')],
-    ayrinti: ['Hücre adayı IFR32700 3,2 V 6 Ah.', 'Kutu seçimi değişebilir; sürücü bölmesinin arkasında kalmalı.', 'Hücre, BMS, şarj cihazı ve güvenlik tasarımı seçilmedi.', r('Shell sınırı: 60 V ve 1.000 Wh', 'dogrula')]},
+    ayrinti: [r('Çakışma: çizimdeki kutu arka halkaya (x = 2150) 50 mm biniyor. Madde 66e gereği kutu ön yüzü x ≥ 2190’a (en az 90 mm arkaya) alınacak.', 'dogrula'), 'Hücre adayı IFR32700 3,2 V 6 Ah.', 'Kutu seçimi değişebilir; sürücü bölmesinin arkasında kalmalı.', 'Hücre, BMS, şarj cihazı ve güvenlik tasarımı seçilmedi.', r('Shell sınırı: 60 V ve 1.000 Wh', 'dogrula')]},
   {id: 'drive', ad: 'Motor sürücüsü', grup: 'Elektrik', durum: 'Seçilmedi', rozet: 'dogrula',
     gorev: 'Motora ne zaman, ne kadar güç gideceğini yönetir.',
     olcu: ['Yeni araç için sürücü seçilmedi'],
@@ -80,7 +80,7 @@ export const parts = [
   {id: 'pc', ad: 'Araç bilgisayarı', grup: 'Elektrik', durum: 'Tercih adayı', dogrula: true,
     gorev: 'Kamera verisini işler, sürüş kararını hazırlar.',
     olcu: ['Seeed reComputer Super J401', 'Jetson Orin NX 16 GB'],
-    ayrinti: ['V2’de koltuk yanında; koltuk arkası alternatif.', 'JetPack, ZED SDK ve ROS 2 sürümleri birlikte doğrulanacak.', 'Takıma ait yarış bilgisayarı kesinleşmedi.']},
+    ayrinti: ['3B konumu temsili (koltuk yanı); kesin yer belirlenmedi.', 'JetPack, ZED SDK ve ROS 2 sürümleri birlikte doğrulanacak.', 'Takıma ait yarış bilgisayarı kesinleşmedi.']},
   {id: 'camera', ad: 'Kamera ve sensörler', grup: 'Elektrik', durum: 'Tedarik önceliği', dogrula: true,
     gorev: 'Aracın önünü ve çevresini görmesini sağlar.',
     olcu: ['Stereolabs ZED 2i · 2,1 mm polarizeli', 'SKU ZED-221120'],
@@ -106,7 +106,7 @@ export const systems = {
     derin: {etiket: 'Mekanik 3B sergisi', href: '#/mechanical'},
     kartlar: [
       {baslik: 'Şasi çizimi', deger: '2.830 × 1.230 mm', not: 'Yükseklik 980 mm · tekerlek ve kabuk hariç', rozet: 'aday',
-        ayrinti: [r('Tekerleklerle toplam boy ≈ 3,1–3,2 m.', 'tahmin'), 'İmalatçı Şahinler Metal; tarih belli değil.', 'Bağlantı noktaları kilitlenmeden imalata verilmeyecek.', '3B görünüm hâlâ eski V2 yerleşimini gösterir.'], href: '#/mechanical/chassis'},
+        ayrinti: [r('Tekerleklerle toplam boy ≈ 3,1–3,2 m.', 'tahmin'), 'İmalatçı Şahinler Metal; tarih belli değil.', 'Bağlantı noktaları kilitlenmeden imalata verilmeyecek.', 'Çizimde olmayan parçalar 3B’de temsilidir.'], href: '#/mechanical/chassis'},
       {baslik: 'Şasi borusu', deger: 'Ø30 × 2 mm', not: 'Alüminyum 6061-T6', rozet: 'beyan',
         ayrinti: [r('İskelet ≈ 17 kg; plaka, kaynak ve bağlantılar hariç.', 'tahmin'), 'Kaynak bölgesi dayanımı ve yuvarlanma koruması ayrıca doğrulanacak.']},
       {baslik: 'Tahrik', deger: 'Orta motor + yarım diferansiyel', not: 'Mafsallı aks · zincir ve hub motor bırakıldı', rozet: 'beyan',
@@ -321,6 +321,23 @@ export const driverInfo = {
   balast: r('Urban Concept’te en az sürücü ağırlığı 70 kg (tam teçhizatla); hafif sürücüde balast gerekir.', 'dogrula')
 };
 
+/* Araç ekranı: Şasi durumu kartı */
+export const chassisStatus = {
+  baslik: 'Şasi durumu',
+  satirlar: [
+    r('Çizim 2.830 × 1.230 × 980 mm (tekerlek ve kabuk hariç)', 'beyan'),
+    r('İmalata serbest bırakma bekliyor; bağlantı noktaları kilitlenmeden imalat yok', 'beyan'),
+    r('Yer yüksekliği ≈ 120 mm (en alçak boru dış yüzü – zemin)', 'tahmin'),
+    r('Kural: yer yüksekliği ≥ 100 mm, sürücü ve balast ile', 'dogrula'),
+    r('Dingil x ≈ 550 / 2.825 mm (ön / arka)', 'aday'),
+    r('İz ≈ 1.010 / 875 mm (ön / arka)', 'aday'),
+    r('Çakışma: akü kutusu arka halkaya (x = 2150) 50 mm biniyor; Madde 66e gereği ön yüz x ≥ 2190 (en az 90 mm arkaya)', 'dogrula')
+  ],
+  eklenecek: {baslik: 'Şasiye eklenecekler', rozet: 'beyan',
+    maddeler: ['Omuz hizası enine boru', 'Çatı orta enine boru', 'Taban paneli', 'Sürücü–enerji bölmesi paneli', 'Balast ve çekme kancası noktaları', 'Çelik akü tepsisi']},
+  not: 'Tekerlek, süspansiyon, tahrik, koltuk, direksiyon ve kabuk 3B’de temsilidir. Ön cam direkleri şasi gövdesinden ayrı çizilmiştir.'
+};
+
 /* Belirsiz konular: Sistemler › Mekanik ekranındaki "Açık sorular" kartı. */
 export const acikSorular = [
   {soru: 'Koltuk konumu ve modeli', not: 'Elde bir otomobil koltuğu var; gerekirse yarış koltuğu alınacak.'},
@@ -335,6 +352,7 @@ export const acikSorular = [
 /* Bırakılan planlar. Arayüzde yalnızca "Eski plan arşivi" içinde ve "Eski plan" rozetiyle görünür. */
 export const eskiPlan = {
   tarih: '27 Kasım 2026',
+  gorsel: {src: 'assets/archive/v2-sasi.jpg', alt: 'Eski V2 şasi yerleşiminin sitedeki 3B görünümü (Eski plan)', baslik: 'V2 şasi 3B görünümü'},
   not: 'Yeni tahrik: tek orta motor + yarım diferansiyel + mafsallı aks.',
   maddeler: [
     {baslik: 'İki arka hub motor', not: 'V2 eskiz yerleşimi.'},
@@ -345,7 +363,7 @@ export const eskiPlan = {
     {baslik: 'QS260 14″ 48 V 1.000 W', not: 'Yüksek tork hub motor adayı.'},
     {baslik: 'Okuldaki hub motorlar', not: '52 V 1200 W ve 48 V 800 W olarak anıldı.'},
     {baslik: 'Flipsky 75100 Pro V2.0', not: 'Tezgâh / ADC sürücü adayı.'},
-    {baslik: 'V2 şasi ≈ 2.675 × 1.183 mm', not: 'Ø40 × 2 boru CAD varsayımıyla.'},
+    {baslik: 'V2 şasi ≈ 2.675 × 1.183 mm', not: 'Ø40 × 2 boru CAD varsayımıyla. 3B görünümü 28 Kasım 2026’da Ø30 çizimiyle değiştirildi.'},
     {baslik: 'Golf tipi direksiyon kutusu', not: 'Yerini merkez girişli kremayer aldı.'}
   ]
 };

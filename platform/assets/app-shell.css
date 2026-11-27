@@ -457,3 +457,13 @@ body[data-route=overview] .presentation-enter { letter-spacing: .01em; }
 .driver-fallback { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .driver-stage { background: radial-gradient(ellipse at 50% 40%, #4a4f54 0%, #2c3034 55%, #171a1d 100%); }
 @media (max-width: 880px) { .driver-screen { row-gap: 16px; } }
+
+/* ---------- Araç: Şasi durumu kartı ve arşiv görseli ---------- */
+.chassis-status { margin-top: 24px; gap: 12px; min-height: 0; }
+.status-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.status-lines li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 0; border-bottom: 1px solid var(--hairline); font-size: 15px; line-height: 1.45; }
+.status-lines li:last-child { border-bottom: 0; }
+.status-subhead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0 4px; font-size: 15px; font-weight: 600; }
+.archive-figure { margin: 8px 0 16px; }
+.archive-figure img { display: block; width: 100%; max-width: 640px; height: auto; border: 1px solid var(--hairline); border-radius: var(--radius-card); }
+.archive-figure figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; font-size: 14px; color: var(--text-muted); }

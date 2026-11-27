@@ -584,7 +584,7 @@
     {
       "id": "frame",
       "label": "Şasi",
-      "status": "V2 GEOMETRİSİ",
+      "status": "Ø30 BORU ŞASİ",
       "point": [
         -0.3,
         0.78,
@@ -592,13 +592,13 @@
       ],
       "desc": "Yeni araç için tek sürücülü, dört tekerli hafif alüminyum şasi hedefleniyor.",
       "facts": [
-        "Bu 3B görünüm eski V2 yerleşimidir (≈ {{chassis.lengthMm}} × {{chassis.widthMm}} mm). Güncel Ø30 çizimiyle değiştirilecek.",
-        "Güncel karar: Ø30 × 2 mm alüminyum 6061-T6 boru. Bu 3B görünüm eski V2 yerleşimidir; Ø30 çizimi 2.830 × 1.230 × 980 mm.",
+        "Şasi: 27 Kasım 2026 STEP çizimi, 2.830 × 1.230 × 980 mm (tekerlek ve kabuk hariç). İmalata serbest bırakma bekliyor.",
+        "Ø30 × 2 mm alüminyum 6061-T6 boru. Borular çizimde dolu çubuk; kütle bu modelden hesaplanmaz (iskelet ≈ 17 kg, Tahmin).",
         "Ön ve arka çift salıncak (ekip kararı). Bağlantı noktaları açık.",
         "16 inç jant hedefi; jant ve lastik alınmadı. Jant, porya, disk ve kaliper kesiti birlikte kontrol edilecek.",
         "v1.2 bağlantı plakaları ve kaynak izleri görsel detaydır; üretim çizimi veya kaynak yöntemi doğrulaması değildir."
       ],
-      "simple": "Aracın tüm parçalarını bir arada tutan hafif taşıyıcı yapı. V2 yerleşimi bu çalışmanın temelini oluşturuyor."
+      "simple": "Aracın tüm parçalarını bir arada tutan alüminyum boru iskelet. Görünüm 27 Kasım 2026 Ø30 STEP çizimidir; tekerlek, süspansiyon, koltuk ve kabuk temsilidir."
     },
     {
       "id": "motor",
@@ -697,7 +697,7 @@
       ],
       "desc": "Araç bilgisayarı kameradan gelen görüntüyü işler ve aracın izleyeceği yolu belirler.",
       "facts": [
-        "V2’de PC koltuğun yanında. Koltuk arkası alternatif konum.",
+        "Bilgisayarın 3B konumu temsili (koltuk yanı); kesin yer belirlenmedi.",
         "İşlemci, besleme ve soğutma henüz seçilecek.",
         "Kontrol kartıyla haberleşme için CAN değerlendiriliyor."
       ],
@@ -803,7 +803,7 @@
     {
       "id": "power",
       "label": "Yardımcı sistemler",
-      "status": "V2 YERLEŞİMİ",
+      "status": "TEMSİLİ KONUM",
       "point": [
         0.58,
         0.31,
@@ -835,11 +835,11 @@
       "status": "GÖRSEL KONSEPT",
       "desc": "Eğrisel kesitlerden üretilen simetrik BufferGeometry gövde, tek kişilik saydam kokpit ve ön/arka davlumbaz rezervleri. CAD/CFD ve hareket zarfı doğrulanmadı.",
       "facts": [
-        "V2 geometri ve tekerlek merkezleri değiştirilmedi. Gövde ayrı bir konsept katmanıdır.",
+        "Kabuk, Ø30 şasi ve aday tekerlek konumlarını örten temsili bir dış zarftır.",
         "Gövde yüzeyleri, davlumbazlar ve servis kapağı üretici CAD’i değildir.",
         "Direksiyon/süspansiyon hareketi, teker boşluğu, kapak mafsalı, görüş ve aerodinamik analiz bekliyor."
       ],
-      "simple": "V2 yerleşimi üzerine geliştirilen beyaz, altın ve grafit gövde konsepti. Tekerlek açıklıkları ve kapaklar gerçek araçta doğrulanacak."
+      "simple": "Temsili dış kabuk. Tekerlek açıklıkları, kapılar ve kapaklar gerçek araçta doğrulanacak."
     }
   ],
   "uiVersion": "1.3",
@@ -869,22 +869,22 @@
         "id": "garage",
         "label": "Araç",
         "title": "Araç",
-        "simple": "Vaccino V2’yi ve mühendislik sistemlerini keşfet.",
-        "technical": "VACCİNO V2 yerleşimi ve teknik sistem kayıtları."
+        "simple": "VACCİNO aracını ve mühendislik sistemlerini keşfet.",
+        "technical": "VACCİNO Ø30 şasi yerleşimi ve teknik sistem kayıtları."
       },
       {
         "id": "overview",
         "label": "Genel Bakış",
         "title": "Mühendisliği birlikte ilerlet.",
         "simple": "Araç, sistemler ve takımın sıradaki adımları.",
-        "technical": "Kaynak tabanlı tasarım kaydı / V2 yerleşim / R01"
+        "technical": "Kaynak tabanlı tasarım kaydı / Ø30 STEP çizimi / R01"
       },
       {
         "id": "vehicle",
         "label": "3B Araç",
         "title": "Tasarımı her açıdan gör.",
         "simple": "Döndür, bir parça seç ve nasıl çalıştığını keşfet.",
-        "technical": "Şasi ölçeği korunmuş V2 model. Üretici CAD’i olmayan bileşenler temsili."
+        "technical": "Ø30 STEP çizimi. Üretici CAD’i olmayan bileşenler temsili."
       },
       {
         "id": "mechanical",
@@ -1268,7 +1268,7 @@
       {
         "name": "Özgün 3B aktarma prototipi",
         "type": "HTML",
-        "note": "V2 şasi ve özgün etkileşimler",
+        "note": "Eski plan · V2 şasi ve özgün etkileşimler",
         "path": "../inputs/Vaccino_26-27_Aktarma_3B.html"
       },
       {
@@ -1312,7 +1312,7 @@
         "title": "Vaccino 26/27",
         "subtitle": "Bir araç. Ortak mühendislik.",
         "simple": "Mekanik, elektrik ve yazılımı aynı araç üzerinde buluşturuyoruz. Tasarımı her açıdan birlikte keşfedelim.",
-        "technical": "V2 yerleşim · {{chassis.lengthMm}} × {{chassis.widthMm}} mm şasi beyanı. Kaynak R01; bağımsız CAD ölçümü ve doğrulama bekleniyor.",
+        "technical": "Ø30 STEP çizimi · 2.830 × 1.230 × 980 mm (tekerlek ve kabuk hariç). Bağımsız doğrulama bekleniyor.",
         "focus": null,
         "camera": {
           "az": -0.88,
@@ -1418,7 +1418,7 @@
       {
         "id": "future",
         "title": "Genel Araç Görünümü",
-        "subtitle": "Vaccino V2",
+        "subtitle": "VACCİNO",
         "simple": "Sıradaki adım parçaları seçmek, ölçmek ve kontrollü testlerle tasarımı geliştirmek. Araç bölümünden pist demosunu ve teknik kayıtları açabilirsin.",
         "technical": "Boyuna demo model ve yerel mühendislik envanteri eklendi. Gerçek pist, yanal dinamik, ölçülmüş araç parametreleri ve donanım doğrulaması bekleniyor.",
         "focus": null,
