@@ -1,6 +1,6 @@
 const equipment = {
   helmet: { node: 'FocusHelmet', radius: .19, azimuth: -.18, copy: 'Tam yüz yarış kaskı ve koyu vizör.' },
-  suit: { node: 'FocusSuit', radius: .34, azimuth: .12, copy: 'Mat siyah kumaş, antrasit paneller ve göğüste Vaccino V.' },
+  suit: { node: 'FocusSuit', radius: .34, azimuth: .12, copy: 'Mat siyah kumaş, antrasit paneller ve göğüste VACCİNO V.' },
   glove: { node: 'FocusGlove', radius: .16, azimuth: .72, copy: 'Sol yarış eldiveninin manşeti ve parmak yapısı.' }
 };
 

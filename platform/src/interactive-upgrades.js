@@ -41,9 +41,9 @@ function ready() {
  const screen=document.getElementById('nextion-screen');
  const tabs=Array.from(document.querySelectorAll('[data-nextion-tab]'));
  const view={
-   home:'<div class="nextion-speed"><span>HIZ</span><strong>00</strong><small>km/h</small></div><div class="nextion-metrics"><div><small>BATARYA</small><strong>82%</strong><div class="nextion-bar"><i></i></div></div><div><small>MOD</small><strong>ECO</strong></div><div><small>SICAKLIK</small><strong>28°C</strong></div></div>',
-   energy:'<div class="nextion-speed"><span>ENERJİ</span><strong>82</strong><small>%</small></div><div class="nextion-metrics"><div><small>GERİLİM</small><strong>48.0 V</strong></div><div><small>AKIM</small><strong>0.0 A</strong></div><div><small>MOD</small><strong>ECO</strong></div></div>',
-   diagnostics:'<div class="nextion-diagnostics"><strong>STATUS / DEMO</strong><p>Kontrolcü: Beklemede</p><p>Fren: Simülasyon</p><p>Sensörler: Bağlı değil</p><p>Telemetri: Örnek değerler</p></div>'
+   home:'<div class="nextion-speed"><span>HIZ</span><strong>00</strong><small>km/sa</small></div><div class="nextion-metrics"><div><small>BATARYA</small><strong>82%</strong><div class="nextion-bar"><i></i></div></div><div><small>MOD</small><strong>EKO</strong></div><div><small>SICAKLIK</small><strong>28°C</strong></div></div>',
+   energy:'<div class="nextion-speed"><span>ENERJİ</span><strong>82</strong><small>%</small></div><div class="nextion-metrics"><div><small>GERİLİM</small><strong>48.0 V</strong></div><div><small>AKIM</small><strong>0.0 A</strong></div><div><small>MOD</small><strong>EKO</strong></div></div>',
+   diagnostics:'<div class="nextion-diagnostics"><strong>DURUM / ÖRNEK</strong><p>Kontrolcü: Beklemede</p><p>Fren: Simülasyon</p><p>Sensörler: Bağlı değil</p><p>Telemetri: Örnek değerler</p></div>'
  };
  const open=()=>{
    if(!dialog?.open){dialog?.showModal();}

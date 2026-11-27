@@ -19,7 +19,7 @@ export function createStudio(T,renderer,scene,vehicleRoot,invalidate) {
   });
   const lettering=texture(512,(ctx,n)=>{
     ctx.clearRect(0,0,n,n);ctx.fillStyle='#9b9f94';ctx.font='bold 22px sans-serif';ctx.textAlign='center';
-    const text='VACCINO  /  DESIGN STUDY  /  ';
+    const text='VACCİNO  /  TASARIM ÇALIŞMASI  /  ';
     for(let i=0;i<text.length;i++){ctx.save();ctx.translate(n/2,n/2);ctx.rotate(i/text.length*Math.PI*2);ctx.translate(0,-n*.445);ctx.fillText(text[i],0,0);ctx.restore();}
   });lettering.colorSpace=T.SRGBColorSpace;
   const studio=new T.Scene();studio.background=new T.Color(0x858b83);

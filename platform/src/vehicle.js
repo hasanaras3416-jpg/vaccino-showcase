@@ -238,7 +238,7 @@ try{
   for(const z of [-.19,.19])rod([x,.398,z],[x,.16,z],.01,steel,batteryMount);
  }
  const batteryLabel=labelTexture(512,256,(c,w,h)=>{
-  c.fillStyle='#edf5ff';c.fillRect(0,0,w,h);c.fillStyle='#104785';c.font='bold 45px sans-serif';c.fillText('VACCINO',30,69);c.font='bold 43px sans-serif';c.fillText(`${parameters.battery.nominalV} V  /  ${parameters.battery.capacityAh} Ah`,30,139);c.font='30px sans-serif';c.fillText(`${parameters.battery.series}S${parameters.battery.parallel}P · TASLAK PAKET`,30,204);
+  c.fillStyle='#edf5ff';c.fillRect(0,0,w,h);c.fillStyle='#104785';c.font='bold 45px sans-serif';c.fillText('VACCİNO',30,69);c.font='bold 43px sans-serif';c.fillText(`${parameters.battery.nominalV} V  /  ${parameters.battery.capacityAh} Ah`,30,139);c.font='30px sans-serif';c.fillText(`${parameters.battery.series}S${parameters.battery.parallel}P · TASLAK PAKET`,30,204);
  });
   refreshBattery=()=>{
   for(const child of batteryPack.children){
@@ -315,7 +315,7 @@ try{
  rounded(.028,.107,.169,.009,dark,panel);
  const hmiTexture=labelTexture(512,320,(c,w,h)=>{
   c.fillStyle='#10232c';c.fillRect(0,0,w,h);c.fillStyle='#76dedc';c.fillRect(22,62,468,3);
-  c.font='bold 29px sans-serif';c.fillText('VACCINO  ·  GÖSTERGE',22,44);
+  c.font='bold 29px sans-serif';c.fillText('VACCİNO  ·  GÖSTERGE',22,44);
   c.fillStyle='#fff';c.font='bold 99px sans-serif';c.fillText('0',33,192);
   c.font='33px sans-serif';c.fillText('km/sa',108,189);c.font='25px sans-serif';c.fillText('NEXTION  /  TASLAK',23,275);
  });

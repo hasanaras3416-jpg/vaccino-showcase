@@ -870,7 +870,7 @@
         "label": "Araç",
         "title": "Araç",
         "simple": "Vaccino V2’yi ve mühendislik sistemlerini keşfet.",
-        "technical": "Vaccino V2 yerleşimi ve teknik sistem kayıtları."
+        "technical": "VACCİNO V2 yerleşimi ve teknik sistem kayıtları."
       },
       {
         "id": "overview",
@@ -933,7 +933,7 @@
         "label": "Araç Deneyimi",
         "title": "Bir araç. Üç perspektif.",
         "simple": "Gövdeyi keşfet, atölyede incele, demo parkurda bir varsayımı sına.",
-        "technical": "Showroom / Atölye / Demo pist · temsili geometri ve parametrik boyuna model"
+        "technical": "Sergi / Atölye / Demo pist · temsili geometri ve parametrik boyuna model"
       },
       {
         "id": "inventory",
