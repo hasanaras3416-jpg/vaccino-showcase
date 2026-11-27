@@ -257,6 +257,7 @@ export function initializeDriver() {
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile.matches ? 1 : 1.5));
     renderer.setSize(width, height, false);
     camera.aspect = aspect; camera.updateProjectionMatrix();
+    sizeMarkers();
     if (!pose || changed) { pose = equipmentView(selected); transition = null; }
     requestFrame();
   }
@@ -415,20 +416,27 @@ export function initializeDriver() {
   // Şasi GLB koordinatı → sürücü koordinatı: Y çevresinde +90°. STEP (mm) → sürücü: x = Z, y = Y + 135, z = −(X − 1400)
   const S2D = (X, Y, Z) => new T.Vector3(Z / 1000, (Y + 135) / 1000, -(X - 1400) / 1000);
   let ergo = null, ergoOn = false;
-  function label(text) {
-    const c = document.createElement('canvas'); c.width = 320; c.height = 72;
+  // Sahnede yalnız numaralı işaret (ekranda sabit ≈ 28 px); değerler yandaki numaralı listede → etiketler çakışmaz.
+  const MARK_PX = 28;
+  function marker(n) {
+    const c = document.createElement('canvas'); c.width = c.height = 96;
     const g = c.getContext('2d');
-    g.fillStyle = 'rgba(9,11,13,.86)'; g.beginPath(); g.roundRect(4, 8, 312, 56, 28); g.fill();
-    g.strokeStyle = '#CBB98B'; g.lineWidth = 2; g.stroke();
-    g.fillStyle = '#F5F2ED'; g.font = '600 30px Inter, Segoe UI, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, 160, 37);
-    const sprite = new T.Sprite(new T.SpriteMaterial({map: new T.CanvasTexture(c), depthTest: false, transparent: true}));
-    sprite.scale.set(.46, .1035, 1); sprite.renderOrder = 10; return sprite;
+    g.fillStyle = 'rgba(9,11,13,.92)'; g.beginPath(); g.arc(48, 48, 42, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = '#CBB98B'; g.lineWidth = 6; g.stroke();
+    g.fillStyle = '#F5F2ED'; g.font = '700 46px Inter, Segoe UI, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(n), 48, 51);
+    const sprite = new T.Sprite(new T.SpriteMaterial({map: new T.CanvasTexture(c), depthTest: false, transparent: true, sizeAttenuation: false}));
+    sprite.renderOrder = 10; sprite.userData.marker = true; return sprite;
   }
-  function measureLine(group, a, b, text) {
+  function sizeMarkers() {
+    if (!ergo || !camera || !stage.clientHeight) return;
+    const s = MARK_PX / stage.clientHeight * 2 * Math.tan(T.MathUtils.degToRad(camera.fov / 2));
+    ergo.lines.traverse(o => { if (o.userData.marker) o.scale.set(s, s, 1); });
+  }
+  function measureLine(group, a, b, n, along) {
     const m = new T.LineBasicMaterial({color: CHAMPAGNE, depthTest: false, transparent: true});
     const line = new T.Line(new T.BufferGeometry().setFromPoints([a, b]), m); line.renderOrder = 9; group.add(line);
     for (const p of [a, b]) { const dot = new T.Mesh(new T.SphereGeometry(.009, 10, 8), new T.MeshBasicMaterial({color: CHAMPAGNE, depthTest: false})); dot.position.copy(p); dot.renderOrder = 9; group.add(dot); }
-    const tag = label(text); tag.position.copy(a.clone().lerp(b, .5)).add(new T.Vector3(0, .06, 0)); group.add(tag);
+    const tag = marker(n); tag.position.copy(a.clone().lerp(b, along)); group.add(tag);
   }
   function measurements() {
     const box = names => { const b = new T.Box3(); for (const n of names) for (const m of layerMeshes.get(n) || []) b.expandByObject(m); return b; };
@@ -464,17 +472,22 @@ export function initializeDriver() {
     if (!ergo) return;
     ergo.lines.clear();
     const m = measurements();
-    for (const item of driverErgonomics.olcumler) measureLine(ergo.lines, m[item.id].a, m[item.id].b, `${m[item.id].mm} mm`);
+    // İşaretler çizgi üzerinde farklı oranlarda: kısa ve yakın çizgilerde üst üste binmez
+    const along = {helmetRoof: .5, helmetHoop: .5, toeNose: .5, cabinHeight: .3, shoulderWidth: .82};
+    driverErgonomics.olcumler.forEach((item, i) => measureLine(ergo.lines, m[item.id].a, m[item.id].b, i + 1, along[item.id] ?? .5));
+    sizeMarkers();
     ergoPanel.replaceChildren(
       Object.assign(document.createElement('h2'), {className: 'driver-product-title', textContent: 'Ergonomi ölçüleri'}),
-      (() => { const dl = document.createElement('dl'); dl.className = 'drawer-facts';
-        for (const item of driverErgonomics.olcumler) {
-          const row = document.createElement('div'), dt = document.createElement('dt'), dd = document.createElement('dd');
-          dt.textContent = item.ad;
-          dd.append(`${m[item.id].mm} mm · sınır ${item.sinir} (${item.madde}) `, badge(item));
-          if (item.not) dd.append(Object.assign(document.createElement('small'), {className: 'ergo-note', textContent: item.not}));
-          row.append(dt, dd); dl.append(row);
-        } return dl; })(),
+      (() => { const ol = document.createElement('ol'); ol.className = 'ergo-list';
+        driverErgonomics.olcumler.forEach((item, i) => {
+          const li = document.createElement('li');
+          const num = Object.assign(document.createElement('span'), {className: 'ergo-num', textContent: String(i + 1)}); num.setAttribute('aria-hidden', 'true');
+          const name = Object.assign(document.createElement('span'), {className: 'ergo-name', textContent: item.ad});
+          const value = document.createElement('span'); value.className = 'ergo-value';
+          value.append(Object.assign(document.createElement('b'), {textContent: `${m[item.id].mm} mm`}), ` sınır ${item.sinir} (${item.madde}) `, badge(item));
+          if (item.not) value.append(Object.assign(document.createElement('small'), {className: 'ergo-note', textContent: item.not}));
+          li.append(num, name, value); ol.append(li);
+        }); return ol; })(),
       ...driverErgonomics.sabit.map(item => { const p = document.createElement('p'); p.className = 'ergo-line'; p.append(`${item.metin} `, badge(item)); return p; }),
       Object.assign(document.createElement('p'), {className: 'drawer-caveat', textContent: driverErgonomics.not}));
   }

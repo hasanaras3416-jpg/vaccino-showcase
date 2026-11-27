@@ -390,10 +390,11 @@ export const eskiPlan = {
 export const team = {
   okul: {ad: 'OİB Lisesi', sehir: 'Bursa', alan: 'Elektrik-Elektronik alanı öğrencileri'},
   bilgiler: [
-    {baslik: 'Kuruluş', deger: 'Mart 2026', not: 'OİB Lisesi çatısında', dogrula: false},
-    {baslik: 'Çekirdek kadro', deger: '7 kişi', not: 'Eski materyallerde 9 kişi yazıyor', dogrula: true},
-    {baslik: 'İlk sezon', deger: '~17 kişi', not: 'Elektrik, mekanik, yazılım, PR', dogrula: true},
-    {baslik: 'Yazılım desteği', deger: '3 tecrübeli üye', not: 'Katılımı düşünülüyor', dogrula: true}
+    {baslik: 'Kuruluş', deger: 'Mart 2026', not: 'OİB Lisesi'},
+    /* Ekip bilgisi doğrulanana kadar sitede gizli (hidden: true). İç notlar sitede gösterilmez. */
+    {baslik: 'Çekirdek kadro', deger: '7 kişi', not: '', hidden: true, icNot: 'Eski materyallerde 9 kişi yazıyor'},
+    {baslik: 'İlk sezon', deger: '~17 kişi', not: 'Elektrik, mekanik, yazılım, PR', hidden: true},
+    {baslik: 'Yazılım desteği', deger: '3 tecrübeli üye', not: '', hidden: true, icNot: 'Katılımı düşünülüyor'}
   ],
   ihtiyaclar: [
     {baslik: 'Şasi imalatı', not: 'Alüminyum şasi imalatı ve mühendislik desteği.',
@@ -403,7 +404,8 @@ export const team = {
     {baslik: 'Mentorluk', not: 'CAD, güvenlik ve yarış kuralları.',
       ayrinti: ['Fiziksel güvenlik ve acil kesme danışmanla tasarlanacak.', 'Şasi taşıyıcı hesabı için mühendislik desteği.']}
   ],
-  /* Görüşme düzeyindeki kurumlar. Hiçbiri onaylı sponsor değildir. */
+  /* Görüşme düzeyindeki kurumlar. Hiçbiri onaylı sponsor değildir. Teyit edilene kadar sitede gizli. */
+  gorusmelerGizli: true,
   gorusmeler: [
     {ad: 'Mahatron', durum: 'Görüşüldü', not: 'Motor/tahrik verisi ve numune; imzalı destek yok'},
     {ad: 'Ficosa', durum: 'Aday', not: 'ADAS, ödünç sensör, mentorluk'},

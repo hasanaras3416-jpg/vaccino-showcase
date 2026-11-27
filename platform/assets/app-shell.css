@@ -482,3 +482,18 @@ body[data-route=overview] .presentation-enter { letter-spacing: .01em; }
 .driver-ergonomics dd { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px; }
 .ergo-note { flex-basis: 100%; font-size: 13px; color: var(--text-muted); }
 .ergo-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 14px; }
+
+/* ---------- Kenar menüsü: yalnız aktif sayfa vurgulu; hover ayrı ve daha hafif ---------- */
+.sidebar .primary-nav a:hover:not([aria-current=page]) { background: transparent; color: var(--ivory); }
+.sidebar .primary-nav a[aria-current=page], .sidebar .primary-nav a[aria-current=page]:hover { background: rgb(203 185 139 / 14%); color: var(--champagne); }
+.sidebar .primary-nav a:focus:not(:focus-visible) { outline: none; }
+@media (max-width: 900px) { .sidebar .primary-nav a:hover:not([aria-current=page]) { background: transparent; } }
+
+/* ---------- Ergonomi: numaralı ölçü listesi ---------- */
+.ergo-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border: 1px solid var(--hairline); border-radius: var(--radius-card); }
+.ergo-list li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 4px 10px; padding: 10px 14px; border-bottom: 1px solid var(--hairline); }
+.ergo-list li:last-child { border-bottom: 0; }
+.ergo-num { grid-row: span 2; display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--champagne); color: var(--ivory); font-size: 13px; font-weight: 600; }
+.ergo-name { font-size: 13px; color: var(--text-muted); }
+.ergo-value { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 15px; color: var(--ivory); }
+.ergo-value b { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }

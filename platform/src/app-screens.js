@@ -336,13 +336,13 @@ function renderSupport() {
     h('h2', {}, 'Birlikte ', h('em', {text: 'yarışalım.'})),
     h('p', {class: 'panel-lead', text: `${team.okul.alan}, ${site.sezon} sezonu.`}));
   const needs = section('İhtiyaçlarımız', h('div', {class: 'card-grid three'}, team.ihtiyaclar.map(item => card({...item, dogrula: false}, {eyebrow: 'İhtiyaç'}))));
-  const talks = nonEmpty(team.gorusmeler) ? section('Görüşmeler', h('button', {type: 'button', class: 'list-launch', 'aria-haspopup': 'dialog',
+  const talks = nonEmpty(team.gorusmeler) && !team.gorusmelerGizli ? section('Görüşmeler', h('button', {type: 'button', class: 'list-launch', 'aria-haspopup': 'dialog',
     onclick: event => openDrawer({eyebrow: 'Destek', title: 'Görüşülen kurumlar', verify: true, trigger: event.currentTarget, sections: [
       h('ul', {class: 'talk-list'}, team.gorusmeler.map(item => h('li', {}, h('strong', {text: item.ad}), h('span', {class: 'talk-meta'}, h('span', {class: 'chip', text: item.durum}), h('span', {text: item.not}))))),
       h('p', {class: 'drawer-caveat', text: 'Hiçbiri onaylı sponsor değildir. Her ilişki kendi teyit düzeyinde.'})]})},
     h('span', {text: `${team.gorusmeler.length} görüşme kaydı`}), h('span', {class: 'card-more', 'aria-hidden': 'true', text: 'Listeyi aç →'}))) : null;
   const contact = section('İletişim', h('dl', {class: 'contact-list'}, team.iletisim.map(item => h('div', {}, h('dt', {text: item.etiket}), h('dd', {text: item.deger})))));
-  $('support-panel').replaceChildren(hero, section('Takım', h('div', {class: 'card-grid'}, team.bilgiler.map(item => card(item)))), needs, talks, contact);
+  $('support-panel').replaceChildren(...[hero, section('Takım', h('div', {class: 'card-grid'}, team.bilgiler.filter(item => !item.hidden).map(item => card({...item, dogrula: false})))), needs, talks, contact].filter(Boolean));
 }
 
 /* ---------- Yönlendirme ---------- */
