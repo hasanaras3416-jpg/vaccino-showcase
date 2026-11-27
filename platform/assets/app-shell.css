@@ -467,3 +467,10 @@ body[data-route=overview] .presentation-enter { letter-spacing: .01em; }
 .archive-figure { margin: 8px 0 16px; }
 .archive-figure img { display: block; width: 100%; max-width: 640px; height: auto; border: 1px solid var(--hairline); border-radius: var(--radius-card); }
 .archive-figure figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; font-size: 14px; color: var(--text-muted); }
+
+/* ---------- Driver Studio: mod anahtarı ---------- */
+.driver-mode { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 8px; padding: 4px; border: 1px solid var(--hairline); border-radius: var(--radius-btn); }
+.driver-mode-label { padding: 0 10px 0 8px; font-size: 13px; color: var(--text-muted); }
+#workspace .driver-mode button { min-height: 44px; min-width: 88px; padding: 0 16px; border: 0; border-radius: var(--radius-btn); background: transparent; color: var(--text-muted); font-size: 14px; font-weight: 500; transition: background var(--dur-micro) var(--ease-in), color var(--dur-micro) var(--ease-in); }
+#workspace .driver-mode button[aria-pressed=true] { background: var(--ivory); color: var(--bg); }
+.driver-mode-note { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 4px 0 16px; font-size: 14px; color: var(--ivory); line-height: 1.45; max-width: 56ch; }

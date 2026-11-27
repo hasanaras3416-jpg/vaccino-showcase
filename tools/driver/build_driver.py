@@ -169,10 +169,45 @@ print('VACCINO_PUSH gloves', push_out(gloves, body, .003))
 # Temel gövde yüzü: özellik taşımayan manken başı (kimseye benzemesin)
 head_vg = body.vertex_groups.new(name='face_smooth')
 head_vg.add([i for i, w in enumerate(head_w) if w > .2], 1.0, 'REPLACE')
+# Kask, yumuşatılmamış başın (pozlanmış kopyası) ölçülerinden üretilir; onaylı kask biçimi değişmez
+head_ref = duplicate(body, 'HeadRef')
+# r5 ile aynı: kask referansı 40 adımlık hafif yumuşatılmış baştan alınır (onaylı kask biçimi)
+hr = head_ref.modifiers.new('HelmetRefSmooth', 'SMOOTH'); hr.factor = 1.0; hr.iterations = 40; hr.vertex_group = 'face_smooth'
+select_only(head_ref)
+bpy.ops.object.modifier_move_to_index(modifier='HelmetRefSmooth', index=0)
+bpy.ops.object.modifier_apply(modifier='HelmetRefSmooth')
+# Özelliksiz manken başı: baş köşeleri başın kendi ölçülerindeki düzgün bir elipsoide izdüşürülür
+# (göz, burun, dudak kalmaz); boyna geçiş ağırlıkla yumuşar. Dinlenme pozunda yapılır, iskelet sonra deforme eder.
 sm = body.modifiers.new('Featureless', 'SMOOTH'); sm.factor = 1.0; sm.iterations = 40; sm.vertex_group = 'face_smooth'
 select_only(body)
 bpy.ops.object.modifier_move_to_index(modifier='Featureless', index=0)
 bpy.ops.object.modifier_apply(modifier='Featureless')
+core = [i for i, w in enumerate(head_w) if w > .5]
+cs = [body.data.vertices[i].co for i in core]
+lo_h = Vector((min(c.x for c in cs), min(c.y for c in cs), min(c.z for c in cs)))
+hi_h = Vector((max(c.x for c in cs), max(c.y for c in cs), max(c.z for c in cs)))
+hc = (lo_h + hi_h) / 2; hr_ = (hi_h - lo_h) / 2
+hc.z += hr_.z * .08                           # tepe biraz yukarı: ovalimsi kafatası
+for i, w in enumerate(head_w):
+    if w <= .2: continue
+    v = body.data.vertices[i]; d = v.co - hc
+    if d.z < -hr_.z * .9: continue            # boyun: dokunma (çene dahil izdüşürülür)
+    n = Vector((d.x / hr_.x, d.y / hr_.y, d.z / hr_.z)); L = n.length
+    if L < 1e-6: continue
+    target = hc + d / L                        # elipsoid yüzeyi, aynı yönde
+    t = min(1.0, (w - .2) / .5)
+    v.co = v.co.lerp(target, t)
+body.data.update()
+sm2 = body.modifiers.new('FeaturelessBlend', 'SMOOTH'); sm2.factor = .7; sm2.iterations = 14; sm2.vertex_group = 'face_smooth'
+bpy.ops.object.modifier_move_to_index(modifier='FeaturelessBlend', index=0)
+bpy.ops.object.modifier_apply(modifier='FeaturelessBlend')
+print('VACCINO_HEAD_ELLIPSOID', tuple(round(c, 3) for c in hr_))
+# Baş bölgesindeki açık delikleri (göz, ağız) kapat: kask kapatılınca yüz özelliği görünmesin
+bm = bmesh.new(); bm.from_mesh(body.data); bm.verts.ensure_lookup_table()
+holes = [e for e in bm.edges if e.is_boundary and all(head_w[v.index] > .2 for v in e.verts)]
+bmesh.ops.holes_fill(bm, edges=holes, sides=0)
+bm.to_mesh(body.data); bm.free()
+print('VACCINO_FACE_HOLES_FILLED', len(holes))
 
 # ---------------------------------------------------------------- oturuş pozu
 select_only(rig); bpy.ops.object.mode_set(mode='POSE')
@@ -252,7 +287,7 @@ J = {k: v + OFFSET for k, v in J.items()}
 print('VACCINO_JOINTS', {k: tuple(round(c, 3) for c in v) for k, v in J.items()})
 
 # pozu sabitle, iskeleti kaldır
-for obj in (body, suit, gloves, shoes):
+for obj in (body, suit, gloves, shoes, head_ref):
     apply_modifiers(obj)
     obj.parent = None
     obj.matrix_world = Matrix.Identity(4)
@@ -263,7 +298,7 @@ bpy.data.objects.remove(rig)
 
 # ---------------------------------------------------------------- kask (pozlanmış baştan)
 def head_points():
-    bm = bmesh.new(); bm.from_mesh(body.data)
+    bm = bmesh.new(); bm.from_mesh(head_ref.data)
     pts = [v.co.copy() for v in bm.verts if head_w[v.index] > .5]
     bm.free(); return pts
 
@@ -301,7 +336,8 @@ bm.to_mesh(me); bm.free()
 bm = bmesh.new(); bm.from_mesh(me)
 bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:], plane_co=L2W(0, 0, -(ext3.z + .012)), plane_no=up, clear_inner=True)
 bm.to_mesh(me); bm.free()
-print('VACCINO_PUSH helmet', push_out(shell, body, .020))
+print('VACCINO_PUSH helmet', push_out(shell, head_ref, .020))   # r5 referans başına göre
+bpy.data.objects.remove(head_ref)
 Hs = BVHTree.FromObject(shell, bpy.context.evaluated_depsgraph_get())
 
 def on_shell(x, y, z, out=0.0):

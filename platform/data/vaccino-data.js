@@ -162,7 +162,7 @@ export const systems = {
     ad: 'Sürücü', ozet: 'Referans sürücü 174 cm ve teçhizat (görsel kontrol).',
     derin: {etiket: 'Sürücü Stüdyosu', href: '#/driver'},
     kartlar: [
-      {baslik: 'Referans sürücü', deger: '174 cm', not: 'Yatık oturuş ≈ 34°', rozet: 'tahmin', ayrinti: ['Oturuş açısı ve göz noktası şasi ve koltuk seçilince doğrulanacak.']},
+      {baslik: 'Referans sürücü', deger: '174 cm', not: 'Yatık oturuş ≈ 40° (Tahmin)', rozet: 'tahmin', ayrinti: ['Kalça x ≈ 1.450, y ≈ 150 mm (Varsayım).', 'Ayak merkezi x ≈ 630, z ± 100 mm (Varsayım); pedal yeri değişirse değişir.', 'Oturuş açısı ve göz noktası şasi ve koltuk seçilince doğrulanacak.']},
       {baslik: 'Kask', deger: 'Seçilmedi', not: 'Kapalı yüzlü yarış kaskı (3B temsili)', rozet: 'dogrula', ayrinti: ['Ürün ve güvenlik standardı kural kitabından belirlenecek.']},
       {baslik: 'Tulum', deger: 'Seçilmedi', not: 'Tek parça sürücü tulumu (3B temsili)', rozet: 'dogrula', ayrinti: ['Yalnız VACCİNO “V” işareti; sponsor logosu yok.']},
       {baslik: 'Eldiven', deger: 'Seçilmedi', not: 'Sürüş eldiveni (3B temsili)', rozet: 'dogrula', ayrinti: ['Ürün seçimi doğrulanmadı.']},
@@ -318,7 +318,12 @@ export const driverGear = {
 };
 export const driverInfo = {
   referans: r('Referans sürücü 174 cm', 'beyan'),
-  balast: r('Urban Concept’te en az sürücü ağırlığı 70 kg (tam teçhizatla); hafif sürücüde balast gerekir.', 'dogrula')
+  balast: r('Urban Concept’te en az sürücü ağırlığı 70 kg (tam teçhizatla); hafif sürücüde balast gerekir.', 'dogrula'),
+  modlar: {
+    adc: r('ADC: güvenlik sürücüsü her zaman araçta; eller direksiyondan bağımsız iki güvenlik cihazında, simide uzanamaz (Madde 405, 412f). Cihaz konumu: Aday.', 'dogrula'),
+    mileage: r('Mileage: sürücü eller simitte. Simit konumu temsilidir (kalçanın ≈ 200 mm önünde).', 'tahmin')
+  },
+  poz: r('Kalça x ≈ 1.450, y ≈ 150 mm; sırt ≈ 40°; ayak merkezi x ≈ 630, z ± 100 mm (pedal yeri kesin değil)', 'tahmin')
 };
 
 /* Araç ekranı: Şasi durumu kartı */

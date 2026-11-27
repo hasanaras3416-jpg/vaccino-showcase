@@ -3,6 +3,7 @@
    Yalnız Driver ekranı açılınca yüklenir. WebGL yoksa, yükleme başarısızsa ya da mobilde
    çizim yavaşsa sabit görsele düşer. */
 import {driverGear, driverInfo, rozetler} from '../data/vaccino-data.js';
+import {buildRepresentativeParts} from './rep-parts.js';
 
 /* Sekme → GLB katmanları ve kamera açısı. Kask sekmesi kaskın tüm katmanlarını birlikte vurgular. */
 const equipment = {
@@ -80,6 +81,7 @@ function layerMaterials(T) {
     // Vizör: koyu, opak ve yansıtıcı; içerideki baş hiçbir açıdan seçilmez.
     Visor: P({color: 0x07090B, roughness: .05, metalness: .55, clearcoat: 1, clearcoatRoughness: .02, envMapIntensity: 1.9}),
     VisorInner: new T.MeshBasicMaterial({color: 0x020304, side: T.DoubleSide}),
+    SafetyDevices: P({color: 0xD8433A, roughness: .45, clearcoat: .6}),
     Harness: P({color: 0xA9ADB1, roughness: .74, normalMap: fabric, normalScale: new T.Vector2(.3, .3)})
   };
 }
@@ -185,13 +187,16 @@ export function initializeDriver() {
   const T = window.THREE;
 
   const facts = document.getElementById('driver-facts');
-  facts?.replaceChildren(...[driverInfo.referans, driverInfo.balast].map(item => {
+  facts?.replaceChildren(...[driverInfo.referans, driverInfo.poz, driverInfo.balast].filter(Boolean).map(item => {
     const p = document.createElement('p'); p.append(`${item.metin} `, badge(item)); return p;
   }));
 
   let active = false, failed = false, startup, renderer, scene, camera, bounds, pose, transition, frameId;
-  let model, materials, selected = '';
-  const layerMeshes = new Map(), baseColor = new Map();
+  let model, materials, selected = '', mode = 'adc', loader;
+  let layerMeshes = new Map();
+  const baseColor = new Map(), poses = {};          // mod → {model, layers}
+  const modeButtons = [...document.querySelectorAll('[data-driver-mode]')];
+  const modeNote = document.getElementById('driver-mode-note');
   const pointers = new Map(), direction = new T.Vector3(), frameTimes = [];
 
   const limit = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -261,8 +266,8 @@ export function initializeDriver() {
     if (id === 'helmet') focus.add('VisorInner');
     if (id === 'glove') focus.add('GloveCuffs');
     for (const [name, meshes] of layerMeshes) for (const mesh of meshes) {
-      const m = mesh.material; if (!m.color || name === 'VisorInner') continue;
-      const base = baseColor.get(m);
+      const m = mesh.material, base = m && baseColor.get(m);
+      if (!m || !m.color || !base || name === 'VisorInner') continue;   // simit gibi gruplar ve kendi malzemeli parçalar atlanır
       const dim = id && !focus.has(name);
       m.color.copy(base).multiplyScalar(dim ? .5 : 1);
       if ('emissive' in m) { m.emissive.setHex(focus.has(name) && name !== 'Visor' ? CHAMPAGNE : 0x000000); m.emissiveIntensity = .05; }
@@ -324,55 +329,86 @@ export function initializeDriver() {
     try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; }
   }
 
-  async function load() {
-    if (!T || !webglAvailable()) throw new Error('WebGL yok');
-    const {GLTFLoader} = await import('../vendor/driver-gltf-loader.js');
-    const url = new URL('../assets/driver/driver.glb', import.meta.url);
+  /* Mod modeli: ADC (eller iki güvenlik cihazında) ve Mileage (eller simitte). Her biri ilk seçildiğinde yüklenir. */
+  async function loadPose(which) {
+    if (poses[which]) return poses[which];
+    const url = new URL(`../assets/driver/driver-${which}.glb`, import.meta.url);
     url.search = new URL(import.meta.url).search;
-    const gltf = await new GLTFLoader().loadAsync(url.href, event => {
+    progress.hidden = false; progress.style.setProperty('--p', '.04');
+    const gltf = await loader.loadAsync(url.href, event => {
       if (event.total) progress.style.setProperty('--p', String(event.loaded / event.total));
     });
-    model = gltf.scene;
-    materials = layerMaterials(T);
-    model.traverse(object => {
+    const group = gltf.scene, layers = new Map();
+    const add = (layer, mesh) => (layers.get(layer) || layers.set(layer, []).get(layer)).push(mesh);
+    group.traverse(object => {
       if (!object.isMesh) return;
-      const name = (object.parent && object.parent.name && !object.name.match(/^[A-Z]/) ? object.parent.name : object.name).replace(/_\d+$/, '');
-      const layer = Object.keys(materials).find(key => name === key) ?? name;
+      const layer = object.name.replace(/_\d+$/, '');
       object.material = materials[layer] ?? materials.Body;
       if (layer === 'Visor') object.renderOrder = 2;
-      (layerMeshes.get(layer) || layerMeshes.set(layer, []).get(layer)).push(object);
+      add(layer, object);
     });
+    const helmetBox = new T.Box3(); (layers.get('Helmet') || []).forEach(m => helmetBox.expandByObject(m));
+    const helmetCenter = helmetBox.getCenter(new T.Vector3());
     // Vizörün arkasına siyah iç kabuk (yalnız görsel): yandan bakınca baş seçilmesin.
-    const helmetBox = boxOf(['Helmet']), helmetCenter = helmetBox.getCenter(new T.Vector3());
-    for (const visor of layerMeshes.get('Visor') || []) {
+    for (const visor of layers.get('Visor') || []) {
       const inner = new T.Mesh(visor.geometry.clone(), materials.VisorInner);
       const pos = inner.geometry.attributes.position, v = new T.Vector3();
       for (let i = 0; i < pos.count; i++) { v.fromBufferAttribute(pos, i); v.lerp(helmetCenter, .025); pos.setXYZ(i, v.x, v.y, v.z); }
-      inner.renderOrder = 1; visor.parent.add(inner);
-      (layerMeshes.get('VisorInner') || layerMeshes.set('VisorInner', []).get('VisorInner')).push(inner);
-    }
-    // Geçici: conta halkası vizörün taşan kenarının altından dışarı çıkıyor; Blender'da vizör kenarına
-    // taşınana kadar kabuğa doğru çekilir (yalnız görünüm; GLB değişmez).
-    for (const seal of layerMeshes.get('HelmetSeal') || []) {
-      const pos = seal.geometry.attributes.position, v = new T.Vector3();
-      for (let i = 0; i < pos.count; i++) { v.fromBufferAttribute(pos, i); v.lerp(helmetCenter, .05); pos.setXYZ(i, v.x, v.y, v.z); }
-      pos.needsUpdate = true; seal.geometry.computeBoundingSphere();
+      inner.renderOrder = 1; visor.parent.add(inner); add('VisorInner', inner);
     }
     // Eldiven manşetleri: bilekte belirgin koyu bant
-    for (const glove of layerMeshes.get('Gloves') || []) {
-      for (const loop of cuffLoops(T, glove)) {
-        const curve = new T.CatmullRomCurve3(loop, true);
-        const cuff = new T.Mesh(new T.TubeGeometry(curve, Math.min(loop.length * 2, 160), .0055, 8, true), materials.GloveCuffs);
-        glove.parent.add(cuff);
-        (layerMeshes.get('GloveCuffs') || layerMeshes.set('GloveCuffs', []).get('GloveCuffs')).push(cuff);
-      }
+    for (const glove of layers.get('Gloves') || []) for (const loop of cuffLoops(T, glove)) {
+      const cuff = new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(loop, true), Math.min(loop.length * 2, 160), .0055, 8, true), materials.GloveCuffs);
+      glove.parent.add(cuff); add('GloveCuffs', cuff);
     }
+    // Mileage: simit (Temsili). Şasi koordinatından sürücü koordinatına: Y ekseni çevresinde +90°.
+    if (which === 'mileage') {
+      const wheel = buildRepresentativeParts(T).steeringWheel;
+      const holder = new T.Group(); holder.rotation.y = Math.PI / 2; holder.add(wheel); group.add(holder);
+      add('SteeringWheel', wheel);
+    }
+    poses[which] = {model: group, layers, bounds: new T.Box3().setFromObject(group)};
+    return poses[which];
+  }
+
+  async function load() {
+    if (!T || !webglAvailable()) throw new Error('WebGL yok');
+    const {GLTFLoader} = await import('../vendor/driver-gltf-loader.js');
+    loader = new GLTFLoader();
+    materials = layerMaterials(T);
     for (const m of Object.values(materials)) if (m.color) baseColor.set(m, m.color.clone());
     scene = new T.Scene();
-    scene.add(model);
-    bounds = new T.Box3().setFromObject(model);
     camera = new T.PerspectiveCamera(30, 1, .02, 40);
+    useMode(await loadPose(mode));
   }
+
+  function useMode(entry) {
+    if (model) scene.remove(model);
+    model = entry.model; layerMeshes = entry.layers; bounds = entry.bounds;
+    scene.add(model);
+    for (const s of switches) setLayer(s.dataset.driverLayer, s.checked);
+    highlight(selected);
+  }
+  function syncModeUi() {
+    for (const b of modeButtons) b.setAttribute('aria-pressed', String(b.dataset.driverMode === mode));
+    const info = driverInfo.modlar?.[mode];
+    if (modeNote && info) modeNote.replaceChildren(`${info.metin} `, badge(info));
+  }
+  async function setMode(next) {
+    if (next === mode && model) return;
+    mode = next; syncModeUi();
+    if (!loader || failed) return;
+    try {
+      const entry = await loadPose(next);
+      if (mode !== next) return;
+      useMode(entry);
+      progress.hidden = true;
+      pose = equipmentView(selected); transition = null; requestFrame();
+    } catch (error) { showFailure(error); }
+  }
+  for (const b of modeButtons) b.addEventListener('click', () => setMode(b.dataset.driverMode));
+  syncModeUi();
+
 
   function show() {
     if (!renderer) {

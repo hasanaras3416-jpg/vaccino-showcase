@@ -7,8 +7,8 @@
 export const repLayout = Object.freeze({
   // Aday değerler (devir kaydı 15.3): dingil x, iz, teker merkezi; teker 16″ Ø500 × 90 mm
   axles: {front: 550, rear: 2825}, track: {front: 1010, rear: 875}, wheelY: 115, wheelR: 250, wheelW: 90,
-  hipX: 1550,                       // Varsayım: kalça noktası 1450–1600 aralığında
-  steeringWheel: [1080, 560, 0], rack: [565, 150, 0]
+  hipX: 1450, hipY: 150, reclineDeg: 40,   // onaylı poz (Tahmin/Varsayım): kalça x 1450, y 150, sırt ≈ 40°
+  steeringWheel: [1250, 540, 0], rack: [565, 150, 0]   // simit kalçanın 200 mm önünde (Temsili)
 });
 const toGlb = ([x, y, z]) => [(x - 1400) / 1000, (y + 135) / 1000, z / 1000];
 
@@ -83,7 +83,7 @@ export function buildRepresentativeParts(T, layout = repLayout) {
     coilover(P([x + 30, y0 - 55, s * (half - 150)]), P(front ? [x + 40, 420, s * 330] : [2700, 380, s * 255]));
   }
 
-  /* Koltuk: V2 kabuk, dolgu, yanaklar ve başlık; sırt ≈ 34° geriye (Tahmin), kalça noktası layout.hipX */
+  /* Koltuk: V2 kabuk, dolgu, yanaklar ve başlık; sırt ≈ 40° geriye (Tahmin), kalça noktası layout.hipX */
   const seat = group('RepSeat');
   const seatNode = new T.Group(); seatNode.position.set(...P([layout.hipX - 110, 70, 0])); seat.add(seatNode);
   rounded(.44, .07, .38, .035, cloth, seatNode, -.078, 0, 0);
@@ -92,7 +92,7 @@ export function buildRepresentativeParts(T, layout = repLayout) {
     const b = rounded(.375, .084, .056, .026, cloth, seatNode, -.09, .053, side * .158); b.rotation.y = side * .075;
     rod([-.27, -.05, side * .14], [.19, -.05, side * .14], .013, machined, seatNode);
   }
-  const back = new T.Group(); back.position.set(.13, .22, 0); back.rotation.z = -.59; seatNode.add(back);   // V2: −.24 rad; burada ≈ 34°
+  const back = new T.Group(); back.position.set(.13, .22, 0); back.rotation.z = -(layout.reclineDeg - 6) * Math.PI / 180; seatNode.add(back);   // sırt yüzeyi ≈ sürücü sırt açısı
   rounded(.072, .5, .357, .031, cloth, back);
   rounded(.037, .36, .245, .016, upholstery, back, -.045, -.043, 0);
   for (const side of [-1, 1]) rounded(.058, .34, .057, .025, cloth, back, -.038, -.06, side * .147);
@@ -109,13 +109,14 @@ export function buildRepresentativeParts(T, layout = repLayout) {
   }
   rounded(.11, .09, .15, .022, anodized, steering, rack[0], rack[1] + .02, 0);
   rod(rack, wheelC, .013, machined, steering); joint(rack, .022, steering);
-  const sw = new T.Group(); sw.position.set(...wheelC);
+  const steeringWheel = group('RepSteeringWheel');
+  const sw = new T.Group(); sw.position.set(...wheelC); steeringWheel.add(sw);
   sw.quaternion.setFromUnitVectors(new T.Vector3(1, 0, 0), new T.Vector3(...wheelC).sub(new T.Vector3(...rack)).normalize());
-  steering.add(sw);
+  steering.add(steeringWheel);
   mesh(new T.TorusGeometry(.137, .015, 13, 42), rubber, sw).rotation.y = Math.PI / 2;
   rod([-.006, 0, -.133], [-.006, 0, .133], .010, anodized, sw);
   rod([-.006, 0, 0], [-.006, -.132, 0], .010, anodized, sw);
   rod([-.021, 0, 0], [.025, 0, 0], .042, dark, sw);
 
-  return {wheels, suspension, seat, steering};
+  return {wheels, suspension, seat, steering, steeringWheel};
 }

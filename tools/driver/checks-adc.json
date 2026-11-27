@@ -1,0 +1,77 @@
+{
+ "recline_deg": 40.0,
+ "pose": "adc",
+ "hip_x": 1450.0,
+ "hip_y": 150.0,
+ "foot_x_target": 630.0,
+ "foot_z_target": 100.0,
+ "ik": {
+  "leg.L": {
+   "reach_short_mm": 0,
+   "L1_mm": 420,
+   "L2_mm": 438
+  },
+  "arm.L": {
+   "reach_short_mm": 0,
+   "L1_mm": 253,
+   "L2_mm": 268
+  },
+  "leg.R": {
+   "reach_short_mm": 0,
+   "L1_mm": 420,
+   "L2_mm": 438
+  },
+  "arm.R": {
+   "reach_short_mm": 0,
+   "L1_mm": 253,
+   "L2_mm": 268
+  }
+ },
+ "toe_min_x": 564,
+ "toe_to_nose_mm": 579,
+ "foot_center_L": [
+  630,
+  186,
+  101
+ ],
+ "foot_center_R": [
+  630,
+  186,
+  -101
+ ],
+ "foot_center_spacing_mm": 203,
+ "feet_inner_gap_mm": 93,
+ "helmet_top_y": 862,
+ "helmet_back_x": 1982,
+ "helmet_to_roof_plane_mm": 73,
+ "helmet_to_rear_hoop_mm": 153,
+ "knee_L": [
+  1056,
+  295,
+  124
+ ],
+ "knee_R": [
+  1056,
+  295,
+  -124
+ ],
+ "legs_min_clearance_mm": 76,
+ "legs_min_at": [
+  768,
+  149,
+  -160
+ ],
+ "helmet_min_clearance_mm": 250,
+ "helmet_min_at": [
+  1932,
+  800,
+  -1
+ ],
+ "driver_min_clearance_mm": 68,
+ "driver_min_at": [
+  772,
+  161,
+  -167
+ ],
+ "knee_vs_nose_post_x770": "önünde değil"
+}
