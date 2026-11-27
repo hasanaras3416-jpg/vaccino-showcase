@@ -419,7 +419,7 @@ body[data-route=overview] .presentation-enter { letter-spacing: .01em; }
 .driver-intro { align-self: start; padding-bottom: 0; }
 
 /* ---------- Doğruluk rozetleri (vaccino-data.js · rozetler) ---------- */
-.badge-karar { border-color: rgb(245 242 237 / 55%); color: var(--ivory); }
+.badge-beyan { border-color: rgb(245 242 237 / 55%); color: var(--ivory); }
 .badge-aday { border-color: rgb(203 185 139 / 70%); color: var(--champagne); background: rgb(203 185 139 / 8%); }
 .badge-tahmin { border-style: dashed; border-color: rgb(179 173 163 / 80%); color: #D8D2C8; }
 .badge-dogrula { border-color: rgb(203 185 139 / 55%); color: var(--champagne); }

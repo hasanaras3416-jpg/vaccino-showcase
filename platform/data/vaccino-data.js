@@ -5,11 +5,12 @@
  * Kurallar:
  *  - Hiçbir değer uydurulmaz. Bilinmeyen alan "Seçilmedi" ya da "model bilinmiyor" yazar.
  *  - Her sayı bir doğruluk rozeti taşır: `rozet` (aşağıdaki anahtarlar). Eski `dogrula: true` → "Doğrulanacak".
+ *  - "Ekip beyanı" hem ekip kararlarını hem ekibin ölçüm/tartı bildirimlerini kapsar.
  *  - Kuraldan gelen sayılar "Doğrulanacak": 2027 Chapter I/IV esas; Chapter II yalnız 2026 referansı.
  *  - Bırakılan planlar yalnızca `eskiPlan` arşivinde ve "Eski plan" rozetiyle durur.
  */
 
-export const rozetler = {karar: 'Ekip kararı', aday: 'Aday', tahmin: 'Tahmin', dogrula: 'Doğrulanacak', eski: 'Eski plan'};
+export const rozetler = {beyan: 'Ekip beyanı', aday: 'Aday', tahmin: 'Tahmin', dogrula: 'Doğrulanacak', eski: 'Eski plan'};
 /* Rozetli satır: metin + rozet. */
 const r = (metin, rozet) => ({metin, rozet});
 
@@ -28,7 +29,7 @@ export const site = {
 
 /* Genel ekranındaki 4 büyük sayı. */
 export const stats = [
-  {deger: 'Mart 2026', etiket: 'Kuruluş', kaynak: 'Takım kaydı', rozet: 'karar'},
+  {deger: 'Mart 2026', etiket: 'Kuruluş', kaynak: 'Takım kaydı', rozet: 'beyan'},
   {deger: '2.830 × 1.230', birim: 'mm', etiket: 'Şasi çizimi (Ø30 boru)', kaynak: 'Tekerlek ve kabuk hariç', rozet: 'aday'},
   {deger: '48 V · 864', birim: 'Wh', etiket: 'Akü adayı', kaynak: '15S3P LiFePO₄', rozet: 'aday'},
   {deger: '60 V · 1.000', birim: 'Wh', etiket: 'Shell üst sınırı', kaynak: '2027 Chapter I', rozet: 'dogrula'}
@@ -38,33 +39,33 @@ export const stats = [
 export const parts = [
   {id: 'frame', ad: 'Şasi', grup: 'Mekanik', durum: 'Ø30 boru çizimi', rozet: 'aday',
     gorev: 'Tüm parçaları bir arada tutan alüminyum boru iskelet (space frame).',
-    olcu: [r('2.830 × 1.230 × 980 mm (boy × genişlik × yükseklik; tekerlek ve kabuk hariç)', 'aday'), r('Ø30 × 2 mm alüminyum 6061-T6 boru', 'karar'), r('İskelet ≈ 17 kg (plaka ve kaynak hariç)', 'tahmin'), r('Tekerleklerle toplam boy ≈ 3,1–3,2 m', 'tahmin')],
+    olcu: [r('2.830 × 1.230 × 980 mm (boy × genişlik × yükseklik; tekerlek ve kabuk hariç)', 'aday'), r('Ø30 × 2 mm alüminyum 6061-T6 boru', 'beyan'), r('İskelet ≈ 17 kg (plaka ve kaynak hariç)', 'tahmin'), r('Tekerleklerle toplam boy ≈ 3,1–3,2 m', 'tahmin')],
     ayrinti: ['Ön ve arka çift salıncak. Koltuk ve direksiyon kutusunun mil çıkışı araç ortasında.', 'İmalatçı Şahinler Metal; imalat tarihi belli değil.', 'Bağlantı noktaları kilitlenmeden imalata verilmeyecek.', '3B görünüm hâlâ eski V2 yerleşimini gösterir; Ø30 çizimiyle güncellenecek.']},
-  {id: 'suspension', ad: 'Süspansiyon', grup: 'Mekanik', durum: 'Çift salıncak · ön ve arka', rozet: 'karar',
+  {id: 'suspension', ad: 'Süspansiyon', grup: 'Mekanik', durum: 'Çift salıncak · ön ve arka', rozet: 'beyan',
     gorev: 'Tekerlekleri şasiye bağlar, yol hareketini karşılar.',
     olcu: [r('Göbek rulmanı adayı DAC35680037 (35 × 68 × 37 mm)', 'aday')],
     ayrinti: ['Bağlantı noktaları, kinematik ve taşıma kapasitesi açık.', 'Tahrikli arka tekerlekte kanallı göbek veya aks ucu gerekir.']},
-  {id: 'steering', ad: 'Direksiyon', grup: 'Mekanik', durum: 'Kremayer · merkez girişli', rozet: 'karar',
+  {id: 'steering', ad: 'Direksiyon', grup: 'Mekanik', durum: 'Kremayer · merkez girişli', rozet: 'beyan',
     gorev: 'Tekerlekleri yönlendirir; elle ve otonom kullanılacak.',
     olcu: [r('Step motor NEMA 43 olarak anılıyor (eski raporda NEMA 34)', 'dogrula')],
     ayrinti: ['Direksiyon mili araç ortasında.', 'Elle ve otonom kullanım için step motorlu dişli kutusu yapılacak.', 'Direksiyon kutusu: Seçilmedi.', 'Açı geri bildirimi için AS5048A adayı.']},
-  {id: 'brake', ad: 'Fren', grup: 'Mekanik', durum: 'Dört disk · çift hidrolik devre', rozet: 'karar',
+  {id: 'brake', ad: 'Fren', grup: 'Mekanik', durum: 'Dört disk · çift hidrolik devre', rozet: 'beyan',
     gorev: 'Aracı yavaşlatır ve durdurur.',
     olcu: ['Disk çapı ve kaliper: Seçilmedi', 'Ticari parça kullanılacak'],
     ayrinti: [r('Madde 51: dört diskli hidrolik, çift devre, disk en az 3 mm', 'dogrula'), 'Motor birimindeki mekanik kaliper sökülecek, kullanılmayacak.', '3B görseldeki disk ve kaliperler temsilidir.']},
-  {id: 'motor', ad: 'Motor ve aktarma', grup: 'Mekanik', durum: 'Orta motor · yarım diferansiyel', rozet: 'karar',
+  {id: 'motor', ad: 'Motor ve aktarma', grup: 'Mekanik', durum: 'Orta motor · yarım diferansiyel', rozet: 'beyan',
     gorev: 'Tek orta motor, yarım diferansiyel ve mafsallı akslarla arka tekerleklere güç gönderir.',
-    olcu: [r('Etiket: 48 V · 1000 W · 450 dev/dk · 20 A', 'dogrula'), r('3 fazlı, hall sensörlü', 'karar')],
-    ayrinti: ['Marka ve model: Seçilmedi / model bilinmiyor; numune test edilecek.', 'Dişli oranı, aks mili ve flanş henüz bilinmiyor.', 'Zincir ve hub motor planı bırakıldı (bkz. eski plan arşivi).', '3B görseldeki motor ve dişli kutusu temsilidir.']},
+    olcu: [r('Etiket: 48 V · 1000 W · 450 dev/dk · 20 A', 'dogrula'), r('3 fazlı, hall sensörlü', 'beyan')],
+    ayrinti: ['Marka ve model: Seçilmedi / model bilinmiyor; numune test edilecek.', r('450 dev/dk etiket değeri; motor milinde mi çıkışta mı olduğu doğrulanacak. 48 V × 20 A = 960 W, etiketteki 1000 W’tan düşük.', 'dogrula'), 'Dişli oranı, aks mili ve flanş henüz bilinmiyor.', 'Zincir ve hub motor planı bırakıldı (bkz. eski plan arşivi).', '3B görseldeki motor ve dişli kutusu temsilidir.']},
   {id: 'clutch', ad: 'Ayırıcı', grup: 'Mekanik', durum: 'İsteğe bağlı konsept', rozet: 'dogrula',
     gorev: 'Motor ile tekerlek arasındaki bağı açmayı amaçlar.',
     olcu: [],
     ayrinti: ['Yeni tahrik biriminde kullanılıp kullanılmayacağı açık.', 'Kavrama tipi, aktüatör ve konum geri bildirimi seçilmedi.']},
-  {id: 'diff', ad: 'Diferansiyel ve akslar', grup: 'Mekanik', durum: 'Yarım diferansiyel · mafsallı aks', rozet: 'karar',
+  {id: 'diff', ad: 'Diferansiyel ve akslar', grup: 'Mekanik', durum: 'Yarım diferansiyel · mafsallı aks', rozet: 'beyan',
     gorev: 'Gücü iki arka tekerleğe dağıtır.',
     olcu: [],
     ayrinti: ['Diferansiyel dişlilerine uyan aks mili aranıyor.', 'Aks boyu ve mafsal açıları doğrulanmadı.']},
-  {id: 'seat', ad: 'Sürücü koltuğu', grup: 'Mekanik', durum: 'Araç ortasında', rozet: 'karar',
+  {id: 'seat', ad: 'Sürücü koltuğu', grup: 'Mekanik', durum: 'Araç ortasında', rozet: 'beyan',
     gorev: 'Sürücünün oturma alanı.',
     olcu: [],
     ayrinti: ['Koltuk araç ortasında; direksiyon mili de ortada.', 'Koltuk modeli ve konumu açık soru.', 'Kemer bağlantısı ve pedal erişimi belirlenecek.']},
@@ -106,19 +107,19 @@ export const systems = {
     kartlar: [
       {baslik: 'Şasi çizimi', deger: '2.830 × 1.230 mm', not: 'Yükseklik 980 mm · tekerlek ve kabuk hariç', rozet: 'aday',
         ayrinti: [r('Tekerleklerle toplam boy ≈ 3,1–3,2 m.', 'tahmin'), 'İmalatçı Şahinler Metal; tarih belli değil.', 'Bağlantı noktaları kilitlenmeden imalata verilmeyecek.', '3B görünüm hâlâ eski V2 yerleşimini gösterir.'], href: '#/mechanical/chassis'},
-      {baslik: 'Şasi borusu', deger: 'Ø30 × 2 mm', not: 'Alüminyum 6061-T6', rozet: 'karar',
+      {baslik: 'Şasi borusu', deger: 'Ø30 × 2 mm', not: 'Alüminyum 6061-T6', rozet: 'beyan',
         ayrinti: [r('İskelet ≈ 17 kg; plaka, kaynak ve bağlantılar hariç.', 'tahmin'), 'Kaynak bölgesi dayanımı ve yuvarlanma koruması ayrıca doğrulanacak.']},
-      {baslik: 'Tahrik', deger: 'Orta motor + yarım diferansiyel', not: 'Mafsallı aks · zincir ve hub motor bırakıldı', rozet: 'karar',
+      {baslik: 'Tahrik', deger: 'Orta motor + yarım diferansiyel', not: 'Mafsallı aks · zincir ve hub motor bırakıldı', rozet: 'beyan',
         ayrinti: ['Dişli oranı, aks mili ve flanş henüz bilinmiyor.', 'Birimin üstündeki disk fren sökülecek.'], href: '#/mechanical/transmission'},
-      {baslik: 'Motor etiketi', deger: '48 V · 1000 W', not: '3 fazlı · hall sensörlü · 450 dev/dk', rozet: 'dogrula',
-        ayrinti: ['Marka ve model: Seçilmedi / model bilinmiyor; numune test edilecek.', r('Etiket akımı 20 A.', 'dogrula')]},
-      {baslik: 'Süspansiyon', deger: 'Çift salıncak', not: 'Ön ve arka', rozet: 'karar',
+      {baslik: 'Motor etiketi', deger: '48 V · 1000 W', not: 'Etiket değeri, anlamı doğrulanacak · 450 dev/dk', rozet: 'dogrula',
+        ayrinti: ['Marka ve model: Seçilmedi / model bilinmiyor; numune test edilecek.', r('450 dev/dk etiket değeri; motor milinde mi çıkışta mı olduğu doğrulanacak.', 'dogrula'), r('48 V × 20 A = 960 W; etiketteki 1000 W ile uyuşmuyor. Etiket yaklaşık kabul edilir.', 'dogrula')]},
+      {baslik: 'Süspansiyon', deger: 'Çift salıncak', not: 'Ön ve arka', rozet: 'beyan',
         ayrinti: ['Bağlantı noktaları ve kinematik açık.', r('Göbek rulmanı adayı DAC35680037.', 'aday')], href: '#/mechanical/suspension'},
-      {baslik: 'Fren', deger: '4 disk · çift hidrolik devre', not: 'Ticari parça · disk ve kaliper seçilmedi', rozet: 'karar',
+      {baslik: 'Fren', deger: '4 disk · çift hidrolik devre', not: 'Ticari parça · disk ve kaliper seçilmedi', rozet: 'beyan',
         ayrinti: [r('Madde 51: tek pedal, çift devre, disk en az 3 mm.', 'dogrula'), 'Disk çapı ve kaliper: Seçilmedi.'], href: '#/mechanical/braking'},
-      {baslik: 'Direksiyon', deger: 'Kremayer · merkez girişli', not: 'Mil çıkışı araç ortasında', rozet: 'karar',
+      {baslik: 'Direksiyon', deger: 'Kremayer · merkez girişli', not: 'Mil çıkışı araç ortasında', rozet: 'beyan',
         ayrinti: [r('Step motor NEMA 43 olarak anılıyor; etiket teyidi bekliyor.', 'dogrula'), 'Elle ve otonom kullanım için dişli kutusu yapılacak.', 'Direksiyon kutusu: Seçilmedi.']},
-      {baslik: 'Tekerlek ve jant', deger: '16 inç', not: 'Jant ve lastik alınmadı', rozet: 'karar',
+      {baslik: 'Tekerlek ve jant', deger: '16 inç', not: 'Jant ve lastik alınmadı', rozet: 'beyan',
         ayrinti: [r('Kural: 14–18 inç jant, lastik en az 80 mm.', 'dogrula'), r('Lastik dış çapı ≈ 500 mm varsayımı.', 'tahmin')]},
       {baslik: 'Seyir hedefi', deger: '30–35 km/sa', not: 'Hesap · Mileage ortalaması ≥ 25 km/sa', rozet: 'tahmin',
         ayrinti: [r('Mileage’ı bitirmek için gereken ortalama hız ≥ 25 km/sa (2026 Chapter II referansı).', 'dogrula'), r('Basit tur modeliyle gereken seyir hızı ≈ 27,4 km/sa.', 'tahmin'), '25 km/sa seyir hızı değil, gereken ortalamadır.']}
@@ -191,8 +192,8 @@ export const races = [
   {
     id: 'shell', ad: 'Shell Eco-marathon', alt: 'Polonya 2027 · Urban Concept / Battery Electric',
     genel: [
-      {baslik: 'Hedef kategori', deger: 'Urban Concept', not: 'Battery Electric', rozet: 'karar'},
-      {baslik: 'Yarışlar', deger: 'ADC · Mileage', not: 'Öncelik ADC; Mileage kuralları da gözetiliyor', rozet: 'karar'},
+      {baslik: 'Hedef kategori', deger: 'Urban Concept', not: 'Battery Electric', rozet: 'beyan'},
+      {baslik: 'Yarışlar', deger: 'ADC · Mileage', not: 'Öncelik ADC; Mileage kuralları da gözetiliyor', rozet: 'beyan'},
       {baslik: 'Portal durumu', deger: 'Takım oluşturuldu', not: 'Ekip beyanı', dogrula: true},
       {baslik: 'Teknik paket', deger: 'Gönderilmedi', not: 'Gönderim ve kabul teyit edilmedi', dogrula: true}
     ],

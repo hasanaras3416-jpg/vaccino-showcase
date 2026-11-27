@@ -43,8 +43,8 @@ A site that looks like a **premium automotive design studio made it**, not a sch
 - Use the same media frame for competition photos. Empty frames say “İçerik eklenecek.” Add team-provided media in the project record with descriptive alt text and captions where available.
 
 ## Drivetrain configurator
-- Keep a single vehicle canvas in Mechanical › Aktarma. Give Hub Motor and Merkezi Aktarma a compact keyboard-operable selector. Show the selected concept and its evaluation status above its component links and keep the detailed comparison in a disclosure.
-- Preserve the user's camera when switching concepts. Fade and restore the existing central motor, belt, differential and shafts as a group. Reveal the hub inside the translucent right rear wheel in the vehicle reference frame (forward −X, up +Y, right −Z). Use that wheel as the common anchor for the motor, translucency and hotspot, and interpolate the battery between visual reserves. With reduced motion, apply the target state immediately.
+- Keep a single vehicle canvas in Mechanical › Aktarma. The hub-motor comparison was dropped on 27 Nov 2026; do not reintroduce a concept selector unless a new decision asks for it.
+- Belt and pulley meshes stay in code for the existing animation but are hidden; a representative gear case stands in for the motor/differential unit.
 - The selection drives the part list, hotspot and mesh eligibility, comparison and visible assemblies together. Suspend 3D picking during transitions. Keep textual part notes and comparison available without WebGL. Route changes outside Aktarma restore the central layout, and the presentation uses the central geometry.
 - Keep the visual reserves in `vehicle-layout.js` and the existing shaft motion intact. Any future CAD fit, weight distribution or service access requires independent verification.
 
