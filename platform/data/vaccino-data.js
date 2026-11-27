@@ -326,6 +326,19 @@ export const driverInfo = {
   poz: r('Kalça x ≈ 1.450, y ≈ 150 mm; sırt ≈ 40°; ayak merkezi x ≈ 630, z ± 100 mm (pedal yeri kesin değil)', 'tahmin')
 };
 
+/* Driver Studio · Ergonomi görünümü. Mesafeler 3B modelden canlı ölçülür; sınırlar kural kitabından (Doğrulanacak). */
+export const driverErgonomics = {
+  olcumler: [
+    {id: 'helmetRoof', ad: 'Kask tepesi – çatı borusu altı', sinir: '≥ 50 mm', madde: 'Madde 26b', rozet: 'dogrula'},
+    {id: 'helmetHoop', ad: 'Kask arkası – arka halka', sinir: '≥ 50 mm', madde: 'Madde 26b', rozet: 'dogrula'},
+    {id: 'toeNose', ad: 'Ayak ucu – burun ucu', sinir: '≥ 100 mm', madde: 'Madde 25a-ii', rozet: 'dogrula', not: 'Pedal yeri değişirse bu değer değişir.'},
+    {id: 'cabinHeight', ad: 'İç yükseklik (taban borusu üstü – çatı borusu altı)', sinir: '≈ 920 mm', madde: 'Madde 45f: ≥ 880', rozet: 'dogrula'},
+    {id: 'shoulderWidth', ad: 'Omuz hizası iç genişlik (arka halka)', sinir: '≥ 700 mm', madde: 'Madde 45f', rozet: 'dogrula'}
+  ],
+  sabit: [r('Bacak/diz – en yakın boru ≈ 76 mm (burun direği yanında, x ≈ 770); çakışma yok', 'dogrula')],
+  not: 'Görsel kontrol; mühendislik doğrulaması değil. Ölçüler Ø30 STEP çizimi ve referans sürücü (174 cm) modelinden alınır.'
+};
+
 /* Araç ekranı: Şasi durumu kartı */
 export const chassisStatus = {
   baslik: 'Şasi durumu',

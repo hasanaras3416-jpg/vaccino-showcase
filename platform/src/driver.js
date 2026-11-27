@@ -2,7 +2,7 @@
    GLB'de her teçhizat ayrı mesh'tir; malzemeler burada katman bazında verilir.
    Yalnız Driver ekranı açılınca yüklenir. WebGL yoksa, yükleme başarısızsa ya da mobilde
    çizim yavaşsa sabit görsele düşer. */
-import {driverGear, driverInfo, rozetler} from '../data/vaccino-data.js';
+import {driverGear, driverInfo, rozetler, driverErgonomics} from '../data/vaccino-data.js';
 import {buildRepresentativeParts} from './rep-parts.js';
 
 /* Sekme → GLB katmanları ve kamera açısı. Kask sekmesi kaskın tüm katmanlarını birlikte vurgular. */
@@ -402,6 +402,7 @@ export function initializeDriver() {
       const entry = await loadPose(next);
       if (mode !== next) return;
       useMode(entry);
+      if (ergoOn && ergo) { bounds = new T.Box3().setFromObject(ergo.group).union(new T.Box3().setFromObject(model)); refreshErgonomics(); }
       progress.hidden = true;
       pose = equipmentView(selected); transition = null; requestFrame();
     } catch (error) { showFailure(error); }
@@ -409,6 +410,86 @@ export function initializeDriver() {
   for (const b of modeButtons) b.addEventListener('click', () => setMode(b.dataset.driverMode));
   syncModeUi();
 
+  /* ---------- Ergonomi görünümü: sürücü Ø30 şasinin içinde, mesafeler mm (Doğrulanacak) ---------- */
+  const ergoButton = document.getElementById('driver-ergo-toggle'), ergoPanel = document.getElementById('driver-ergonomics');
+  // Şasi GLB koordinatı → sürücü koordinatı: Y çevresinde +90°. STEP (mm) → sürücü: x = Z, y = Y + 135, z = −(X − 1400)
+  const S2D = (X, Y, Z) => new T.Vector3(Z / 1000, (Y + 135) / 1000, -(X - 1400) / 1000);
+  let ergo = null, ergoOn = false;
+  function label(text) {
+    const c = document.createElement('canvas'); c.width = 320; c.height = 72;
+    const g = c.getContext('2d');
+    g.fillStyle = 'rgba(9,11,13,.86)'; g.beginPath(); g.roundRect(4, 8, 312, 56, 28); g.fill();
+    g.strokeStyle = '#CBB98B'; g.lineWidth = 2; g.stroke();
+    g.fillStyle = '#F5F2ED'; g.font = '600 30px Inter, Segoe UI, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, 160, 37);
+    const sprite = new T.Sprite(new T.SpriteMaterial({map: new T.CanvasTexture(c), depthTest: false, transparent: true}));
+    sprite.scale.set(.46, .1035, 1); sprite.renderOrder = 10; return sprite;
+  }
+  function measureLine(group, a, b, text) {
+    const m = new T.LineBasicMaterial({color: CHAMPAGNE, depthTest: false, transparent: true});
+    const line = new T.Line(new T.BufferGeometry().setFromPoints([a, b]), m); line.renderOrder = 9; group.add(line);
+    for (const p of [a, b]) { const dot = new T.Mesh(new T.SphereGeometry(.009, 10, 8), new T.MeshBasicMaterial({color: CHAMPAGNE, depthTest: false})); dot.position.copy(p); dot.renderOrder = 9; group.add(dot); }
+    const tag = label(text); tag.position.copy(a.clone().lerp(b, .5)).add(new T.Vector3(0, .06, 0)); group.add(tag);
+  }
+  function measurements() {
+    const box = names => { const b = new T.Box3(); for (const n of names) for (const m of layerMeshes.get(n) || []) b.expandByObject(m); return b; };
+    const helmet = box(['Helmet']), shoes = box(['Shoes']);
+    const hc = helmet.getCenter(new T.Vector3());
+    const roofY = S2D(0, 935, 0).y, hoopZ = S2D(2135, 0, 0).z, noseZ = S2D(-15, 0, 0).z;
+    return {
+      helmetRoof: {mm: Math.round((roofY - helmet.max.y) * 1000), a: new T.Vector3(hc.x, helmet.max.y, hc.z), b: new T.Vector3(hc.x, roofY, hc.z)},
+      helmetHoop: {mm: Math.round((helmet.min.z - hoopZ) * 1000), a: new T.Vector3(hc.x, hc.y, helmet.min.z), b: new T.Vector3(hc.x, hc.y, hoopZ)},
+      toeNose: {mm: Math.round((noseZ - shoes.max.z) * 1000), a: new T.Vector3(0, shoes.max.y - .03, shoes.max.z), b: new T.Vector3(0, shoes.max.y - .03, noseZ)},
+      cabinHeight: {mm: 935 - 15, a: S2D(1700, 15, 0), b: S2D(1700, 935, 0)},
+      shoulderWidth: {mm: 2 * (600 - 15), a: S2D(2150, 520, -585), b: S2D(2150, 520, 585)}
+    };
+  }
+  async function buildErgonomics() {
+    const url = new URL('../assets/vehicle/frame-step.glb', import.meta.url); url.search = new URL(import.meta.url).search;
+    const gltf = await loader.loadAsync(url.href);
+    const group = new T.Group(), frameHolder = new T.Group(); frameHolder.rotation.y = Math.PI / 2;
+    const steel = new T.MeshStandardMaterial({color: 0xC9CDD0, metalness: .6, roughness: .35, transparent: true, opacity: .5, depthWrite: false});
+    const pillar = new T.MeshStandardMaterial({color: 0xE9A85B, metalness: .4, roughness: .4, transparent: true, opacity: .6, depthWrite: false});
+    gltf.scene.traverse(o => { if (o.isMesh) o.visible = false; });
+    for (const name of ['Frame', 'UnknownPartL', 'UnknownPartR']) {
+      const m = gltf.scene.getObjectByName(name); if (!m) continue;
+      m.visible = true; m.material = name === 'Frame' ? steel : pillar; frameHolder.add(m);
+    }
+    const parts = buildRepresentativeParts(T);
+    frameHolder.add(parts.seat);
+    group.add(frameHolder);
+    const lines = new T.Group(); group.add(lines);
+    return {group, lines};
+  }
+  function refreshErgonomics() {
+    if (!ergo) return;
+    ergo.lines.clear();
+    const m = measurements();
+    for (const item of driverErgonomics.olcumler) measureLine(ergo.lines, m[item.id].a, m[item.id].b, `${m[item.id].mm} mm`);
+    ergoPanel.replaceChildren(
+      Object.assign(document.createElement('h2'), {className: 'driver-product-title', textContent: 'Ergonomi ölçüleri'}),
+      (() => { const dl = document.createElement('dl'); dl.className = 'drawer-facts';
+        for (const item of driverErgonomics.olcumler) {
+          const row = document.createElement('div'), dt = document.createElement('dt'), dd = document.createElement('dd');
+          dt.textContent = item.ad;
+          dd.append(`${m[item.id].mm} mm · sınır ${item.sinir} (${item.madde}) `, badge(item));
+          if (item.not) dd.append(Object.assign(document.createElement('small'), {className: 'ergo-note', textContent: item.not}));
+          row.append(dt, dd); dl.append(row);
+        } return dl; })(),
+      ...driverErgonomics.sabit.map(item => { const p = document.createElement('p'); p.className = 'ergo-line'; p.append(`${item.metin} `, badge(item)); return p; }),
+      Object.assign(document.createElement('p'), {className: 'drawer-caveat', textContent: driverErgonomics.not}));
+  }
+  async function setErgonomics(on) {
+    ergoOn = on; ergoButton.setAttribute('aria-pressed', String(on)); ergoPanel.hidden = !on;
+    if (!loader || failed) return;
+    if (on && !ergo) { ergoButton.disabled = true; try { ergo = await buildErgonomics(); } finally { ergoButton.disabled = false; } }
+    if (!ergo) return;
+    if (on) { scene.add(ergo.group); refreshErgonomics(); } else scene.remove(ergo.group);
+    bounds = on ? new T.Box3().setFromObject(ergo.group).union(new T.Box3().setFromObject(model)) : poses[mode].bounds;
+    select('', false);
+    if (on) { pose = {...overview(), azimuth: Math.PI / 2 - .25, elevation: .22}; transition = null; }
+    requestFrame();
+  }
+  ergoButton?.addEventListener('click', () => setErgonomics(!ergoOn));
 
   function show() {
     if (!renderer) {

@@ -50,6 +50,7 @@
 <button type="button" data-driver-mode="adc" aria-pressed="true">ADC</button>
 <button type="button" data-driver-mode="mileage" aria-pressed="false">Mileage</button>
 </div>
+<button type="button" class="driver-ergo-toggle" id="driver-ergo-toggle" aria-pressed="false" aria-controls="driver-ergonomics">Ergonomi görünümü</button>
 <p class="driver-mode-note" id="driver-mode-note"></p>
 <div class="driver-options" role="group" aria-label="Sürücü teçhizatı">
 <button type="button" data-driver-focus="helmet" aria-pressed="false">Kask</button>
@@ -67,6 +68,7 @@
 <label><input type="checkbox" role="switch" data-driver-layer="shoes" checked> Ayakkabı</label>
 <label><input type="checkbox" role="switch" data-driver-layer="harness" checked> Emniyet kemeri</label>
 </fieldset>
+<section id="driver-ergonomics" class="card driver-ergonomics" aria-label="Ergonomi ölçüleri" hidden></section>
 <div id="driver-facts" class="driver-facts"></div>
 <p class="driver-caveat">Teçhizat 3B temsilidir. Ürün seçimi, güvenlik sertifikası ve yarışma uygunluğu doğrulanmadı. Sponsor veya organizatör logosu kullanılmaz.</p>
 </div>

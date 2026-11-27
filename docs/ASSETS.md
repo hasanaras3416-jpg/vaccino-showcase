@@ -5,7 +5,7 @@ Her yeni varlık eklendiğinde buraya yazılır: ad, yazar, lisans, bağlantı v
 
 ## Driver Studio — referans sürücü (174 cm)
 
-Durum: onaylandı ve Driver Studio'ya bağlandı (`platform/assets/driver/driver.glb`). Son malzemeler sitede katman bazında verilir (`platform/src/driver.js`). Yedek görsel `driver-fallback.jpg` sitenin kendi 3B görünümünden alınmıştır.
+Durum: onaylandı ve Driver Studio'ya bağlandı: `platform/assets/driver/driver-adc.glb` (eller iki güvenlik cihazında) ve `driver-mileage.glb` (eller simitte). Poz: kalça x 1450 / y 150 mm, sırt ≈ 40°, ayak merkezi x ≈ 630, z ± 100 mm (Tahmin/Varsayım). Son malzemeler sitede katman bazında verilir (`platform/src/driver.js`). Yedek görsel `driver-fallback.jpg` sitenin kendi 3B görünümünden alınmıştır.
 
 ### Kullanılan araçlar
 | Araç | Sürüm | Lisans | Kaynak | Not |
@@ -40,7 +40,7 @@ Kullanıcı (topluluk) varlıkları kullanılmadı. Paketin geri kalanı (saç, 
 Hiçbir sponsor, organizatör ya da üçüncü taraf logosu yok.
 
 ### Üretim
-Betik: `tools/driver/build_driver.py`. Çıktı: iskeletsiz, sabit pozlu `driver.glb` (≈ 1,3 MB, sıkıştırmasız). Her katman ayrı mesh ve ayrı malzeme yuvası taşır; GLB'deki malzemeler nötrdür, son renkler site tarafında katman bazında verilir.
+Betik: `tools/driver/build_driver.py`. Çıktı: iskeletsiz, sabit pozlu `driver-<poz>.glb` (her biri ≈ 1,3 MB, sıkıştırmasız) ve mm cinsinden kontrol dosyası `tools/driver/checks-<poz>.json`. Temel gövdenin başı özelliksiz bir elipsoide izdüşürülür; kask, onaylı biçimi korumak için hafif yumuşatılmış başın kopyasından üretilir. Her katman ayrı mesh ve ayrı malzeme yuvası taşır; GLB'deki malzemeler nötrdür, son renkler site tarafında katman bazında verilir.
 
 ### Önceki model
 `pilot.glb` (tevy — Pit Crew Member v1, CC0 1.0, https://tevy.dev/models/pit-crew) kaldırıldı. Lisans CC0 olduğundan atıf zorunlu değildir; alt bilgide ayrıca atıf gerekmez.
