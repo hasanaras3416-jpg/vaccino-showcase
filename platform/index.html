@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#090B0D"><title>VACCİNO — Otonom elektrikli yarış aracı</title><meta name="description" content="OİB Lisesi öğrencilerinin geliştirdiği otonom elektrikli yarış aracı VACCİNO: 3B araç, sistemler, yarışlar ve destek."><meta property="og:type" content="website"><meta property="og:title" content="VACCİNO — Otonom elektrikli yarış aracı"><meta property="og:description" content="Lise öğrencilerinin geliştirdiği otonom elektrikli yarış aracı. 3B araç, sistemler, yarışlar ve destek."><meta property="og:locale" content="tr_TR"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="VACCİNO — Otonom elektrikli yarış aracı"><meta name="twitter:description" content="Lise öğrencilerinin geliştirdiği otonom elektrikli yarış aracı."><link rel="icon" href="assets/branding/vaccino-logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,300..600&amp;family=Inter:wght@400;500;600;700&amp;display=swap"><link rel="stylesheet" href="assets/workspace.css?v=data-02"><link rel="stylesheet" href="assets/presentation.css?v=data-02"><link rel="stylesheet" href="assets/experience.css?v=data-02"><link rel="stylesheet" href="assets/refresh.css?v=data-02"><link rel="stylesheet" href="assets/automotive-home.css?v=data-02"><link rel="stylesheet" href="assets/driver-and-dashboard.css?v=data-02"><link rel="stylesheet" href="assets/engineering.css?v=data-02"><link rel="stylesheet" href="assets/app-shell.css?v=data-02"><link rel="stylesheet" href="css/motion.css?v=data-02"></head>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#090B0D"><title>VACCİNO — Otonom elektrikli yarış aracı</title><meta name="description" content="OİB Lisesi öğrencilerinin geliştirdiği otonom elektrikli yarış aracı VACCİNO: 3B araç, sistemler, yarışlar ve destek."><meta property="og:type" content="website"><meta property="og:title" content="VACCİNO — Otonom elektrikli yarış aracı"><meta property="og:description" content="Lise öğrencilerinin geliştirdiği otonom elektrikli yarış aracı. 3B araç, sistemler, yarışlar ve destek."><meta property="og:locale" content="tr_TR"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="VACCİNO — Otonom elektrikli yarış aracı"><meta name="twitter:description" content="Lise öğrencilerinin geliştirdiği otonom elektrikli yarış aracı."><link rel="icon" href="assets/branding/vaccino-logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,300..600&amp;family=Inter:wght@400;500;600;700&amp;display=swap"><link rel="stylesheet" href="assets/workspace.css?v=driver-03"><link rel="stylesheet" href="assets/presentation.css?v=driver-03"><link rel="stylesheet" href="assets/experience.css?v=driver-03"><link rel="stylesheet" href="assets/refresh.css?v=driver-03"><link rel="stylesheet" href="assets/automotive-home.css?v=driver-03"><link rel="stylesheet" href="assets/driver-and-dashboard.css?v=driver-03"><link rel="stylesheet" href="assets/engineering.css?v=driver-03"><link rel="stylesheet" href="assets/app-shell.css?v=driver-03"><link rel="stylesheet" href="css/motion.css?v=driver-03"></head>
 <body data-route="overview"><a class="skip-link" href="#screen-title">İçeriğe geç</a>
 <aside class="sidebar" id="sidebar" aria-label="Site gezinmesi">
 <a class="brand" href="#/overview" aria-label="VACCİNO ana sayfa"><span class="brand-wordmark">VACCİNO</span></a>
@@ -31,26 +31,39 @@
 <section class="screen driver-screen" data-screen="driver" aria-labelledby="driver-title" hidden>
 <header class="driver-intro">
 <h1 id="driver-title" tabindex="-1">Sürücü<br> Stüdyosu</h1>
-<p>Kontrol, güvenlik ve insan faktörü.</p>
+<p>Referans sürücü 174 cm · teçhizat ve oturuş, görsel kontrol.</p>
 </header>
 <div class="driver-stage" id="driver-stage">
-<canvas id="driver-canvas" aria-label="VACCİNO pilotunun etkileşimli 3B görünümü" aria-describedby="driver-controls-hint" tabindex="0" hidden></canvas>
+<canvas id="driver-canvas" aria-label="Referans sürücünün etkileşimli 3B görünümü" aria-describedby="driver-controls-hint" tabindex="0" hidden></canvas>
+<img id="driver-fallback" class="driver-fallback" src="assets/driver/driver-fallback.jpg" alt="Referans sürücü 174 cm, tam teçhizatla yatık oturuş pozunda (sabit görsel)" loading="lazy" decoding="async" hidden>
 <p id="driver-controls-hint" class="driver-visually-hidden">Döndürmek için sürükleyin veya yön tuşlarını kullanın. Yakınlaştırmak için fare tekerleğini, iki parmak hareketini ya da artı ve eksi tuşlarını kullanın. İlk görünüme dönmek için Escape tuşuna basın.</p>
-<p class="driver-render-status" id="driver-render-status" role="status">3B pilot yükleniyor…</p>
-<div class="driver-view-controls" id="driver-view-controls" role="group" aria-label="Pilot kamerası" hidden>
+<div class="driver-progress" id="driver-progress" aria-hidden="true"><span></span></div>
+<p class="driver-render-status" id="driver-render-status" role="status">3B sürücü yükleniyor…</p>
+<div class="driver-view-controls" id="driver-view-controls" role="group" aria-label="Sürücü kamerası" hidden>
 <button type="button" data-driver-zoom="-1" aria-label="Uzaklaştır">−</button>
 <button type="button" data-driver-zoom="1" aria-label="Yakınlaştır">+</button>
 <button type="button" id="driver-reset">Görünümü sıfırla</button>
 </div>
 </div>
 <div class="driver-equipment">
-<div class="driver-options" role="group" aria-label="Pilot ekipmanı">
+<div class="driver-options" role="group" aria-label="Sürücü teçhizatı">
 <button type="button" data-driver-focus="helmet" aria-pressed="false">Kask</button>
 <button type="button" data-driver-focus="suit" aria-pressed="false">Tulum</button>
 <button type="button" data-driver-focus="glove" aria-pressed="false">Eldiven</button>
+<button type="button" data-driver-focus="shoes" aria-pressed="false">Ayakkabı</button>
+<button type="button" data-driver-focus="harness" aria-pressed="false">Emniyet kemeri</button>
 </div>
-<p class="driver-equipment-note" id="driver-item-text" aria-live="polite">Yakından incelemek için bir ekipman seçin.</p>
-<p class="driver-caveat">Ekipman görsel konsepttir. Ürün seçimi, güvenlik sertifikası ve yarışma uygunluğu doğrulanmadı.</p>
+<div id="driver-product" class="driver-product-slot" aria-live="polite"></div>
+<fieldset class="driver-layers">
+<legend>Teçhizat</legend>
+<label><input type="checkbox" role="switch" data-driver-layer="helmet" checked> Kask</label>
+<label><input type="checkbox" role="switch" data-driver-layer="suit" checked> Tulum</label>
+<label><input type="checkbox" role="switch" data-driver-layer="glove" checked> Eldiven</label>
+<label><input type="checkbox" role="switch" data-driver-layer="shoes" checked> Ayakkabı</label>
+<label><input type="checkbox" role="switch" data-driver-layer="harness" checked> Emniyet kemeri</label>
+</fieldset>
+<div id="driver-facts" class="driver-facts"></div>
+<p class="driver-caveat">Teçhizat 3B temsilidir. Ürün seçimi, güvenlik sertifikası ve yarışma uygunluğu doğrulanmadı. Sponsor veya organizatör logosu kullanılmaz.</p>
 </div>
 </section>
 <section class="screen" data-screen="vehicle" aria-label="Araç" hidden><div class="vehicle-app"><div class="vehicle-stage-wrap"><div class="view-toolbar"><span>V2 şasi · dört teker</span><span class="geometry-tag">Temsili yerleşim</span></div><div class="scene-slot" data-slot="vehicle"></div></div><aside class="part-panel" aria-labelledby="part-panel-title"><div class="part-panel-head"><h2 id="part-panel-title">Parçalar</h2><output id="part-panel-count"></output></div><div class="chip-group" id="part-filter" role="group" aria-label="Parça grubu"></div><ul class="part-list" id="part-list"></ul></aside></div></section>
@@ -105,4 +118,4 @@
 <button id="season-start" type="button" aria-label="VACCİNO sitesine gir"></button>
 <p id="season-error" role="alert" hidden>VACCİNO logosu yüklenemedi. assets/branding/vaccino-logo.png dosyasını kontrol edin.</p>
 <button id="season-skip" type="button">Animasyonu atla</button>
-</dialog><script src="src/app.js?v=data-02"></script></body></html>
+</dialog><script src="src/app.js?v=driver-03"></script></body></html>

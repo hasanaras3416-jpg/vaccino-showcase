@@ -71,7 +71,7 @@ Kararlı, paylaşılabilir kaynak kod **`main`** dalında; devam eden tasarım �
 
 ## Kaynak ve kullanım hakları
 
-Driver Studio'daki temel 3B karakter, [tevy — Pit Crew Member v1](https://tevy.dev/models/pit-crew) modelinden uyarlanmıştır ([CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)). Bu lisans bilgisi diğer kaynak kodların, görsellerin veya marka işaretlerinin aynı lisansla dağıtıldığı anlamına gelmez.
+Driver Studio'daki referans sürücü (174 cm), MakeHuman temel gövdesi ve MakeHuman system assets (`shoes06`) varlıklarından türetilmiştir; ikisi de CC0 1.0'dır. Kask, tulum, eldiven ve emniyet kemeri bu varlıklardan Blender'da üretilmiştir. Ayrıntılar ve kaynaklar: [docs/ASSETS.md](docs/ASSETS.md).
 
 Vaccino ve üçüncü taraf marka işaretlerinin kullanım hakları ilgili sahiplerine aittir. **Depodaki diğer içerikler için açık kaynak lisansı beyan edilmemiştir**; yeniden kullanım koşulları için depo sahibiyle iletişime geçin.
 

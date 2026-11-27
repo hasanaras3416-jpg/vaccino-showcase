@@ -159,14 +159,17 @@ export const systems = {
     hat: ['CARLA bağlantısı', 'RGB kamera ve OpenCV', 'Şerit / hedef noktası', 'PID direksiyon', 'Hız ve fren', 'Dur çizgisi', 'Engel', 'Shell pist senaryosu', 'ROS 2 / gerçek araç']
   },
   surucu: {
-    ad: 'Sürücü', ozet: 'Pilot ekipmanı görsel konsepti.',
+    ad: 'Sürücü', ozet: 'Referans sürücü 174 cm ve teçhizat (görsel kontrol).',
     derin: {etiket: 'Sürücü Stüdyosu', href: '#/driver'},
     kartlar: [
-      {baslik: 'Kask', deger: '3B konsept', not: 'Koyu ve yansıtıcı vizör', dogrula: true, ayrinti: ['Ürün seçimi ve güvenlik sertifikası doğrulanmadı.']},
-      {baslik: 'Tulum', deger: '3B konsept', not: 'Mat siyah, şampanya V', dogrula: true, ayrinti: ['Yarışma kıyafet uygunluğu doğrulanmadı.']},
-      {baslik: 'Eldiven', deger: '3B konsept', not: 'Sol eldiven yakın planı', dogrula: true, ayrinti: ['Ürün seçimi doğrulanmadı.']}
+      {baslik: 'Referans sürücü', deger: '174 cm', not: 'Yatık oturuş ≈ 34°', rozet: 'tahmin', ayrinti: ['Oturuş açısı ve göz noktası şasi ve koltuk seçilince doğrulanacak.']},
+      {baslik: 'Kask', deger: 'Seçilmedi', not: 'Kapalı yüzlü yarış kaskı (3B temsili)', rozet: 'dogrula', ayrinti: ['Ürün ve güvenlik standardı kural kitabından belirlenecek.']},
+      {baslik: 'Tulum', deger: 'Seçilmedi', not: 'Tek parça sürücü tulumu (3B temsili)', rozet: 'dogrula', ayrinti: ['Yalnız VACCİNO “V” işareti; sponsor logosu yok.']},
+      {baslik: 'Eldiven', deger: 'Seçilmedi', not: 'Sürüş eldiveni (3B temsili)', rozet: 'dogrula', ayrinti: ['Ürün seçimi doğrulanmadı.']},
+      {baslik: 'Ayakkabı', deger: 'Seçilmedi', not: 'Kapalı sürüş ayakkabısı (3B temsili)', rozet: 'dogrula', ayrinti: ['Ürün seçimi doğrulanmadı.']},
+      {baslik: 'Emniyet kemeri', deger: '5 noktalı', not: 'Madde 29 · bağlantı ≥ 200 N', rozet: 'dogrula', ayrinti: ['Ürün seçilmedi. Bağlantı noktaları şasi ana yapısına.']}
     ],
-    not: 'Temel model tevy Pit Crew Member v1 (CC0 1.0).'
+    not: 'Temel model MakeHuman (CC0). Ayrıntı: docs/ASSETS.md.'
   },
   nextion: {
     ad: 'Nextion', ozet: 'Kokpit ekranı arayüz taslağı.',
@@ -304,6 +307,19 @@ export const inventory = [
   {id: 'A02', ad: 'Ayarlı güç kaynağı', model: 'Model belirtilmedi', kategori: 'Atölye', durum: 'Elde', adet: '—', ekip: 'Elektrik', not: 'Atölyede mevcut.', kaynak: 'ATLAS'},
   {id: 'A03', ad: 'Lehimleme ekipmanı', model: 'Model belirtilmedi', kategori: 'Atölye', durum: 'Elde', adet: '—', ekip: 'Elektrik', not: 'Atölyede mevcut.', kaynak: 'ATLAS'}
 ];
+
+/* Driver Studio ürün kartları. Marka/model uydurulmaz: seçilmemişse "Seçilmedi". */
+export const driverGear = {
+  helmet: {ad: 'Kask', tur: 'Kapalı yüzlü yarış kaskı, ayrı vizör', urun: 'Seçilmedi', standart: r('Kural kitabındaki sürücü teçhizatı maddesine göre belirlenecek', 'dogrula'), kaynak: '3B temsili · MakeHuman CC0 türevi'},
+  suit: {ad: 'Tulum', tur: 'Tek parça sürücü tulumu', urun: 'Seçilmedi', standart: r('Kural kitabındaki sürücü teçhizatı maddesine göre belirlenecek', 'dogrula'), kaynak: '3B temsili · yalnız VACCİNO “V”, sponsor logosu yok'},
+  glove: {ad: 'Eldiven', tur: 'Sürüş eldiveni', urun: 'Seçilmedi', standart: r('Belirlenecek', 'dogrula'), kaynak: '3B temsili · MakeHuman CC0 türevi'},
+  shoes: {ad: 'Ayakkabı', tur: 'Kapalı sürüş ayakkabısı', urun: 'Seçilmedi', standart: r('Belirlenecek', 'dogrula'), kaynak: '3B temsili · MakeHuman CC0 shoes06 türevi'},
+  harness: {ad: 'Emniyet kemeri', tur: '5 noktalı emniyet kemeri', urun: 'Seçilmedi', standart: r('Madde 29: 5 nokta, bağlantı ≥ 200 N, ana yapıya bağlı', 'dogrula'), kaynak: '3B temsili şerit ve döner kilit'}
+};
+export const driverInfo = {
+  referans: r('Referans sürücü 174 cm', 'beyan'),
+  balast: r('Urban Concept’te en az sürücü ağırlığı 70 kg (tam teçhizatla); hafif sürücüde balast gerekir.', 'dogrula')
+};
 
 /* Belirsiz konular: Sistemler › Mekanik ekranındaki "Açık sorular" kartı. */
 export const acikSorular = [
