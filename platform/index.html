@@ -1,80 +1,40 @@
 <!doctype html>
-<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080808"><meta name="description" content="Vaccino 26/27 mühendislik platformu. Araç, sistemler ve tasarım kararları tek çalışma alanında."><title>Vaccino 26/27 — Engineering Platform</title><link rel="icon" href="assets/branding/vaccino-logo.png"><link rel="stylesheet" href="assets/workspace.css"><link rel="stylesheet" href="assets/presentation.css"><link rel="stylesheet" href="assets/experience.css"><link rel="stylesheet" href="assets/refresh.css"><link rel="stylesheet" href="assets/automotive-home.css"><link rel="stylesheet" href="assets/driver-and-dashboard.css?v=driver-studio-03"><link rel="stylesheet" href="assets/engineering.css"></head>
-<body data-route="overview"><a class="skip-link" href="#screen-title">İçeriğe geç</a><div class="menu-scrim" id="menu-scrim" hidden></div>
-<aside class="sidebar" id="sidebar" aria-label="Platform gezinmesi" inert>
-<div class="drawer-head"><a class="brand" href="#/overview" aria-label="Vaccino ana sayfa"><span class="brand-wordmark">VACCINO</span></a><button id="menu-close" type="button">Kapat</button></div>
-<nav class="primary-nav" aria-label="Ana menü">
-<a href="#/overview" data-route="overview">Ana Menü</a>
-<a href="#/garage" data-route="garage">Araç</a>
-<a href="#/driver" data-route="driver">Driver</a>
-<a href="#/team/goals" data-route="team">Yarışmalar</a>
-<a href="#/inventory" data-route="inventory">Envanter</a>
-</nav></aside>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#090B0D"><title>VACCİNO — Otonom elektrikli yarış aracı</title><meta name="description" content="OİB Lisesi öğrencilerinin geliştirdiği otonom elektrikli yarış aracı VACCİNO: 3B araç, sistemler, yarışlar ve destek."><meta property="og:type" content="website"><meta property="og:title" content="VACCİNO — Otonom elektrikli yarış aracı"><meta property="og:description" content="Lise öğrencilerinin geliştirdiği otonom elektrikli yarış aracı. 3B araç, sistemler, yarışlar ve destek."><meta property="og:locale" content="tr_TR"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="VACCİNO — Otonom elektrikli yarış aracı"><meta name="twitter:description" content="Lise öğrencilerinin geliştirdiği otonom elektrikli yarış aracı."><link rel="icon" href="assets/branding/vaccino-logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,300..600&amp;family=Inter:wght@400;500;600;700&amp;display=swap"><link rel="stylesheet" href="assets/workspace.css"><link rel="stylesheet" href="assets/presentation.css"><link rel="stylesheet" href="assets/experience.css"><link rel="stylesheet" href="assets/refresh.css"><link rel="stylesheet" href="assets/automotive-home.css"><link rel="stylesheet" href="assets/driver-and-dashboard.css?v=app-shell-03"><link rel="stylesheet" href="assets/engineering.css"><link rel="stylesheet" href="assets/app-shell.css?v=app-shell-03"></head>
+<body data-route="overview"><a class="skip-link" href="#screen-title">İçeriğe geç</a>
+<aside class="sidebar" id="sidebar" aria-label="Site gezinmesi">
+<a class="brand" href="#/overview" aria-label="VACCİNO ana sayfa"><span class="brand-wordmark">VACCİNO</span></a>
+<nav class="primary-nav" aria-label="Ana menü"><a href="#/overview" data-route="overview"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z"/></svg><span class="nav-label-full">Ana Sayfa</span><span class="nav-label-short" aria-hidden="true">Ana Sayfa</span></a><a href="#/vehicle" data-route="vehicle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 15.5h17M5 15.5l1.6-4.6A2 2 0 0 1 8.5 9.5h7a2 2 0 0 1 1.9 1.4l1.6 4.6v2.5H5z"/><circle cx="8" cy="17.5" r="1.6"/><circle cx="16" cy="17.5" r="1.6"/></svg><span class="nav-label-full">Araç</span><span class="nav-label-short" aria-hidden="true">Araç</span></a><a href="#/systems" data-route="systems"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 4 8 4-8 4-8-4z"/><path d="m4 12 8 4 8-4M4 16l8 4 8-4"/></svg><span class="nav-label-full">Sistemler</span><span class="nav-label-short" aria-hidden="true">Sistemler</span></a><a href="#/races" data-route="races"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4M6 4.5h11l-2 3.5 2 3.5H6"/></svg><span class="nav-label-full">Yarışlar</span><span class="nav-label-short" aria-hidden="true">Yarışlar</span></a><a href="#/inventory" data-route="inventory"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg><span class="nav-label-full">Envanter</span><span class="nav-label-short" aria-hidden="true">Envanter</span></a><a href="#/support" data-route="support"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9.5" r="2.3"/><path d="M15.5 14.3c2.6-.4 4.6 1.2 5 4.2"/></svg><span class="nav-label-full">Takım ve Destek</span><span class="nav-label-short" aria-hidden="true">Takım</span></a></nav>
+</aside>
 <div class="app-shell"><header class="topbar">
-<button class="icon-button" id="menu-toggle" aria-expanded="false" aria-controls="sidebar" aria-label="Menüyü aç"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16 M4 12h16 M4 17h16"/></svg></button>
-<a class="studio-brand" href="#/overview" aria-label="Vaccino ana sayfa"><span class="brand-wordmark">VACCINO</span></a>
+<a class="studio-brand" href="#/overview" aria-label="VACCİNO ana sayfa"><span class="brand-wordmark">VACCİNO</span></a>
 <span class="breadcrumb" id="breadcrumb"></span>
 <button id="presentation-enter" class="presentation-enter" aria-haspopup="dialog">Aracı Tanı</button>
 </header>
 <main id="workspace"><div class="screen-heading"><div><h1 id="screen-title" tabindex="-1">Mühendisliği birlikte ilerlet.</h1></div><p id="screen-description"></p></div>
-<section class="screen studio-home" data-screen="overview" aria-label="Vaccino stüdyosu">
+<section class="screen studio-home" data-screen="overview" aria-labelledby="home-title">
 <div class="scene-slot" data-slot="overview">
 <div class="v-hero-content">
-  <p class="v-eyebrow">Elektrikli yarış aracı &nbsp; / &nbsp; 2027 konsepti</p>
-  <h2>VACCINO <strong>2027.</strong></h2>
-  <p class="v-subtitle">Verimlilik için tasarlandı. Gelecek için geliştiriliyor. Bir yarış aracından fazlası.</p>
+  <p class="v-eyebrow" id="home-eyebrow">OİB Lisesi · Bursa</p>
+  <h2 id="home-title">VACCİNO <em>2027</em></h2>
+  <p class="v-subtitle" id="home-tagline"></p>
+  <p class="status-pill" id="home-status"></p>
   <div class="v-hero-actions">
-    <a class="v-link primary" href="#/experience/showroom">Aracı keşfet <span aria-hidden="true"></span></a>
-    <a class="v-link" href="#/garage">Mühendislik <span aria-hidden="true"></span></a>
+    <a class="v-link primary" href="#/vehicle">Aracı incele <span aria-hidden="true"></span></a>
+    <a class="v-link" href="#/support">Destek ol <span aria-hidden="true"></span></a>
   </div>
 </div>
-<div class="v-hero-bottom"><span class="v-scroll">Keşfetmek için kaydır</span></div><button class="v-hero-restore" id="v-hero-restore" type="button" hidden aria-label="Ana başlığı tekrar göster">← Tanıtımı göster</button>
+<button class="v-hero-restore" id="v-hero-restore" type="button" hidden aria-label="Ana başlığı tekrar göster">← Tanıtımı göster</button>
 <span id="v-hero-controls" hidden>Aracı döndürmek için sürükleyin veya ok tuşlarına basın. Artı ve eksi tuşlarıyla yakınlaşın veya uzaklaşın.</span>
 </div>
-<section class="v-editorial" aria-labelledby="v-story-title">
-  <div class="v-editorial-grid">
-    <div>
-      <span class="v-section-number">01 / Bir fikirden fazlası</span>
-      <h3 id="v-story-title">Sınırları <em>yeniden düşün.</em></h3>
-    </div>
-    <div>
-      <p>Vaccino, enerji verimliliği ve otonom mobiliteyi tek bir araç üzerinde buluşturan bir öğrenci mühendislik projesi. Her çizgi, her bileşen, her tercih yeni bir soruyla başlıyor: Daha iyisi mümkün mü?</p>
-      <a class="v-dark-link" href="#/vehicle">3B konsept modeli incele <span aria-hidden="true">↗</span></a>
-      <div class="v-quote"><span>VACCINO / ENGINEERING PHILOSOPHY</span><strong>“Geleceği yalnızca hayal etmiyoruz. Onu tasarlamayı öğreniyoruz.”</strong></div>
-    </div>
-  </div>
-</section>
-<section class="v-pathways" aria-labelledby="v-pathways-title">
-  <div class="v-pathways-head">
-    <div><span class="v-section-number">02 / Daha yakından bak</span><h3 id="v-pathways-title">Her detayın<br>bir amacı var.</h3></div>
-  </div>
-  <nav class="v-pathway-grid" aria-label="Vaccino keşif alanları">
-    <a href="#/experience/showroom"><small>01 / DESIGN</small><strong>Showroom</strong><p>Aracın formunu, hareketini ve konseptini üç boyutlu keşfet.</p><span class="v-arrow" aria-hidden="true">↗</span></a>
-    <a href="#/mechanical"><small>02 / ENGINEERING</small><strong>Sistemler</strong><p>Aktarma, şasi, fren ve elektrik mimarisinin arkasındaki fikirler.</p><span class="v-arrow" aria-hidden="true">↗</span></a>
-    <a href="#/team/goals"><small>03 / THE JOURNEY</small><strong>Yolculuk</strong><p>Vaccino'nun yarışma hedeflerini ve gelişim yolculuğunu takip et.</p><span class="v-arrow" aria-hidden="true">↗</span></a>
-  </nav>
-  <p class="v-note">3B yerleşimler konsept gösterimleridir; üretim çizimi, doğrulanmış araç dinamiği veya yarışma uygunluğu anlamına gelmez.</p>
-</section>
-</section>
-<section class="screen" data-screen="garage" hidden>
-<div class="vehicle-options">
-<a href="#/driver"><h2>Driver</h2><p>Kask, eldiven ve yarış tulumu konseptini 3B incele.</p></a>
-<a href="#/vehicle"><h2>3B Model</h2><p>V2 şasiyi döndür, yakınlaş ve parçaları incele.</p></a>
-<a href="#/mechanical"><h2>Mekanik</h2><p>Şasi, direksiyon, süspansiyon, fren ve aktarma.</p></a>
-<a href="#/electrical"><h2>Elektrik</h2><p>Bataryadan güç dağıtımına ve kontrol birimlerine.</p></a>
-<a href="#/autonomy"><h2>Yazılım</h2><p>Algılama, karar, araç kontrolü ve simülasyon.</p></a>
-</div>
-<nav class="secondary-links" aria-label="Araç ortamları ve teknik kayıtlar">
-<a href="#/experience/showroom">Showroom</a><a href="#/experience/workshop">Atölye ve lift</a><a href="#/experience/track">Pist ve simülasyon</a><a href="#/decisions">Mühendislik kararları</a><a href="#/tests">Test planı</a>
-</nav>
+<section class="stat-row" aria-label="Öne çıkan değerler"><ul id="home-stats"></ul></section>
 </section>
 <section class="screen driver-screen" data-screen="driver" aria-labelledby="driver-title" hidden>
 <header class="driver-intro">
-<h1 id="driver-title" lang="en" tabindex="-1">Driver<br> Studio</h1>
+<h1 id="driver-title" tabindex="-1">Sürücü<br> Stüdyosu</h1>
 <p>Kontrol, güvenlik ve insan faktörü.</p>
 </header>
 <div class="driver-stage" id="driver-stage">
-<canvas id="driver-canvas" aria-label="Vaccino pilotunun etkileşimli 3B görünümü" aria-describedby="driver-controls-hint" tabindex="0" hidden></canvas>
+<canvas id="driver-canvas" aria-label="VACCİNO pilotunun etkileşimli 3B görünümü" aria-describedby="driver-controls-hint" tabindex="0" hidden></canvas>
 <p id="driver-controls-hint" class="driver-visually-hidden">Döndürmek için sürükleyin veya yön tuşlarını kullanın. Yakınlaştırmak için fare tekerleğini, iki parmak hareketini ya da artı ve eksi tuşlarını kullanın. İlk görünüme dönmek için Escape tuşuna basın.</p>
 <p class="driver-render-status" id="driver-render-status" role="status">3B pilot yükleniyor…</p>
 <div class="driver-view-controls" id="driver-view-controls" role="group" aria-label="Pilot kamerası" hidden>
@@ -93,26 +53,26 @@
 <p class="driver-caveat">Ekipman görsel konsepttir. Ürün seçimi, güvenlik sertifikası ve yarışma uygunluğu doğrulanmadı.</p>
 </div>
 </section>
-<section class="screen" data-screen="vehicle" aria-label="3B Araç" hidden><div class="view-toolbar"><span>V2 ŞASİ / DÖRT TEKER / TEK MOTOR</span><span class="geometry-tag">Temsili yerleşim</span></div><div class="scene-slot" data-slot="vehicle"></div></section>
+<section class="screen" data-screen="vehicle" aria-label="Araç" hidden><div class="vehicle-app"><div class="vehicle-stage-wrap"><div class="view-toolbar"><span>V2 şasi · dört teker</span><span class="geometry-tag">Temsili yerleşim</span></div><div class="scene-slot" data-slot="vehicle"></div></div><aside class="part-panel" aria-labelledby="part-panel-title"><div class="part-panel-head"><h2 id="part-panel-title">Parçalar</h2><output id="part-panel-count"></output></div><div class="chip-group" id="part-filter" role="group" aria-label="Parça grubu"></div><ul class="part-list" id="part-list"></ul></aside></div></section>
 <section class="screen" data-screen="mechanical" aria-label="Mekanik Sistemler" hidden><nav class="subnav" id="mechanical-tabs" aria-label="Mekanik alt sistemleri"></nav><fieldset id="drivetrain-selector" class="drivetrain-selector" hidden><legend>Aktarma mimarisi</legend><div id="drivetrain-options"></div></fieldset><div class="system-exhibit">
   <div class="scene-slot" data-slot="mechanical"></div>
   <section id="mechanical-brief" class="system-briefing" aria-labelledby="mechanical-title"></section>
 </div></section>
 <section class="screen" data-screen="electrical" aria-label="Elektrik ve Elektronik" hidden><nav class="subnav" id="electrical-tabs" aria-label="Elektrik alt sistemleri"></nav><div class="system-exhibit"><div class="scene-slot" data-slot="electrical"></div><section id="electrical-brief" class="system-briefing" aria-labelledby="electrical-title"></section></div></section>
-<section class="screen" data-screen="autonomy" aria-label="Yazılım" hidden><nav class="subnav" id="autonomy-tabs" aria-label="Otonom alt sistemleri"></nav><div id="software-showcase"></div><div class="nextion-entry"><span class="v-section-number">DIGITAL COCKPIT / CONCEPT</span><div><h2>Nextion gösterge arayüzü</h2><p>Göğüs panelindeki ekran için ilk etkileşimli sürüş göstergesi taslağı. 3B araçtaki göstergeyi seçebilir veya buradan büyütebilirsin.</p></div><button type="button" data-open-nextion>Ekranı büyüt ↗</button></div><details id="software-resources" class="engineering-disclosure">
+<section class="screen" data-screen="autonomy" aria-label="Yazılım" hidden><nav class="subnav" id="autonomy-tabs" aria-label="Otonom alt sistemleri"></nav><div id="software-showcase"></div><div class="nextion-entry"><span class="v-section-number">KOKPİT EKRANI / TASLAK</span><div><h2>Nextion gösterge arayüzü</h2><p>Göğüs panelindeki ekran için ilk etkileşimli sürüş göstergesi taslağı. 3B araçtaki göstergeyi seçebilir veya buradan büyütebilirsin.</p></div><button type="button" data-open-nextion>Ekranı büyüt ↗</button></div><details id="software-resources" class="engineering-disclosure">
   <summary>Teknik kaynaklar</summary>
   <section id="sensors" class="inventory-section" aria-label="Sensörler ve veri arayüzleri">
     <div class="section-title"><h2>Sensörler ve veri arayüzleri</h2><a class="text-link" href="../inputs/Vaccino_26-27_Sensor_Envanteri.xlsx" download>Özgün Excel ↗</a></div>
     <p class="muted">Araç modelinde ön stereo kamera rezervi gösteriliyor. Diğer sensörlerin yerleşimleri henüz modellenmedi.</p><p class="simple-only muted">Aracın çevreyi ve kendi hareketini anlamasını sağlayan parçalar. Bir sensörü açarak modelini ve ilk kontrol adımını görebilirsin.</p><p class="technical-only muted">Yayın hızları entegrasyon hedefidir. LiDAR adayları birbirinin alternatifidir. Üretici referansları kaynak Excel’den aktarılmıştır; bu sürümde yeniden doğrulanmadı.</p><div class="filters"><label>Ara <input id="sensor-search" type="search" placeholder="Sensör, model veya sinyal…"></label><label>Aşama <select id="sensor-filter"><option>Tümü</option><option>İlk prototip</option><option>Karara bağlı</option><option>Kıyas ve ikinci aşama</option></select></label><output id="sensor-count"></output></div><div id="sensor-summary" class="sensor-list simple-only"></div><div class="sensor-technical"><details><summary>Teknik envanteri gör</summary><div class="table-wrap" tabindex="0" aria-label="Sensör teknik envanteri"><table id="sensor-table"></table></div></details></div><details class="interface-disclosure technical-only"><summary>Yazılım veri arayüzleri <span id="interface-count"></span></summary><p class="muted">ROS 2 / CAN prototip sözleşmesi. CAN kimlikleri, hızlar ve zaman aşımı değerleri entegrasyonda belirlenecek.</p><div class="table-wrap" tabindex="0" aria-label="Veri arayüzleri"><table id="interface-table"></table></div></details></section></details></section>
 <section class="screen" data-screen="decisions" aria-label="Mühendislik Kararları" hidden><div class="section-title"><p class="muted">Tasarımın gerekçesi, kaynağı ve sıradaki doğrulaması.</p><label>Ekip <select id="decision-filter"><option>Tümü</option><option>Mekanik</option><option>Elektrik</option><option>Yazılım</option><option>Takım</option><option>Tarihçe</option></select></label></div><div id="decision-list" class="decision-ledger"></div><div class="ledger-foot">R01 <span>Kaynak kararı ≠ ölçümle doğrulama. Kayıt durumları özgün gereksinim belgesinden gelir.</span></div></section>
 <section class="screen" data-screen="tests" aria-label="Testler ve Geliştirme" hidden><div class="test-intro"><span class="large-number" id="test-total"></span><div><h2>Bir sonraki kanıt.</h2><p>Planı gör. Ölçümü yap. Sonucu kaynakla kaydet.</p></div><span class="geometry-tag">Sonuç verisi sağlanmadı</span></div><div id="test-list" class="test-timeline"></div><details class="future-architecture technical-only"><summary>Pist simülasyonu / İlk boyuna model <span>Demo varsayımları</span></summary><p>Araç Deneyimi bölümünde örnek parkur üzerinde ilk boyuna hareket ve enerji modeli çalışır. Gerçek pist, yanal dinamik ve ölçümle doğrulama henüz yoktur.</p><div class="architecture-flow"><span>Pist geometrisi</span><b>→</b><span>Araç & enerji modeli</span><b>→</b><span>Kontrol adaptörü</span><b>→</b><span>Tekrarlanabilir kayıt</span></div><a href="../docs/simulation-architecture.md" download class="text-link">Mimari önerisini indir ↗</a></details></section>
-<section class="screen" data-screen="team" aria-label="Takım ve Yarışmalar" hidden><nav class="subnav" id="team-tabs" aria-label="Takım alt bölümleri"><a href="#/team/goals" data-sub="goals">Yarışma hedefleri</a><a href="#/team/files" data-sub="files">Kaynak dosyalar</a></nav><div id="team-goals"><div id="competition-record" class="competition-list"></div>
-<section id="competition-gallery" class="competition-gallery" aria-labelledby="competition-gallery-title">
-  <h2 id="competition-gallery-title">Takım fotoğrafları</h2>
-  <div id="competition-media"></div>
-</section></div><section id="files" hidden><div class="section-title"><h2>Kaynağa geri dön.</h2><span class="geometry-tag">Özgün belgeler korunur</span></div><div id="file-list" class="file-list"></div><p class="muted">Ayrı STEP/yerleşim ZIP’i, sezon planı ve güncel resmî şartname sağlanmadı. Yarış uygunluğu doğrulanmadı.</p></section></section>
-<section class="screen" data-screen="experience" aria-label="Araç Deneyimi" hidden><nav class="subnav experience-nav" aria-label="Araç ortamı"><a href="#/experience/showroom" data-sub="showroom">SHOWROOM</a><a href="#/experience/workshop" data-sub="workshop">ATÖLYE</a><a href="#/experience/track" data-sub="track">PİST / DEMO</a></nav><div class="experience-controls"><div id="workshop-controls"><button id="lift-toggle" aria-pressed="false">Lifti Kaldır</button><button data-workshop-focus="under">Alt şasi</button><button data-workshop-focus="suspension">Süspansiyon / fren</button><button data-workshop-focus="transmission">Aktarma</button><button data-workshop-focus="control">Elektronik</button></div><div id="track-controls"><button data-track-view="3d" aria-pressed="true">3B Pist</button><button data-track-view="2d" aria-pressed="false">2B Simülasyon</button><label>Kamera <select id="track-camera"><option value="follow">Takip</option><option value="top">Üstten</option><option value="road">Yol kenarı</option><option value="cockpit">Kokpit</option></select></label></div></div><p id="experience-limit" class="experience-limit"></p><div class="vehicle-status"><p id="vehicle-status-mode"></p><div><span>Hız <output id="status-speed"></output></span><span>Aktarma <output id="status-drive"></output></span><span>Motor <output id="status-motor"></output></span><span>Sim. zamanı <output id="status-time"></output></span><span>Batarya <output id="status-battery"></output></span></div></div><div class="scene-slot" data-slot="experience"></div><section id="simulation-panel"></section></section><section class="screen" data-screen="inventory" aria-label="Mühendislik Envanteri" hidden><div id="engineering-inventory"></div></section></main><footer class="app-footer"><span>VACCINO 26/27 <i>·</i> ENGINEERING PLATFORM</span><span id="footer-context">Tasarım çalışması / v1.3</span></footer></div>
-<div id="viewer" class="scene-shell" data-context="overview"><div class="scene-column"><div class="stage" id="stage"><canvas id="vehicle" aria-label="Döndürülebilen üç boyutlu Vaccino araç modeli" tabindex="0"></canvas><div class="tools" aria-label="3B inceleme kontrolleri"><button id="reset">Görüşü sıfırla</button><details class="viewer-settings" id="viewer-settings">
+<section class="screen" data-screen="experience" aria-label="Araç Deneyimi" hidden><nav class="subnav experience-nav" aria-label="Araç ortamı"><a href="#/experience/showroom" data-sub="showroom">SERGİ</a><a href="#/experience/workshop" data-sub="workshop">ATÖLYE</a><a href="#/experience/track" data-sub="track">PİST / DEMO</a></nav><div class="experience-controls"><div id="workshop-controls"><button id="lift-toggle" aria-pressed="false">Lifti Kaldır</button><button data-workshop-focus="under">Alt şasi</button><button data-workshop-focus="suspension">Süspansiyon / fren</button><button data-workshop-focus="transmission">Aktarma</button><button data-workshop-focus="control">Elektronik</button></div><div id="track-controls"><button data-track-view="3d" aria-pressed="true">3B Pist</button><button data-track-view="2d" aria-pressed="false">2B Simülasyon</button><label>Kamera <select id="track-camera"><option value="follow">Takip</option><option value="top">Üstten</option><option value="road">Yol kenarı</option><option value="cockpit">Kokpit</option></select></label></div></div><p id="experience-limit" class="experience-limit"></p><div class="vehicle-status"><p id="vehicle-status-mode"></p><div><span>Hız <output id="status-speed"></output></span><span>Aktarma <output id="status-drive"></output></span><span>Motor <output id="status-motor"></output></span><span>Sim. zamanı <output id="status-time"></output></span><span>Batarya <output id="status-battery"></output></span></div></div><div class="scene-slot" data-slot="experience"></div><section id="simulation-panel"></section></section><section class="screen app-screen" data-screen="systems" aria-label="Sistemler" hidden><nav class="tabs" id="systems-tabs" aria-label="Sistem sekmeleri"></nav><div class="tab-panel" id="systems-panel"></div></section>
+<section class="screen app-screen" data-screen="races" aria-label="Yarışlar" hidden><nav class="race-switch" id="race-switch" aria-label="Yarışma seçimi"></nav><nav class="tabs" id="race-tabs" aria-label="Yarışma sekmeleri"></nav><div class="tab-panel" id="races-panel"></div></section>
+<section class="screen app-screen" data-screen="inventory" aria-label="Envanter" hidden><div class="inventory-bar" role="search"><label class="field field-grow"><span>Ara</span><input id="inv-search" type="search" placeholder="Parça, model veya ekip" autocomplete="off"></label><label class="field"><span>Kategori</span><select id="inv-category"><option value="">Tümü</option></select></label><label class="field"><span>Durum</span><select id="inv-status"><option value="">Tümü</option></select></label><output id="inv-count" aria-live="polite"></output></div><div class="inv-table-wrap" tabindex="0" role="region" aria-label="Envanter listesi"><table class="inv-table"><thead><tr><th scope="col">Parça</th><th scope="col">Model</th><th scope="col">Kategori</th><th scope="col">Durum</th></tr></thead><tbody id="inv-rows"></tbody></table></div><details class="quiet-disclosure"><summary>Yerel düzenleme ve dışa aktarma</summary><div id="engineering-inventory"></div></details></section>
+<section class="screen app-screen" data-screen="support" aria-label="Takım ve Destek" hidden><div id="support-panel"></div></section>
+</main><footer class="app-footer"><span>VACCİNO 2026/27 <i>·</i> OİB Lisesi, Bursa</span><span id="footer-context">Tasarım çalışması / v1.3</span></footer></div>
+<aside id="detail-drawer" class="detail-drawer" role="dialog" aria-labelledby="drawer-title" hidden><div class="drawer-head"><div><p class="drawer-eyebrow" id="drawer-eyebrow"></p><h2 id="drawer-title" tabindex="-1"></h2></div><button type="button" class="drawer-close" id="drawer-close">Kapat</button></div><div class="drawer-body" id="drawer-body"></div></aside>
+<div id="viewer" class="scene-shell" data-context="overview"><div class="scene-column"><div class="stage" id="stage"><canvas id="vehicle" aria-label="Döndürülebilen üç boyutlu VACCİNO araç modeli" tabindex="0"></canvas><div class="tools" aria-label="3B inceleme kontrolleri"><button id="reset">Görüşü sıfırla</button><details class="viewer-settings" id="viewer-settings">
   <summary><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16M8 4v4M16 10v4M10 16v4"/></svg>Ayarlar</summary>
   <div class="viewer-settings-panel">
     <label for="quality">Grafik kalitesi</label>
@@ -135,14 +95,14 @@
   <button id="engage" title="Aktarma bağlantısı" aria-pressed="true" hidden>Bağlı</button>
   <button id="part-open" aria-controls="part-inspector" aria-expanded="false">Parça seç</button>
 </div><p class="caption"><span class="simple-only">Parçaları seç, aracı döndür, sistemin nasıl çalıştığını keşfet.</span><span class="technical-only">Çalışma prensibi animasyonu · Geometriler temsili · Fizik, çakışma ve dayanım analizi yapılmadı.</span></p></div><aside id="part-inspector" class="inspector" aria-label="Seçili parça" inert><div class="inspector-heading"><h2>Parça inceleme</h2><button id="part-close" type="button">Kapat</button></div><details class="part-library"><summary>Parça seç <span id="part-count"></span></summary><nav id="parts" aria-label="Araç bölümleri"></nav></details><article aria-live="polite"><div id="status"></div><h3 id="title" tabindex="-1"></h3><h4>Görevi</h4><p id="desc"></p><h4>Açıklama</h4><p id="part-technical"></p><h4>Temel teknik özellikler</h4><ul id="facts"></ul><details id="part-details"><summary>Kontroller ve kaynak</summary><div id="variants"></div><p id="variant-note"></p><div class="geometry-note">Temsili yerleşim · doğrulama bekliyor</div><div class="provenance technical-only"><b>Kaynak</b><p>Aktarma 3B HTML · V2 yerleşim / Gereksinim belgesi R01</p><b>Geometri ve doğrulama</b><p>Şasi prototipten alınmıştır. Diğer parçalar temsili; üretici CAD’i yoktur. Sonraki adım: ölçü, bağlantı ve hareket açıklığı kontrolü.</p></div></details></article></aside></div><noscript><p class="noscript">Etkileşimli araç için JavaScript gerekir. <a href="../inputs/Vaccino_26-27_Aktarma_3B.html">Özgün prototip</a> ve <a href="../inputs/Vaccino_26-27_Sensor_Envanteri.xlsx">Excel envanteri</a> indirilebilir.</p></noscript><dialog id="nextion-dialog" class="nextion-dialog" aria-label="Nextion gösterge konsepti">
-<div class="nextion-head"><span>VACCINO / DIGITAL COCKPIT <small>ARAYÜZ TASLAĞI</small></span><button id="nextion-close" type="button" aria-label="Ekranı kapat">✕</button></div>
-<div class="nextion-device"><div class="nextion-glass"><div class="nextion-status"><strong>VACCINO</strong><span>READY · SIMULATED</span><span>12:00</span></div>
-<div class="nextion-screen" id="nextion-screen"><div class="nextion-speed"><span>HIZ</span><strong>00</strong><small>km/h</small></div><div class="nextion-metrics"><div><small>BATARYA</small><strong>82%</strong><div class="nextion-bar"><i></i></div></div><div><small>MOD</small><strong>ECO</strong></div><div><small>SICAKLIK</small><strong>28°C</strong></div></div></div>
+<div class="nextion-head"><span>VACCİNO / KOKPİT EKRANI <small>ARAYÜZ TASLAĞI</small></span><button id="nextion-close" type="button" aria-label="Ekranı kapat">✕</button></div>
+<div class="nextion-device"><div class="nextion-glass"><div class="nextion-status"><strong>VACCİNO</strong><span>HAZIR · ÖRNEK VERİ</span><span>12:00</span></div>
+<div class="nextion-screen" id="nextion-screen"><div class="nextion-speed"><span>HIZ</span><strong>00</strong><small>km/sa</small></div><div class="nextion-metrics"><div><small>BATARYA</small><strong>82%</strong><div class="nextion-bar"><i></i></div></div><div><small>MOD</small><strong>EKO</strong></div><div><small>SICAKLIK</small><strong>28°C</strong></div></div></div>
 <div class="nextion-tabs"><button type="button" data-nextion-tab="home" aria-pressed="true">Sürüş</button><button type="button" data-nextion-tab="energy" aria-pressed="false">Enerji</button><button type="button" data-nextion-tab="diagnostics" aria-pressed="false">Sistem</button></div></div></div>
 <p class="nextion-note">Bu gösterim tarayıcıda çalışan, gerçek Nextion donanımına bağlı olmayan UI prototipidir. Gerçek panel çözünürlüğü, seri komutlar ve güvenlik göstergeleri ayrıca belirlenecek.</p>
 </dialog>
-<dialog id="season-intro" class="season-intro" aria-label="Vaccino açılışı">
-<button id="season-start" type="button" aria-label="Vaccino stüdyosuna gir"></button>
-<p id="season-error" role="alert" hidden>Vaccino logosu yüklenemedi. assets/branding/vaccino-logo.png dosyasını kontrol edin.</p>
+<dialog id="season-intro" class="season-intro" aria-label="VACCİNO açılışı">
+<button id="season-start" type="button" aria-label="VACCİNO sitesine gir"></button>
+<p id="season-error" role="alert" hidden>VACCİNO logosu yüklenemedi. assets/branding/vaccino-logo.png dosyasını kontrol edin.</p>
 <button id="season-skip" type="button">Animasyonu atla</button>
-</dialog><script src="src/app.js?v=driver-studio-03"></script></body></html>
+</dialog><script src="src/app.js?v=app-shell-03"></script></body></html>

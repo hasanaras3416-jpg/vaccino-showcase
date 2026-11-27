@@ -4,13 +4,13 @@
     const message=document.createElement('p');
     message.className='noscript';
     message.setAttribute('role','alert');
-    message.textContent='Vaccino açılamadı. Platformu yerel sunucu üzerinden açıp sayfayı yenileyin.';
+    message.textContent='VACCİNO açılamadı. Platformu yerel sunucu üzerinden açıp sayfayı yenileyin.';
     document.querySelector('.app-shell').before(message);
   }
 
   const entry=document.currentScript&&new URL(document.currentScript.src);
   if(!entry?.search||!HTMLScriptElement.supports?.('importmap')){
-    reportLoadFailure(new Error('Vaccino sürümü yüklenemedi. Güncel bir tarayıcı ve sürümlü giriş dosyası gerekir.'));
+    reportLoadFailure(new Error('VACCİNO sürümü yüklenemedi. Güncel bir tarayıcı ve sürümlü giriş dosyası gerekir.'));
     return;
   }
 
@@ -22,8 +22,8 @@
     'interactive-upgrades.js','inventory-store.js','inventory-ui.js',
     'mechanical-details.js','presentation.js','season.js','simulation-engine.js',
     'simulation-ui.js','store.js','studio.js','track-geometry.js','track-scene.js',
-    'vehicle-layout.js','vehicle.js','workshop-scene.js','workspace.js',
-    '../data/geometry.js','../vendor/driver-gltf-loader.js'
+    'vehicle-layout.js','vehicle.js','workshop-scene.js','workspace.js','app-screens.js',
+    '../data/geometry.js','../data/vaccino-data.js','../vendor/driver-gltf-loader.js'
   ];
   function versioned(url) {
     const resolved=new URL(url,entry);
@@ -42,7 +42,8 @@
   three.onload=()=>{
     Promise.all([
       import(versioned('workspace.js')),
-      import(versioned('interactive-upgrades.js'))
+      import(versioned('interactive-upgrades.js')),
+      import(versioned('app-screens.js'))
     ]).catch(reportLoadFailure);
   };
   three.onerror=()=>reportLoadFailure(new Error(`3B kitaplığı yüklenemedi: ${three.src}`));
