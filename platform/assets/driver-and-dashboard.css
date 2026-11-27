@@ -80,8 +80,8 @@ body[data-route=driver] #workspace { padding-block:clamp(1.25rem, 3.4vw, 3.75rem
   .driver-view-controls { right:.6rem; bottom:.6rem; }
   .driver-equipment-note, .driver-caveat { margin-top:.75rem; }
 }
-#season-start img {transform:scale(1);transition:transform .3s cubic-bezier(.2,.8,.2,1), filter .3s ease !important}
-#season-start:is(:hover,:focus-visible) img {transform:scale(1.095)!important;filter:drop-shadow(0 0 16px rgb(184 138 50 / 18%))!important}
+#season-start img {transform:scale(1);transition:filter var(--dur-micro) var(--ease-in) !important}
+#season-start:is(:hover,:focus-visible) img {transform:none!important;filter:drop-shadow(0 0 16px rgb(184 138 50 / 18%))!important}
 #season-start:is(:hover,:focus-visible) {background:transparent!important}
 .nextion-dialog {width:min(820px,calc(100vw - 26px));max-height:95dvh;overflow:auto;border:1px solid #4e493f;padding:clamp(18px,3vw,30px);background:#0b0d0e;color:#f2eee7;box-shadow:0 28px 100px #000b}
 .nextion-dialog::backdrop {background:rgba(0,0,0,.82);backdrop-filter:blur(7px)}

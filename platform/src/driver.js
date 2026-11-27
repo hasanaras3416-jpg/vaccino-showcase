@@ -108,9 +108,11 @@ export function initializeDriver() {
   function draw(now) {
     frameId = 0;
     if (!active || document.hidden) return;
+    // Ekran geçişi sürerken çizim bekler; geçiş bitince vaccino:resize yeniden başlatır.
+    if (document.documentElement.dataset.transition) return;
     if (transition) {
       const {from, to, start} = transition;
-      const progress = limit((now - start) / 600, 0, 1);
+      const progress = limit((now - start) / 360, 0, 1);
       const eased = progress * progress * (3 - 2 * progress);
       pose.target.lerpVectors(from.target, to.target, eased);
       pose.azimuth = T.MathUtils.lerp(from.azimuth, to.azimuth, eased);
@@ -282,6 +284,7 @@ export function initializeDriver() {
   new ResizeObserver(resize).observe(stage);
   mobile.addEventListener('change', resize);
   document.addEventListener('vaccino:route', syncRoute);
+  document.addEventListener('vaccino:resize', requestFrame);
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stopFrames();
     else requestFrame();

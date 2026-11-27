@@ -4,6 +4,7 @@ import {site, stats, parts, systems, tests, races, inventory, inventoryCategorie
 
 const $ = id => document.getElementById(id);
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const cssMs = name => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
 
 function h(tag, props = {}, ...children) {
   const node = document.createElement(tag);
@@ -56,7 +57,7 @@ export function closeDrawer({returnFocus = true} = {}) {
   if (drawer.hidden) return;
   drawer.classList.remove('is-open');
   document.body.classList.remove('drawer-open');
-  drawerTimer = setTimeout(() => { drawer.hidden = true; }, reducedMotion.matches ? 0 : 360);
+  drawerTimer = setTimeout(() => { drawer.hidden = true; }, cssMs('--dur-panel'));
   document.querySelectorAll('[data-pick][aria-pressed="true"]').forEach(button => button.setAttribute('aria-pressed', 'false'));
   if (returnFocus && drawerTrigger?.isConnected) drawerTrigger.focus({preventScroll: true});
   drawerTrigger = null;
@@ -83,7 +84,7 @@ function placeIndicator(nav) {
   const active = nav.querySelector('[aria-current]'), indicator = nav.querySelector('.tab-indicator');
   if (!active || !indicator) return;
   indicator.style.setProperty('--x', `${active.offsetLeft}px`);
-  indicator.style.setProperty('--w', `${active.offsetWidth}px`);
+  indicator.style.setProperty('--sx', String(active.offsetWidth / 100));
   if (nav.scrollWidth > nav.clientWidth) active.scrollIntoView({block: 'nearest', inline: 'nearest', behavior: 'instant'});
 }
 new ResizeObserver(() => document.querySelectorAll('.tabs').forEach(placeIndicator)).observe(document.body);
@@ -93,7 +94,28 @@ function animatePanel(panel) {
   if (reducedMotion.matches) return;
   panel.getBoundingClientRect();
   panel.classList.add('panel-enter');
+  // Kart ve listeler sırayla: en çok 6 öğe, 40 ms aralık; gerisi altıncıyla birlikte.
+  panel.querySelectorAll('.card-grid, .race-switch, .tag-list, .talk-list').forEach(list => {
+    [...list.children].forEach((item, i) => item.style.setProperty('--i', String(Math.min(i, 5))));
+    list.classList.remove('m-stagger'); void list.offsetWidth; list.classList.add('m-stagger');
+  });
 }
+/* Kart ızgarası dengesi: son satırda tek kart kalmasın (bkz. app-shell.css, .card-grid[data-n]). */
+function balanceGrid(grid) {
+  const n = grid.children.length;
+  grid.dataset.n = String(n); grid.dataset.r3 = String(n % 3); grid.dataset.r2 = String(n % 2);
+}
+new MutationObserver(records => {
+  for (const record of records) {
+    if (record.target.matches?.('.card-grid')) balanceGrid(record.target);
+    for (const node of record.addedNodes) {
+      if (node.nodeType !== 1) continue;
+      if (node.matches('.card-grid')) balanceGrid(node);
+      node.querySelectorAll('.card-grid').forEach(balanceGrid);
+    }
+  }
+}).observe(document.getElementById('workspace'), {childList: true, subtree: true});
+document.querySelectorAll('.card-grid').forEach(balanceGrid);
 
 /* ---------- Kartlar ---------- */
 function card(item, {eyebrow = '', extra = []} = {}) {

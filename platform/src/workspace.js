@@ -286,14 +286,44 @@ function syncViewerControls({closeSettings=true}={}){
 }
 const knownRoutes=new Set(['overview','vehicle','systems','races','inventory','support','driver','mechanical','electrical','autonomy','decisions','tests','experience']);
 const navParent={mechanical:'systems',electrical:'systems',autonomy:'systems',driver:'systems',decisions:'systems',tests:'systems',experience:'vehicle'};
+function resolveHash(hash) {
+  const raw=hash.replace(/^#\/?/,'').split('/');
+  const alias={competitions:['races'],team:['races'],files:['races'],garage:['systems'],sensors:['autonomy','sensors'],'vehicle-section':['vehicle'],
+    genel:['overview'],arac:['vehicle'],sistemler:['systems',...raw.slice(1)],yarislar:['races',...raw.slice(1)],envanter:['inventory'],destek:['support'],takim:['support']};
+  return alias[raw[0]]||raw;
+}
+const routeOf=path=>knownRoutes.has(path[0])?path[0]:'overview';
+// Menü sırası geçiş yönünü belirler: aşağıdaki ekran ileri, yukarıdaki geri.
+const navOrder=['overview','vehicle','systems','races','inventory','support'];
+const navIndex=route=>navOrder.indexOf(navParent[route]||route);
+// 3B sahnenin yuvası olan ekranlar; iki ekranda da varsa sahne tek öğe olarak taşınır.
+const sceneRoutes=new Set([...document.querySelectorAll('[data-slot]')].map(slot=>slot.dataset.slot));
+function placeNavIndicator() {
+  const indicator=document.querySelector('.nav-indicator');
+  const active=document.querySelector('.primary-nav a[aria-current=page]');
+  if(!indicator)return;
+  if(!active){indicator.style.opacity='0';return;}
+  indicator.style.opacity='1';
+  const horizontal=getComputedStyle(active.parentElement).flexDirection==='row';
+  indicator.style.setProperty('--nav-x',horizontal?`${active.offsetLeft+(active.offsetWidth-indicator.offsetWidth)/2}px`:'0px');
+  indicator.style.setProperty('--nav-y',horizontal?'0px':`${active.offsetTop+(active.offsetHeight-indicator.offsetHeight)/2}px`);
+  requestAnimationFrame(()=>{indicator.dataset.ready='';});
+}
+new ResizeObserver(()=>{const i=document.querySelector('.nav-indicator');if(i)delete i.dataset.ready;placeNavIndicator();}).observe(document.querySelector('.primary-nav'));
+// Kart ve listeler sırayla girer: en çok 6 öğe, 40 ms aralık; gerisi altıncıyla birlikte.
+function staggerIn(root) {
+  if(!root)return;
+  root.querySelectorAll('.card-grid, .part-list, .race-switch, .tag-list, .talk-list').forEach(list=>{
+    if(list.closest('[hidden]'))return;
+    [...list.children].forEach((item,i)=>item.style.setProperty('--i',String(Math.min(i,5))));
+    list.classList.remove('m-stagger');void list.offsetWidth;list.classList.add('m-stagger');
+  });
+}
 function navigate({focusHeading=false}={}) {
   document.dispatchEvent(new Event('vaccino:inspector-close'));
   if(document.body.classList.contains('presentation-active'))document.dispatchEvent(new Event('vaccino:presentation-exit'));
-  const raw=location.hash.replace(/^#\/?/,'').split('/');
-  const alias={competitions:['races'],team:['races'],files:['races'],garage:['systems'],sensors:['autonomy','sensors'],'vehicle-section':['vehicle'],
-    genel:['overview'],arac:['vehicle'],sistemler:['systems',...raw.slice(1)],yarislar:['races',...raw.slice(1)],envanter:['inventory'],destek:['support'],takim:['support']};
-  const path=alias[raw[0]]||raw;
-  state.route=knownRoutes.has(path[0])?path[0]:'overview';
+  const path=resolveHash(location.hash);
+  state.route=routeOf(path);
   const entries=state.route==='autonomy'?software:systems[state.route];
   const legacySoftware={perception:'vision',sensors:'vision',interfaces:'vision'};
   const requested=state.route==='autonomy'?(legacySoftware[path[1]]??path[1]):path[1];
@@ -304,6 +334,7 @@ function navigate({focusHeading=false}={}) {
   document.querySelectorAll('[data-screen]').forEach(screen=>{screen.hidden=screen.dataset.screen!==state.route;});
   const navRoute=navParent[state.route]||state.route;
   document.querySelectorAll('.primary-nav a').forEach(a=>{if(a.dataset.route===navRoute)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  placeNavIndicator();
   document.querySelectorAll('.subnav a').forEach(a=>{if(a.closest('[data-screen]')?.dataset.screen===state.route&&a.dataset.sub===state.sub)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   const slot=document.querySelector(`[data-slot="${state.route}"]`);
   if(slot){slot.insertBefore(viewer,state.route==='overview'?$('v-hero-restore'):null);viewer.hidden=false;viewer.dataset.context=state.route;}
@@ -380,16 +411,25 @@ const interfaceSection=document.querySelector('.interface-disclosure');interface
 navigate();
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 let lastRoute=state.route;
+const root=document.documentElement;
 window.addEventListener('hashchange',()=>{
-  const run=()=>{navigate({focusHeading:true});lastRoute=state.route;};
   const before=lastRoute;
-  const next=(location.hash.replace(/^#\/?/,'').split('/')[0])||'overview';
-  const sameScreen=next===before;
-  if(document.startViewTransition&&!reducedMotion.matches&&!sameScreen&&!document.body.classList.contains('presentation-active')){
-    document.documentElement.dataset.transition='screen';
+  const next=routeOf(resolveHash(location.hash));
+  const run=()=>{navigate({focusHeading:true});lastRoute=state.route;if(next!==before&&!reducedMotion.matches)staggerIn(document.querySelector('[data-screen]:not([hidden])'));};
+  if(next===before||document.body.classList.contains('presentation-active')){run();return;}
+  root.dataset.dir=navIndex(next)>=navIndex(before)?'forward':'back';
+  if(sceneRoutes.has(next)&&sceneRoutes.has(before))root.dataset.shared='';else delete root.dataset.shared;
+  // Ekran değişirken 3B render döngüleri durur; yeni ekran görününce yeniden başlar.
+  root.dataset.transition='screen';
+  const done=()=>{delete root.dataset.transition;delete root.dataset.shared;document.dispatchEvent(new Event('vaccino:resize'));};
+  if(document.startViewTransition){
     const transition=document.startViewTransition(run);
-    transition.finished.finally(()=>{delete document.documentElement.dataset.transition;});
-  }else run();
+    transition.finished.finally(done);
+  }else{
+    run();
+    const ms=parseFloat(getComputedStyle(root).getPropertyValue('--dur-screen'))||320;
+    setTimeout(done,ms);
+  }
 });
 document.body.dataset.data='ready';
 const logo=loadBrandLogo();

@@ -748,7 +748,8 @@ try{
  let renderWidth=0,renderHeight=0,homeFit=1,vehicleFit=1;
  function loop(now){
   requestAnimationFrame(loop);
-  if(document.hidden||$('viewer').hidden||canvas.clientWidth<2||canvas.clientHeight<2){lastNow=now;return;}
+  // Ekran geçişi sürerken çizim durur (bkz. workspace.js, html[data-transition]).
+  if(document.hidden||document.documentElement.dataset.transition||$('viewer').hidden||canvas.clientWidth<2||canvas.clientHeight<2){lastNow=now;return;}
   if(cameraMotion.tick(now))draw=true;
   drivetrain.tick(now);
   const sleeveEnd=engaged?.145:.105;if(Math.abs(sleeve.position.z-sleeveEnd)>.0001){sleeve.position.z=T.MathUtils.lerp(sleeve.position.z,sleeveEnd,.18);draw=true;}
