@@ -314,7 +314,7 @@ body[data-route=overview] .studio-home > .scene-slot {
   .v-hero-content h2 { font-size: clamp(3.2rem, 12vw, 5.5rem); }
   .v-hero-content h2 em { display: inline; }
   .stat-row { padding: 16px var(--gutter) 24px; }
-  .detail-drawer { width: 100vw; border-left: 0; }
+  .detail-drawer { left: 0; width: auto; border-left: 0; }
   #workspace .scene-shell[data-context=vehicle]:not([data-presentation]) .stage { height: clamp(320px, 58svh, 560px); }
   .timeline li { grid-template-columns: 1fr; gap: 6px; }
 }

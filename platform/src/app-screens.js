@@ -99,8 +99,8 @@ function animatePanel(panel) {
 function card(item, {eyebrow = '', extra = []} = {}) {
   const hasDetail = nonEmpty(item.ayrinti) || item.href;
   const content = [
-    h('span', {class: 'card-title', text: item.baslik}),
-    item.deger ? h('strong', {class: 'card-value', text: item.deger}) : null,
+    item.deger ? h('span', {class: 'card-title', text: item.baslik}) : null,
+    h('strong', {class: 'card-value', text: item.deger || item.baslik}),
     item.not ? h('span', {class: 'card-note', text: item.not}) : null,
     h('span', {class: 'card-foot'}, item.dogrula ? verifyBadge() : h('span'), hasDetail ? h('span', {class: 'card-more', 'aria-hidden': 'true', text: 'Ayrıntı →'}) : null)
   ];
