@@ -105,24 +105,14 @@ export const systems = {
     ad: 'Mekanik', ozet: 'Şasi, süspansiyon, direksiyon, fren ve aktarma.',
     derin: {etiket: 'Mekanik 3B sergisi', href: '#/mechanical'},
     kartlar: [
-      {baslik: 'Şasi çizimi', deger: '2.830 × 1.230 mm', not: 'Yükseklik 980 mm · tekerlek ve kabuk hariç', rozet: 'aday',
-        ayrinti: [r('Tekerleklerle toplam boy ≈ 3,1–3,2 m.', 'tahmin'), 'İmalatçı Şahinler Metal; tarih belli değil.', 'Bağlantı noktaları kilitlenmeden imalata verilmeyecek.', 'Çizimde olmayan parçalar 3B’de temsilidir.'], href: '#/mechanical/chassis'},
-      {baslik: 'Şasi borusu', deger: 'Ø30 × 2 mm', not: 'Alüminyum 6061-T6', rozet: 'beyan',
-        ayrinti: [r('İskelet ≈ 17 kg; plaka, kaynak ve bağlantılar hariç.', 'tahmin'), 'Kaynak bölgesi dayanımı ve yuvarlanma koruması ayrıca doğrulanacak.']},
-      {baslik: 'Tahrik', deger: 'Orta motor + yarım diferansiyel', not: 'Mafsallı aks · zincir ve hub motor bırakıldı', rozet: 'beyan',
-        ayrinti: ['Dişli oranı, aks mili ve flanş henüz bilinmiyor.', 'Birimin üstündeki disk fren sökülecek.'], href: '#/mechanical/transmission'},
-      {baslik: 'Motor etiketi', deger: '48 V · 1000 W', not: 'Etiket değeri, anlamı doğrulanacak · 450 dev/dk', rozet: 'dogrula',
-        ayrinti: ['Marka ve model: Seçilmedi / model bilinmiyor; numune test edilecek.', r('450 dev/dk etiket değeri; motor milinde mi çıkışta mı olduğu doğrulanacak.', 'dogrula'), r('48 V × 20 A = 960 W; etiketteki 1000 W ile uyuşmuyor. Etiket yaklaşık kabul edilir.', 'dogrula')]},
-      {baslik: 'Süspansiyon', deger: 'Çift salıncak', not: 'Ön ve arka', rozet: 'beyan',
-        ayrinti: ['Bağlantı noktaları ve kinematik açık.', r('Göbek rulmanı adayı DAC35680037.', 'aday')], href: '#/mechanical/suspension'},
-      {baslik: 'Fren', deger: '4 disk · çift hidrolik devre', not: 'Ticari parça · disk ve kaliper seçilmedi', rozet: 'beyan',
-        ayrinti: [r('Madde 51: tek pedal, çift devre, disk en az 3 mm.', 'dogrula'), 'Disk çapı ve kaliper: Seçilmedi.'], href: '#/mechanical/braking'},
-      {baslik: 'Direksiyon', deger: 'Kremayer · merkez girişli', not: 'Mil çıkışı araç ortasında', rozet: 'beyan',
-        ayrinti: [r('Step motor NEMA 43 olarak anılıyor; etiket teyidi bekliyor.', 'dogrula'), 'Elle ve otonom kullanım için dişli kutusu yapılacak.', 'Direksiyon kutusu: Seçilmedi.']},
-      {baslik: 'Tekerlek ve jant', deger: '16 inç', not: 'Jant ve lastik alınmadı', rozet: 'beyan',
-        ayrinti: [r('Kural: 14–18 inç jant, lastik en az 80 mm.', 'dogrula'), r('Lastik dış çapı ≈ 500 mm varsayımı.', 'tahmin')]},
-      {baslik: 'Seyir hedefi', deger: '30–35 km/sa', not: 'Hesap · Mileage ortalaması ≥ 25 km/sa', rozet: 'tahmin',
-        ayrinti: [r('Mileage’ı bitirmek için gereken ortalama hız ≥ 25 km/sa (2026 Chapter II referansı).', 'dogrula'), r('Basit tur modeliyle gereken seyir hızı ≈ 27,4 km/sa.', 'tahmin'), '25 km/sa seyir hızı değil, gereken ortalamadır.']}
+      {baslik: 'Şasi', deger: '2.830 × 1.230 mm', not: 'Ø30 × 2 mm alüminyum boru', rozet: 'aday',
+        ayrinti: ['STEP çizimi; yükseklik 980 mm, tekerlek ve kabuk hariç.', r('Boru Ø30 × 2 mm, alüminyum 6061-T6.', 'beyan'), r('İskelet ≈ 17 kg; plaka, kaynak ve bağlantılar hariç.', 'tahmin'), r('Tekerleklerle toplam boy ≈ 3,1–3,2 m.', 'tahmin'), 'İmalatçı Şahinler Metal; tarih belli değil.', 'Bağlantı noktaları kilitlenmeden imalata verilmeyecek.', 'Kaynak bölgesi dayanımı ve yuvarlanma koruması ayrıca doğrulanacak.', 'Çizimde olmayan parçalar 3B’de temsilidir.'], href: '#/mechanical/chassis'},
+      {baslik: 'Tahrik', deger: 'Orta motor', not: 'Yarım diferansiyel · mafsallı aks', rozet: 'beyan',
+        ayrinti: ['Zincir ve hub motor bırakıldı (Eski plan).', r('Motor etiketi 48 V · 1000 W · 450 dev/dk; anlamı doğrulanacak.', 'dogrula'), 'Marka ve model: Seçilmedi / model bilinmiyor; numune test edilecek.', r('450 dev/dk etiket değeri; motor milinde mi çıkışta mı olduğu doğrulanacak.', 'dogrula'), r('48 V × 20 A = 960 W; etiketteki 1000 W ile uyuşmuyor. Etiket yaklaşık kabul edilir.', 'dogrula'), 'Dişli oranı, aks mili ve flanş henüz bilinmiyor.', 'Birimin üstündeki disk fren sökülecek.', r('Seyir hedefi 30–35 km/sa; Mileage’ı bitirmek için gereken ortalama ≥ 25 km/sa (2026 Chapter II referansı).', 'tahmin'), r('Basit tur modeliyle gereken seyir hızı ≈ 27,4 km/sa.', 'tahmin')], href: '#/mechanical/transmission'},
+      {baslik: 'Süspansiyon ve direksiyon', deger: 'Çift salıncak', not: 'Ön ve arka · merkez girişli kremayer', rozet: 'beyan',
+        ayrinti: ['Bağlantı noktaları ve kinematik açık; STEP çiziminde bağlantı tablası yok.', r('Ön alt salıncak ≈ 190–230 mm: şasi burnu dar; mekanik ekip değerlendiriyor.', 'dogrula'), r('Göbek rulmanı adayı DAC35680037.', 'aday'), 'Direksiyon: kremayer, mil çıkışı araç ortasında; direksiyon kutusu seçilmedi.', r('Step motor NEMA 43 olarak anılıyor; etiket teyidi bekliyor.', 'dogrula'), 'Elle ve otonom kullanım için dişli kutusu yapılacak.', r('Tekerlek 16 inç; jant ve lastik alınmadı.', 'beyan'), r('Kural: 14–18 inç jant, lastik en az 80 mm.', 'dogrula'), r('Lastik dış çapı ≈ 500 mm varsayımı.', 'tahmin')], href: '#/mechanical/suspension'},
+      {baslik: 'Fren', deger: '4 disk · çift devre', not: 'Hidrolik · disk ve kaliper seçilmedi', rozet: 'beyan',
+        ayrinti: [r('Madde 51: tek pedal, çift devre, disk en az 3 mm.', 'dogrula'), 'Ticari parça; disk çapı ve kaliper: Seçilmedi.'], href: '#/mechanical/braking'}
     ]
   },
   elektrik: {
@@ -133,27 +123,30 @@ export const systems = {
         ayrinti: [r('Kutu ≈ 316 × 220 × 90 mm.', 'tahmin'), r('Tam dolu 54,75 V.', 'aday'), r('Shell sınırı: 60 V ve 1.000 Wh.', 'dogrula'), 'Hücre, BMS ve şarj cihazı seçilmedi.'], href: '#/electrical/battery'},
       {baslik: 'Motor sürücüsü', deger: 'Seçilmedi', not: 'Mileage’da amaca özel sürücü şart', rozet: 'dogrula',
         ayrinti: [r('Madde 66a: Mileage’da ticari sürücü kabul edilmez.', 'dogrula'), r('ADC’de bu şart yok (Madde 402b).', 'dogrula'), 'Tartılan 0,9 kg’lık birimin modeli bilinmiyor.'], href: '#/electrical/control'},
-      {baslik: 'Araç kontrolü', deger: 'NUCLEO-G474RE', not: 'TCAN1042HGV ile tezgâh adayı', dogrula: true,
+      {baslik: 'Araç kontrolü', deger: 'NUCLEO-G474RE', not: 'TCAN1042HGV ile tezgâh adayı', rozet: 'aday',
         ayrinti: ['Mevcut ESP32 erken prototipte kullanılabilir.', 'CAN altyapısı henüz doğrulanmadı.']},
-      {baslik: 'Besleme ve koruma', deger: '12 V DC-DC', not: 'Mean Well RSD-100C-12 adayı', dogrula: true,
-        ayrinti: ['TE EV200A1ANA kontaktör ve Eaton JJN Class T sigorta örnek adaylar.', 'Ön şarj ve koruma ölçümle seçilecek.'], href: '#/electrical/auxiliary'},
-      {baslik: 'PC-2 test platformu', deger: '48 V · 4 kW', not: 'Önceki sezon aracı, 3300 dev/dk', dogrula: true,
+      {baslik: 'Besleme ve koruma', deger: '12 V DC-DC', not: 'Mean Well RSD-100C-12 adayı', rozet: 'aday',
+        ayrinti: ['TE EV200A1ANA kontaktör ve Eaton JJN Class T sigorta örnek adaylar.', 'Ön şarj ve koruma ölçümle seçilecek.'], href: '#/electrical/auxiliary'}
+    ],
+    /* Önceki sezon aracı: yeni araçla aynı ızgarada gösterilmez; Sistemler › Elektrik altında kapalı bölüm. */
+    oncekiSezon: {baslik: 'Önceki sezon (PC-2)', not: 'Yeni araçta kullanılmıyor. Envanterde: E01, T06.', kartlar: [
+      {baslik: 'PC-2 test platformu', deger: '48 V · 4 kW', not: 'Önceki sezon aracı · 3300 dev/dk', rozet: 'beyan',
         ayrinti: ['Curtis 1232SE sürücü, kısa devreden sonra çalışmadı; yeni araç için aday değil.', 'MOSFET arızası bir tahmin; ölçüm kaydı bekleniyor.', 'Uzaktan kumandalı sürüş yeniden test edilmeli.']},
-      {baslik: 'Eski batarya', deger: '48 V · 100 Ah', not: 'LiFePO₄, JK BMS, ~50–52 kg', dogrula: true,
+      {baslik: 'Eski batarya', deger: '48 V · 100 Ah', not: 'LiFePO₄ · JK BMS · ~50–52 kg', rozet: 'beyan',
         ayrinti: ['Yaklaşık 4,8 kWh; incelenen yarış sınırının üzerinde.', 'Yalnızca tezgâh ve platform envanteri.']}
-    ]
+    ]}
   },
   yazilim: {
     ad: 'Yazılım', ozet: 'Simülasyon, algılama ve araç kontrolü.',
     derin: {etiket: 'Yazılım sergisi', href: '#/autonomy'},
     kartlar: [
-      {baslik: 'CARLA simülasyonu', deger: '0.9.15', not: 'Town10HD_Opt, RGB ve semantic kamera', dogrula: true,
-        ayrinti: ['OpenCV Canny/Hough ile şerit çizgisi tespiti çalıştı.', 'PID direksiyon fazla hassastı.'], href: '#/autonomy/simulation'},
+      {baslik: 'CARLA simülasyonu', deger: '0.9.15', not: 'RGB ve semantic kamera', rozet: 'beyan',
+        ayrinti: ['Harita: Town10HD_Opt.', 'OpenCV Canny/Hough ile şerit çizgisi tespiti çalıştı.', 'PID direksiyon fazla hassastı.'], href: '#/autonomy/simulation'},
       {baslik: 'Segmentasyon denemesi', deger: 'mIoU 0,7135', not: 'Yol IoU 0,8594 · çizgi 0,3147', dogrula: true,
         ayrinti: ['Değerler eğitim kaydından doğrulanacak.', 'Pist veya fiziksel araç başarısı değildir.'], href: '#/autonomy/vision'},
       {baslik: 'Geçen sezon çalışmaları', deger: 'Gazebo · CARLA', not: 'Park, şerit takibi, tabela', dogrula: true,
         ayrinti: ['SegNet ve CLRNet denendi; YOLO incelendi.', 'ESP32 kontrol altyapısı ve RViz görselleştirme çalışıldı.', 'Komutlar, sürümler ve test kayıtları teyit bekliyor.']},
-      {baslik: 'Araçta veri akışı', deger: 'Kamera → CAN', not: 'Algılama, planlama, komut', dogrula: true,
+      {baslik: 'Araçta veri akışı', deger: 'Kamera → CAN', not: 'Algılama, planlama, komut · plan',
         ayrinti: ['Kamera/LiDAR → araç bilgisayarı → CAN → kontrol MCU’su.', 'Direksiyon, çekiş ve fren; hız/açı geri bildirimi.', 'Güvenlik ve acil kesme ayrıca tasarlanacak.']}
     ],
     hat: ['CARLA bağlantısı', 'RGB kamera ve OpenCV', 'Şerit / hedef noktası', 'PID direksiyon', 'Hız ve fren', 'Dur çizgisi', 'Engel', 'Shell pist senaryosu', 'ROS 2 / gerçek araç']
@@ -163,10 +156,7 @@ export const systems = {
     derin: {etiket: 'Sürücü Stüdyosu', href: '#/driver'},
     kartlar: [
       {baslik: 'Referans sürücü', deger: '174 cm', not: 'Yatık oturuş ≈ 40° (Tahmin)', rozet: 'tahmin', ayrinti: ['Kalça x ≈ 1.450, y ≈ 150 mm (Varsayım).', 'Ayak merkezi x ≈ 630, z ± 100 mm (Varsayım); pedal yeri değişirse değişir.', 'Oturuş açısı ve göz noktası şasi ve koltuk seçilince doğrulanacak.']},
-      {baslik: 'Kask', deger: 'Seçilmedi', not: 'Kapalı yüzlü yarış kaskı (3B temsili)', rozet: 'dogrula', ayrinti: ['Ürün ve güvenlik standardı kural kitabından belirlenecek.']},
-      {baslik: 'Tulum', deger: 'Seçilmedi', not: 'Tek parça sürücü tulumu (3B temsili)', rozet: 'dogrula', ayrinti: ['Yalnız VACCİNO “V” işareti; sponsor logosu yok.']},
-      {baslik: 'Eldiven', deger: 'Seçilmedi', not: 'Sürüş eldiveni (3B temsili)', rozet: 'dogrula', ayrinti: ['Ürün seçimi doğrulanmadı.']},
-      {baslik: 'Ayakkabı', deger: 'Seçilmedi', not: 'Kapalı sürüş ayakkabısı (3B temsili)', rozet: 'dogrula', ayrinti: ['Ürün seçimi doğrulanmadı.']},
+      {baslik: 'Teçhizat', deger: 'Seçilmedi', not: 'Kask, tulum, eldiven, ayakkabı (3B temsili)', rozet: 'dogrula', ayrinti: ['Kask: kapalı yüzlü yarış kaskı; ürün ve güvenlik standardı kural kitabından belirlenecek.', 'Tulum: tek parça; yalnız VACCİNO “V” işareti, sponsor logosu yok.', 'Eldiven ve kapalı sürüş ayakkabısı: ürün seçimi doğrulanmadı.']},
       {baslik: 'Emniyet kemeri', deger: '5 noktalı', not: 'Madde 29 · bağlantı ≥ 200 N', rozet: 'dogrula', ayrinti: ['Ürün seçilmedi. Bağlantı noktaları şasi ana yapısına.']}
     ],
     not: 'Temel model MakeHuman (CC0). Ayrıntı: docs/ASSETS.md.'
@@ -174,7 +164,7 @@ export const systems = {
   nextion: {
     ad: 'Nextion', ozet: 'Kokpit ekranı arayüz taslağı.',
     kartlar: [
-      {baslik: 'Ekran adayı', deger: 'NX4827T043', not: 'Nextion kokpit ekranı', dogrula: true, ayrinti: ['Panel çözünürlüğü ve seri komutlar ayrıca belirlenecek.']},
+      {baslik: 'Ekran adayı', deger: 'NX4827T043', not: 'Nextion kokpit ekranı', rozet: 'aday', ayrinti: ['Panel çözünürlüğü ve seri komutlar ayrıca belirlenecek.']},
       {baslik: 'Sürüş ekranı', deger: 'Hız · mod', not: 'Örnek değerler', dogrula: false, ayrinti: ['Tarayıcıda çalışan prototip; donanıma bağlı değil.']},
       {baslik: 'Enerji ekranı', deger: 'Gerilim · akım', not: 'Örnek değerler', dogrula: false, ayrinti: ['Gerçek telemetri bağlı değil.']},
       {baslik: 'Sistem ekranı', deger: 'Durum', not: 'Örnek değerler', dogrula: false, ayrinti: ['Güvenlik göstergeleri ayrıca tasarlanacak.']}
@@ -195,14 +185,13 @@ export const races = [
   {
     id: 'shell', ad: 'Shell Eco-marathon', alt: 'Polonya 2027 · Urban Concept / Battery Electric',
     genel: [
-      {baslik: 'Hedef kategori', deger: 'Urban Concept', not: 'Battery Electric', rozet: 'beyan'},
-      {baslik: 'Yarışlar', deger: 'ADC · Mileage', not: 'Öncelik ADC; Mileage kuralları da gözetiliyor', rozet: 'beyan'},
-      {baslik: 'Portal durumu', deger: 'Takım oluşturuldu', not: 'Ekip beyanı', dogrula: true},
-      {baslik: 'Teknik paket', deger: 'Gönderilmedi', not: 'Gönderim ve kabul teyit edilmedi', dogrula: true}
-    ],
-    gorevler: [
-      {ad: 'Autonomous Driving Competition', ozet: 'Araç pistte kendi gider, dur çizgisinde durur, engelden kaçar. Güvenlik sürücüsü araçta oturur (Madde 405).', dogrula: true},
-      {ad: 'Mileage Challenge', ozet: 'Sürücü kullanır; geçerli sürüş km/kWh ile değerlendirilir. Amaca özel motor sürücüsü ve bagaj alanı gerekir.', dogrula: true}
+      {baslik: 'Kategori', deger: 'Urban Concept', not: 'Battery Electric', rozet: 'beyan'},
+      {baslik: 'Tarih ve yer', deger: '8–12 Haziran 2027', not: 'Polonya', rozet: 'dogrula',
+        ayrinti: ['Önceki kontrolde görünen resmî tarih; resmî takvimden yeniden kontrol edilecek.']},
+      {baslik: 'Durum', deger: 'Takım oluşturuldu', not: 'Teknik paket gönderilmedi', rozet: 'dogrula',
+        ayrinti: ['Portalda takım oluşturuldu (ekip beyanı).', 'Teknik paket gönderilmedi; gönderim ve kabul teyit edilmedi.']},
+      {baslik: 'Hedefimiz', deger: 'ADC öncelikli', not: 'Mileage kuralları da gözetiliyor', rozet: 'beyan',
+        ayrinti: [r('Autonomous Driving Competition: araç pistte kendi gider, dur çizgisinde durur, engelden kaçar. Güvenlik sürücüsü araçta oturur (Madde 405).', 'dogrula'), r('Mileage Challenge: sürücü kullanır; geçerli sürüş km/kWh ile değerlendirilir. Amaca özel motor sürücüsü ve bagaj alanı gerekir.', 'dogrula')]}
     ],
     basvuru: ['Team Manager ve Faculty Advisor profilleri', 'Ön / arka 3/4 açı araç görselleri', 'Bir dakikadan kısa video', 'Enerji ve çekiş blok şemaları', 'En fazla üç sayfa otonom teknoloji PDF’i', 'Belgeleme ve motivasyon metni'],
     kurallar: [
@@ -238,12 +227,13 @@ export const races = [
   {
     id: 'teknofest', ad: 'TEKNOFEST Robotaksi', alt: 'Özgün Araç kategorisi',
     genel: [
-      {baslik: 'Kategori', deger: 'Özgün Araç', not: 'İlk sezon hedefi', dogrula: false},
-      {baslik: 'İlk sezon', deger: 'KTR geçildi', not: 'Ekip beyanı', dogrula: true},
-      {baslik: 'Elenme aşaması', deger: 'Test ve simülasyon videosu', not: 'Resmî aşama adı kontrol edilecek', dogrula: true},
-      {baslik: '2027 başvurusu', deger: 'Hedef', not: 'Başvuru durumu bilinmiyor', dogrula: true}
+      {baslik: 'Kategori', deger: 'Özgün Araç', not: 'Robotaksi · ilk sezon hedefi'},
+      {baslik: 'Tarih ve yer', deger: 'Açıklanmadı', not: 'Şartname kontrol edilecek',
+        ayrinti: ['2027 şartnamesi ve takvimi resmî sayfadan kontrol edilecek; tarih yazılmadı.']},
+      {baslik: 'Durum', deger: 'KTR geçildi', not: 'İlk sezon · ekip beyanı', rozet: 'dogrula',
+        ayrinti: ['Elenme aşaması: test ve simülasyon videosu; resmî aşama adı kontrol edilecek.']},
+      {baslik: 'Hedefimiz', deger: '2027 başvurusu', not: 'Başvuru durumu bilinmiyor', rozet: 'dogrula'}
     ],
-    gorevler: [],
     basvuru: [],
     kurallar: [
       {baslik: '2027 şartnamesi', deger: 'Kontrol edilecek', not: 'Robotaksi 2026 belgeleri geçmiş referans'}
@@ -349,6 +339,7 @@ export const chassisStatus = {
     r('Kural: yer yüksekliği ≥ 100 mm, sürücü ve balast ile', 'dogrula'),
     r('Dingil x ≈ 550 / 2.825 mm (ön / arka)', 'aday'),
     r('İz ≈ 1.010 / 875 mm (ön / arka)', 'aday'),
+    r('Ön alt salıncak ≈ 190–230 mm: şasi burnu dar; mekanik ekip değerlendiriyor', 'dogrula'),
     r('Çakışma: akü kutusu arka halkaya (x = 2150) 50 mm biniyor; Madde 66e gereği ön yüz x ≥ 2190 (en az 90 mm arkaya)', 'dogrula')
   ],
   eklenecek: {baslik: 'Şasiye eklenecekler', rozet: 'beyan',
@@ -358,6 +349,7 @@ export const chassisStatus = {
 
 /* Belirsiz konular: Sistemler › Mekanik ekranındaki "Açık sorular" kartı. */
 export const acikSorular = [
+  {soru: 'Ön alt salıncak boyu ≈ 190–230 mm', not: 'Şasi burnu dar; mekanik ekip değerlendiriyor.', rozet: 'dogrula'},
   {soru: 'Koltuk konumu ve modeli', not: 'Elde bir otomobil koltuğu var; gerekirse yarış koltuğu alınacak.'},
   {soru: 'Motor dişli oranı', not: 'Aks mili ve flanş da bilinmiyor; numune testiyle ölçülecek.'},
   {soru: 'Şasi imalat tarihi', not: 'İmalatçı Şahinler Metal; bağlantı noktaları kilitlenmeden imalat yok.'},

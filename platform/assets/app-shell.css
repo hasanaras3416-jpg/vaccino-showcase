@@ -158,7 +158,7 @@ body[data-route=overview] .studio-home > .scene-slot {
 .card-title { font-size: 13px; color: var(--text-muted); letter-spacing: .02em; }
 .card-value { font-size: 22px; font-weight: 600; letter-spacing: -.015em; line-height: 1.2; }
 .card-value.small { font-size: 17px; }
-.card-note { font-size: 14px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-note { font-size: 14px; color: var(--text-muted); overflow-wrap: anywhere; }   /* tam metin; "…" ile kesilmez */
 .card-foot { margin-top: auto; padding-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .card-more { font-size: 13px; color: var(--champagne); }
 .badge-verify { display: inline-flex; align-items: center; min-height: 24px; padding: 0 9px; border: 1px solid rgb(203 185 139 / 55%); border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--champagne); white-space: nowrap; vertical-align: middle; }
@@ -170,7 +170,8 @@ body[data-route=overview] .studio-home > .scene-slot {
 .section-note { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0; font-size: 14px; color: var(--text-muted); line-height: 1.5; }
 .related-links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--hairline); }
 .related-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; color: var(--champagne); }
-.related-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.related-links :is(a, .link-button):hover { text-decoration: underline; text-underline-offset: 4px; }
+#workspace .related-links .link-button { display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; border-radius: 0; background: none; font: inherit; font-size: 16px; font-weight: inherit; letter-spacing: inherit; text-transform: none; color: var(--champagne); cursor: pointer; }
 .pipeline { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .pipeline li { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--hairline); border-radius: 10px; font-size: 14px; }
 .pipeline small { font-size: 12px; color: var(--champagne); font-variant-numeric: tabular-nums; }
@@ -374,18 +375,18 @@ body[data-route=overview] .studio-home > .scene-slot {
 .support-hero h2 { font-size: var(--title-size); }
 
 /* Düğmeler: dolu = ekranın ana eylemi, çerçeveli = ikincil eylem. */
-:is(.topbar .presentation-enter, #workspace .pill-link, .drawer-close, #workspace .tools #reset, #workspace .viewer-settings > summary,
+:is(.topbar .presentation-enter, #workspace .pill-link, .drawer-close, #workspace .tools :is(#reset, #side-view), #workspace .viewer-settings > summary,
   #workspace .driver-view-controls button, #workspace .v-link, #workspace .viewer-actions #play) {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   min-height: 44px; min-width: 44px; padding: 0 18px; border-radius: var(--radius-btn);
   font: 500 14px/1 var(--font-sans); letter-spacing: .01em; text-transform: none; text-decoration: none;
   transition: background var(--dur-micro) var(--ease-in), color var(--dur-micro) var(--ease-in), border-color var(--dur-micro) var(--ease-in);
 }
-:is(.topbar .presentation-enter, #workspace .pill-link, .drawer-close, #workspace .tools #reset, #workspace .viewer-settings > summary,
+:is(.topbar .presentation-enter, #workspace .pill-link, .drawer-close, #workspace .tools :is(#reset, #side-view), #workspace .viewer-settings > summary,
   #workspace .driver-view-controls button, #workspace .v-link:not(.primary)) {
   border: 1px solid rgb(245 242 237 / 34%); background: rgb(9 11 13 / 72%); color: var(--ivory);
 }
-:is(.topbar .presentation-enter, #workspace .pill-link, .drawer-close, #workspace .tools #reset, #workspace .viewer-settings > summary,
+:is(.topbar .presentation-enter, #workspace .pill-link, .drawer-close, #workspace .tools :is(#reset, #side-view), #workspace .viewer-settings > summary,
   #workspace .driver-view-controls button, #workspace .v-link:not(.primary)):hover {
   border-color: var(--champagne); color: var(--champagne); background: rgb(9 11 13 / 72%);
 }

@@ -72,6 +72,18 @@ data.stats.forEach((item, i) => needsBadge(item, `stats[${i}]`));
 for (const [id, system] of Object.entries(data.systems)) system.kartlar.forEach(item => needsBadge(item, `systems.${id} · ${item.baslik}`));
 for (const race of data.races) race.genel.forEach(item => needsBadge(item, `races.${race.id} · ${item.baslik}`));
 
+/* 7. Sade ekran: sekme başına en çok 4 kutu ve en çok 2 "Doğrulanacak" rozeti */
+const isVerify = item => (item?.rozet ?? (item?.dogrula ? 'dogrula' : null)) === 'dogrula';
+for (const [id, system] of Object.entries(data.systems)) {
+  if (system.kartlar.length > 4) warn(`systems.${id}: ${system.kartlar.length} kutu (en çok 4)`);
+  const shown = system.kartlar.filter(isVerify).length + (id === 'mekanik' ? data.acikSorular.filter(isVerify).length : 0);
+  if (shown > 2) warn(`systems.${id}: ${shown} "Doğrulanacak" rozeti görünüyor (en çok 2)`);
+}
+for (const race of data.races) {
+  if (race.genel.length > 4) warn(`races.${race.id}: ${race.genel.length} kutu (en çok 4)`);
+  if (race.genel.filter(isVerify).length > 2) warn(`races.${race.id}: 2'den fazla "Doğrulanacak" rozeti`);
+}
+
 if (problems.length) {
   console.error(`Veri kontrolü: ${problems.length} uyarı`);
   for (const line of problems) console.error(`  - ${line}`);

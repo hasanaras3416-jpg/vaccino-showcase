@@ -259,3 +259,19 @@ body[data-route=autonomy] .screen-heading {
 .drivetrain-comparison dt { font-weight:650; margin-bottom:.4rem; }
 .drivetrain-comparison dd { margin:0 0 .35rem; color:var(--muted); font-size:.875rem; }
 .drivetrain-comparison dd b { color:var(--warm-white); font-size:.79rem; }
+
+/* Yan görünüş (Araç sayfası): ölçü çizgileri ve açıklama kutusu */
+#workspace .tools-start { display:flex; flex-wrap:wrap; gap:8px; }
+#workspace .scene-shell:not([data-context=vehicle]) #side-view,
+#workspace .scene-shell[data-presentation] #side-view { display:none; }
+#workspace .tools #side-view[aria-pressed=true] { border-color:var(--champagne); color:var(--champagne); }
+#side-dims { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:6; overflow:visible; }
+#side-dims .dim-line { stroke:var(--champagne); stroke-width:1.2; }
+#side-dims .dim-ext { stroke:rgb(245 242 237 / 38%); stroke-width:1; stroke-dasharray:3 4; }
+#side-dims .dim-text { fill:var(--ivory); font:500 12px/1 var(--font-sans); paint-order:stroke; stroke:rgb(9 11 13 / 85%); stroke-width:3px; }
+#side-legend { position:absolute; left:14px; top:72px; z-index:7; max-width:min(380px, calc(100% - 28px)); display:grid; gap:4px;
+  padding:10px 12px; border:1px solid rgb(245 242 237 / 18%); border-radius:12px; background:rgb(9 11 13 / 78%); color:var(--ivory); font-size:13px; line-height:1.4; }
+#side-legend .side-legend-muted { color:var(--text-muted); }
+#side-legend .side-legend-question .badge-verify { margin-left:4px; }
+#stage.is-side-view :is(.stage-label, .guide) { display:none; }   /* ölçü açıklaması alt yazıların yerini alır */
+@media (max-width:560px) { #side-legend { top:auto; bottom:12px; left:10px; font-size:12px; } #side-dims .dim-text { font-size:10px; } }

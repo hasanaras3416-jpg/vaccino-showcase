@@ -8,7 +8,18 @@ export const repLayout = Object.freeze({
   // Aday değerler (devir kaydı 15.3): dingil x, iz, teker merkezi; teker 16″ Ø500 × 90 mm
   axles: {front: 550, rear: 2825}, track: {front: 1010, rear: 875}, wheelY: 115, wheelR: 250, wheelW: 90,
   hipX: 1450, hipY: 150, reclineDeg: 40,   // onaylı poz (Tahmin/Varsayım): kalça x 1450, y 150, sırt ≈ 40°
-  steeringWheel: [1250, 540, 0], rack: [565, 150, 0]   // simit kalçanın 200 mm önünde (Temsili)
+  steeringWheel: [1250, 540, 0], rack: [565, 150, 0],   // simit kalçanın 200 mm önünde (Temsili)
+  /* Salıncak iç bağlantıları ve amortisör üst noktaları: STEP borularının merkez hattında (z > 0 tarafı; diğer taraf aynası).
+     tools/frame çıktısındaki frame-step.glb dilimlenerek ölçüldü (28 Kasım 2026). STEP'te bağlantı tablası yok;
+     noktalar yalnız boru üstündeki yerdir, tabla konumu değildir. Dış mafsallar teker merkezine göre V2 ofsetleridir (Temsili). */
+  pivots: {
+    front: {lower: [[400, 0, 250], [700, 0, 250]],      // burun taban borusu
+            upper: [[420, 338, 327], [680, 393, 374]],  // burun üst rayı (eski: 17 / 35 mm havada)
+            damperTop: [590, 374, 358]},                // burun üst rayı (eski: 54 mm havada)
+    rear:  {lower: [[2640, 0, 250], [2790, -5, 257]],   // arka taban borusu
+            upper: [[2640, 300, 250], [2790, 308, 252]],// arka üst boru
+            damperTop: [2700, 325, 306]}                // arka çapraz boru (eski: 62 mm havada)
+  }
 });
 const toGlb = ([x, y, z]) => [(x - 1400) / 1000, (y + 135) / 1000, z / 1000];
 
@@ -70,9 +81,9 @@ export function buildRepresentativeParts(T, layout = repLayout) {
   for (const front of [true, false]) for (const s of [-1, 1]) {
     const x = front ? layout.axles.front : layout.axles.rear, half = (front ? layout.track.front : layout.track.rear) / 2, y0 = layout.wheelY;
     const lower = [x, y0 - 75, s * (half - 62)], upper = [x - 15, y0 + 100, s * (half - 78)];
-    // iç bağlantılar: önde burun taban borusu (z=±250, y=0) ve üst ray (≈ y 360, z ±340); arkada z=±250, y=0 / 300
-    const inner = front ? {lo: [[x - 150, 0, s * 250], [x + 150, 0, s * 250]], up: [[x - 130, 355, s * 330], [x + 130, 375, s * 345]]}
-                        : {lo: [[2640, 0, s * 250], [2790, 0, s * 250]], up: [[2640, 300, s * 250], [2790, 300, s * 250]]};
+    // iç bağlantılar STEP boru merkez hattında (layout.pivots); dış uçlar teker merkezine göre (Temsili)
+    const pv = front ? layout.pivots.front : layout.pivots.rear, mirror = ([px, py, pz]) => [px, py, s * pz];
+    const inner = {lo: pv.lower.map(mirror), up: pv.upper.map(mirror)};
     for (const [end, pair] of [[lower, inner.lo], [upper, inner.up]]) {
       const [A, B] = pair.map(P), E = P(end);
       rod(A, E, .012, anodized, suspension); rod(B, E, .012, anodized, suspension); rod(A, B, .011, steel, suspension);
@@ -80,7 +91,7 @@ export function buildRepresentativeParts(T, layout = repLayout) {
     }
     rod(P(lower), P(upper), .022, machined, suspension); joint(P(lower), .017, suspension); joint(P(upper), .017, suspension);
     rod(P([x, y0, s * (half - 70)]), P([x, y0, s * (half - 30)]), .022, machined, suspension);
-    coilover(P([x + 30, y0 - 55, s * (half - 150)]), P(front ? [x + 40, 420, s * 330] : [2700, 380, s * 255]));
+    coilover(P([x + 30, y0 - 55, s * (half - 150)]), P(mirror(pv.damperTop)));
   }
 
   /* Koltuk: V2 kabuk, dolgu, yanaklar ve başlık; sırt ≈ 40° geriye (Tahmin), kalça noktası layout.hipX */

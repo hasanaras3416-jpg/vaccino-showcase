@@ -747,6 +747,68 @@ try{
   }
  };
  for(const id of ['rear','top','cockpit']){const old=$(id).onclick;$(id).onclick=()=>{old();focusGoal=null;draw=true};}
+
+ /* Yan görünüş: tam yandan, dar açılı (≈ ortografik) kamera ve ölçü çizgileri. Ölçüler STEP şasi ağından ve
+    repLayout aday aks konumlarından okunur; sabit sayı yazılmaz. Teker, salıncak ve kabuk temsilidir. */
+ let sideView=false;const sideFov=10,baseFov=camera.fov;
+ const svgNS='http://www.w3.org/2000/svg';
+ const sideSvg=document.createElementNS(svgNS,'svg');sideSvg.id='side-dims';sideSvg.setAttribute('aria-hidden','true');sideSvg.style.display='none';   // SVG'de .hidden yok; display kullanılır
+ const sideLegend=document.createElement('div');sideLegend.id='side-legend';sideLegend.hidden=true;
+ $('stage').append(sideSvg,sideLegend);
+ const fmt=n=>Math.round(n).toLocaleString('tr-TR');
+ function sideMeasures(){
+  const box=new T.Box3().setFromObject(stepMeshes.Frame||frame);
+  const nose=box.min.x*1000+1400,tail=box.max.x*1000+1400,bottom=box.min.y*1000-135;
+  const {front,rear}=repLayout.axles;
+  return {nose,tail,bottom,front,rear,wheelbase:rear-front,frontOverhang:front-nose,rearOverhang:tail-rear};
+ }
+ function buildSideLegend(){
+  sideLegend.innerHTML='';
+  const add=(tag,text,cls)=>{const e=document.createElement(tag);if(cls)e.className=cls;e.textContent=text;sideLegend.append(e);return e;};
+  add('strong','Yan görünüş · mm');
+  add('span','Şasi: STEP çizimi. Aks konumları: aday. Teker ve salıncak temsili.','side-legend-muted');
+  const q=add('span','Ön alt salıncak ≈ 190–230 mm: şasi burnu dar; mekanik ekip değerlendiriyor ','side-legend-question');
+  const b=document.createElement('span');b.className='badge-verify badge-dogrula';b.textContent='Doğrulanacak';q.append(b);
+ }
+ function enterSideView(){
+  cameraMotion.cancel();if(pickMode==='body')setMode('frame');
+  rearView=false;cockpitView=false;refreshDrive();focusGoal=null;
+  const m=sideMeasures();sideView=m;buildSideLegend();
+  camera.fov=sideFov;az=0;el=0;rad=1;
+  target.copy(toStep((m.nose+m.rear+repLayout.wheelR)/2,560,0)).applyMatrix4(vehicleRoot.matrixWorld);
+  sideSvg.style.display='';sideLegend.hidden=false;$('stage').classList.add('is-side-view');$('side-view').setAttribute('aria-pressed','true');draw=true;
+ }
+ function exitSideView(){
+  if(!sideView)return;
+  sideView=false;camera.fov=baseFov;rad=vehiclePose.rad;
+  sideSvg.style.display='none';sideSvg.replaceChildren();sideLegend.hidden=true;$('stage').classList.remove('is-side-view');$('side-view').setAttribute('aria-pressed','false');draw=true;
+ }
+ $('side-view').onclick=()=>sideView?$('reset').click():enterSideView();
+ document.addEventListener('vaccino:route',()=>{if(sideView&&!isVehicleView())exitSideView();});   // sunum modu çizim döngüsünde yakalanır
+ for(const id of ['reset','rear','top','cockpit','bottom','frame','body']){const old=$(id).onclick;$(id).onclick=e=>{exitSideView();old?.(e);};}
+ function sideFit(aspect){
+  const m=sideView,c=[];
+  for(const x of [m.nose-60,m.rear+repLayout.wheelR+60])for(const y of [-430,1000])for(const z of [-615,615])c.push(toStep(x,y,z).applyMatrix4(vehicleRoot.matrixWorld));
+  return distanceToFit(c,{az:0,el:0,rad:1,target:target.toArray()},aspect,.86,.84);
+ }
+ function drawSideDims(w,h){
+  const m=sideView,P=(x,y)=>{const v=toStep(x,y,0).applyMatrix4(vehicleRoot.matrixWorld).project(camera);return [(v.x+1)*w/2,(1-v.y)*h/2];};
+  const parts=[];
+  const line=(a,b,cls='dim-line')=>parts.push(`<line class="${cls}" x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}"/>`);
+  const label=(p,text,anchor='middle',dy=-7)=>parts.push(`<text class="dim-text" x="${p[0].toFixed(1)}" y="${(p[1]+dy).toFixed(1)}" text-anchor="${anchor}">${text}</text>`);
+  const rowA=-230,rowB=-340,tick=6;
+  const dim=(x1,x2,row,text,anchor)=>{
+   const a=P(x1,row),b=P(x2,row);line(a,b);
+   for(const p of [a,b])line([p[0],p[1]-tick],[p[0],p[1]+tick]);
+   label(anchor==='end'?[Math.min(a[0],b[0])-10,a[1]]:[(a[0]+b[0])/2,a[1]],text,anchor||'middle',anchor==='end'?4:-7);
+  };
+  for(const x of [m.front,m.rear])line(P(x,repLayout.wheelY),P(x,rowB-20),'dim-ext');
+  for(const x of [m.nose,m.tail])line(P(x,m.bottom),P(x,rowB-20),'dim-ext');
+  dim(m.front,m.rear,rowA,`Dingil mesafesi ${fmt(m.wheelbase)} mm · aday`);
+  dim(m.nose,m.front,rowB,`Ön çıkıntı ${fmt(m.frontOverhang)} mm`);
+  dim(Math.min(m.tail,m.rear),Math.max(m.tail,m.rear),rowB,m.rearOverhang<0?`Aks şasi ucunun ${fmt(-m.rearOverhang)} mm arkasında`:`Arka çıkıntı ${fmt(m.rearOverhang)} mm`,'end');
+  sideSvg.setAttribute('viewBox',`0 0 ${w} ${h}`);sideSvg.innerHTML=parts.join('');
+ }
  const pointers=new Map();let pinch=0;
  const notifyInspection=()=>{if(isHomeView())canvas.dispatchEvent(new Event('vaccino:home-inspect'));};
  canvas.addEventListener('pointerdown',e=>{
@@ -857,7 +919,9 @@ try{
   if(inHome){
    camera.setViewOffset(w,h,(.5-framing.x)*w,(.5-framing.y)*h,w,h);
   }else if(camera.view?.enabled)camera.clearViewOffset();
-  const fit=inHome?homeFit:inVehicle&&!rearView&&!cockpitView?vehicleFit:
+  if(sideView&&(!inVehicle||Math.abs(az)>1e-3||Math.abs(el)>1e-3))exitSideView();
+  if(sideView)rad=1;
+  const fit=sideView?sideFit(camera.aspect):inHome?homeFit:inVehicle&&!rearView&&!cockpitView?vehicleFit:
    Math.max(1,(document.body.classList.contains('presentation-active')?.95:rearView?.91:1.13)/camera.aspect);
   if(!world.camera(camera,target,az,el,rad,fit)){camera.position.set(target.x+fit*rad*Math.cos(el)*Math.sin(az),target.y+fit*rad*Math.sin(el),target.z+fit*rad*Math.cos(el)*Math.cos(az));camera.lookAt(target);}camera.updateProjectionMatrix();render.render(scene,camera);
   const variant=activeDrivetrain();
@@ -866,7 +930,9 @@ try{
    p.button.hidden=!canInspect(p.id)||cockpitView||(!variant&&rearView&&!['motor','clutch','diff','drive'].includes(p.id))||(pickMode==='body'&&p.id!=='camera')||Math.abs(v.x)>.97||Math.abs(v.y)>.97;
    p.button.style.left=(v.x+1)*w/2+'px';
    p.button.style.top=(1-v.y)*h/2+'px';
+   if(sideView)p.button.hidden=true;
   }
+  if(sideView)drawSideDims(w,h);
  }
  const batteryReference=new T.Vector3(...vehicleLayout.battery.position);
  function partAnchor(id,position){

@@ -1,6 +1,6 @@
 /* Uygulama ekranları: Genel, Araç parça listesi, Sistemler, Yarışlar, Envanter, Takım ve Destek.
    Tüm içerik ../data/vaccino-data.js dosyasından okunur. 3B sahneye yalnızca window.vaccino API'si ile dokunulur. */
-import {site, stats, parts, systems, tests, races, inventory, inventoryCategories, inventoryStatuses, team, interfaces, rozetler, acikSorular, eskiPlan, chassisStatus} from '../data/vaccino-data.js';
+import {site, stats, parts, systems, races, inventory, inventoryCategories, inventoryStatuses, team, interfaces, rozetler, acikSorular, eskiPlan, chassisStatus} from '../data/vaccino-data.js';
 
 const $ = id => document.getElementById(id);
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -226,18 +226,18 @@ function renderSystems(sub) {
   const blocks = [head, h('div', {class: 'card-grid'}, data.kartlar.map(item => card(item, {eyebrow: data.ad})))];
   if (nonEmpty(data.hat)) blocks.push(section('Geliştirme hattı', h('ol', {class: 'pipeline'}, data.hat.map((step, i) => h('li', {}, h('small', {text: String(i + 1).padStart(2, '0')}), h('span', {text: step}))))));
   if (key === 'yazilim' && nonEmpty(interfaces)) {
-    blocks.push(section('Veri arayüzleri', h('p', {class: 'section-note'}, 'ROS 2 / CAN prototip sözleşmesi. ', verifyBadge()),
+    blocks.push(section('Veri arayüzleri', h('p', {class: 'section-note', text: 'ROS 2 / CAN prototip sözleşmesi; henüz doğrulanmadı.'}),
       h('div', {class: 'table-scroll', tabindex: '0', role: 'region', 'aria-label': 'Veri arayüzleri'},
         h('table', {class: 'data-table'}, h('thead', {}, h('tr', {}, ['Kod', 'Sinyal', 'Veri yolu', 'Birim'].map(text => h('th', {scope: 'col', text})))),
           h('tbody', {}, interfaces.map(row => h('tr', {}, h('td', {text: row.id}), h('td', {text: row.sinyal}), h('td', {text: row.yol}), h('td', {text: row.birim}))))))));
   }
-  const planned = tests.filter(test => test.sistem === key);
-  if (planned.length) blocks.push(section('Planlanan testler', h('div', {class: 'card-grid'}, planned.map(test => h('div', {class: 'card'},
-    h('span', {class: 'card-title', text: test.durum}), h('strong', {class: 'card-value small', text: test.baslik}), h('span', {class: 'card-note', text: test.yontem}),
-    h('span', {class: 'card-foot'}, h('span', {class: 'chip', text: 'Sonuç bekleniyor'})))))));
+  if (data.oncekiSezon) blocks.push(h('details', {class: 'quiet-disclosure archive'},
+    h('summary', {}, `${data.oncekiSezon.baslik} · ${data.oncekiSezon.kartlar.length}`),
+    h('p', {class: 'section-note', text: data.oncekiSezon.not}),
+    h('div', {class: 'card-grid'}, data.oncekiSezon.kartlar.map(item => card(item, {eyebrow: data.oncekiSezon.baslik})))));
   if (key === 'mekanik') {
     if (nonEmpty(acikSorular)) blocks.push(section('Açık sorular', h('div', {class: 'card question-card'},
-      h('ul', {class: 'question-list'}, acikSorular.map(item => h('li', {}, h('strong', {text: item.soru}), h('span', {text: item.not})))))));
+      h('ul', {class: 'question-list'}, acikSorular.map(item => h('li', {}, h('strong', {}, item.soru + ' ', badge(item.rozet)), h('span', {text: item.not})))))));
     if (nonEmpty(eskiPlan?.maddeler)) blocks.push(h('details', {class: 'quiet-disclosure archive'},
       h('summary', {}, `Eski plan arşivi (${eskiPlan.maddeler.length})`),
       h('p', {class: 'section-note'}, `${eskiPlan.tarih} itibarıyla bırakıldı. ${eskiPlan.not}`),
@@ -267,12 +267,7 @@ function renderRaces(sub) {
   const panel = $('races-panel');
   const blocks = [];
   if (tab === 'genel') {
-    blocks.push(h('div', {class: 'card-grid'}, race.genel.map(item => card(item, {eyebrow: race.ad}))));
-    if (nonEmpty(race.gorevler)) blocks.push(section('Yarışlar', h('div', {class: 'card-grid two'}, race.gorevler.map(item => card({baslik: item.ad, not: item.ozet, dogrula: item.dogrula, ayrinti: [item.ozet]}, {eyebrow: race.ad})))));
-    if (nonEmpty(race.basvuru)) blocks.push(section('Başvuru dosyaları', h('button', {type: 'button', class: 'list-launch', 'aria-haspopup': 'dialog',
-      onclick: event => openDrawer({eyebrow: race.ad, title: 'Teknik başvuru çıktıları', verify: true, trigger: event.currentTarget,
-        sections: [drawerSection('Konuşulan çıktılar', race.basvuru), h('p', {class: 'drawer-caveat', text: 'Kurumsal imza ve roller portal ve Chapter I ile doğrulanacak.'})]})},
-      h('span', {text: `${race.basvuru.length} çıktı`}), h('span', {class: 'card-more', 'aria-hidden': 'true', text: 'Listeyi aç →'}))));
+    blocks.push(h('div', {class: 'card-grid'}, race.genel.slice(0, 4).map(item => card(item, {eyebrow: race.ad}))));
   }
   if (tab === 'kurallar') {
     blocks.push(h('p', {class: 'section-note'}, race.kuralNotu + ' ', verifyBadge()));
@@ -287,8 +282,11 @@ function renderRaces(sub) {
       h('span', {class: 'timeline-body'}, h('strong', {text: item.baslik}), h('span', {class: 'timeline-meta'}, h('span', {class: 'chip', text: item.tur}), item.dogrula ? verifyBadge() : null))))));
     blocks.push(h('p', {class: 'section-note', text: 'Önceki kontrolde görünen tarihler. Resmî kaynaktan yeniden kontrol edilecek.'}));
   }
-  if (nonEmpty(race.baglantilar)) blocks.push(h('nav', {class: 'related-links', 'aria-label': 'Resmî kaynaklar'},
-    race.baglantilar.map(link => h('a', {href: link.href, target: '_blank', rel: 'noopener noreferrer', text: `${link.etiket} ↗`}))));
+  const files = nonEmpty(race.basvuru) ? h('button', {type: 'button', class: 'link-button', 'aria-haspopup': 'dialog', text: `Başvuru dosyaları (${race.basvuru.length})`,
+    onclick: event => openDrawer({eyebrow: race.ad, title: 'Teknik başvuru çıktıları', verify: true, trigger: event.currentTarget,
+      sections: [drawerSection('Konuşulan çıktılar', race.basvuru), h('p', {class: 'drawer-caveat', text: 'Kurumsal imza ve roller portal ve Chapter I ile doğrulanacak.'})]})}) : null;
+  if (files || nonEmpty(race.baglantilar)) blocks.push(h('nav', {class: 'related-links', 'aria-label': 'Başvuru ve resmî kaynaklar'}, files,
+    (race.baglantilar || []).map(link => h('a', {href: link.href, target: '_blank', rel: 'noopener noreferrer', text: `${link.etiket} ↗`}))));
   panel.replaceChildren(...blocks);
   animatePanel(panel);
 }
