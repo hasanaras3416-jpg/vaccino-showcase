@@ -85,7 +85,7 @@ for (const race of data.races) {
 }
 
 /* 8. Dingil mesafesi 1900 adayı: eski arka dingil / dingil mesafesi (2825 / 2275) ekran verisinde kalmasın */
-for (const value of ['2.825', '2825', '2.275', '2275']) {
+for (const value of ['2.825', '2825', '2.275', '2275', 'arka 130 mm', '≈ 395', '≈ 373', '0.61', '26.9 N/mm', '2443']) {   // 2825/2275: eski yerleşim; diğerleri 1900 r1 değerleri (r2: bölüm 19.7)
   const where = JSON.stringify({...data, eskiPlan: undefined});
   if (where.includes(value)) warn(`Eski yerleşim değeri "${value}" vaccino-data.js içinde duruyor`);
 }

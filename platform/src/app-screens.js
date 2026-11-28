@@ -1,9 +1,9 @@
 /* Uygulama ekranları: Genel, Araç parça listesi, Sistemler, Yarışlar, Envanter, Takım ve Destek.
    Tüm içerik ../data/vaccino-data.js dosyasından okunur. 3B sahneye yalnızca window.vaccino API'si ile dokunulur. */
 import {site, stats, parts, systems, races, inventory, inventoryCategories, inventoryStatuses, team, interfaces, rozetler, acikSorular, eskiPlan, chassisStatus, suspension1900} from '../data/vaccino-data.js';
-import {layout1900} from './layout-1900.js';
+import {layout1900r2} from './layout-1900-r2.js';   // 1900 adayı revizyon 2 (önceki: layout-1900.js)
 import {cornerSolver} from './suspension-1900.js';
-import {clearance, wheelClearance, driveShafts, segmentSegment} from './frame-1900.js';
+import {clearance, runChecksR2, mountPointsR2} from './frame-1900-r2.js';
 
 const $ = id => document.getElementById(id);
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -192,74 +192,63 @@ function renderChassisStatus() {
   screen.append(card);
 }
 /* Süspansiyon ADAYI (dingil 1900): mekanik ekibin tablosu, tekerlek hareketi kaydırıcısı, bağlantı noktası – boru
-   uzaklıkları ve çakışma kontrolü. Uzaklıklar 3B sahnedeki kesilmiş şasi ağından (vaccino.frameModel); Doğrulanacak. */
+   uzaklıkları ve çakışma/boşluk denetimi (revizyon 2, bölüm 19.7). Uzaklıklar 3B sahnedeki kesilmiş şasi ağından (vaccino.frameModel); Doğrulanacak. */
 const fmtMm = n => `${Math.round(n).toLocaleString('tr-TR')} mm`;
 const fmtDeg = n => `${n > 0 ? '+' : n < 0 ? '−' : ''}${Math.abs(n).toFixed(2).replace('.', ',')}°`;
 function renderSuspension1900() {
   const screen = document.querySelector('[data-screen=vehicle]');
   if (!screen || document.getElementById('suspension-1900') || !suspension1900) return;
-  const d = suspension1900, L = layout1900;
+  const d = suspension1900, L = layout1900r2;
   const solvers = Object.fromEntries(['front', 'rear'].map(k => [k, cornerSolver(L.corners[k], L.track[k] / 2, L.wheelY)]));
-  const rest = Object.fromEntries(['front', 'rear'].map(k => [k, solvers[k](0)]));
-  const live = h('output', {class: 'susp-live', 'aria-live': 'polite'});
+  const solve = (k, t) => solvers[k](t);
+  const rest = Object.fromEntries(['front', 'rear'].map(k => [k, solve(k, 0)]));
+  const live = h('output', {class: 'susp-live', 'aria-live': 'polite'}), stop = h('p', {class: 'susp-stop', hidden: true});
   const slider = h('input', {type: 'range', min: String(-L.travel), max: String(L.travel), step: '1', value: '0', id: 'susp-travel', 'aria-describedby': 'susp-travel-note'});
+  const num = (n, k = 1) => n.toFixed(k).replace('.', ',');
   const update = () => {
     const t = +slider.value, rows = [];
     for (const [k, ad] of [['front', 'Ön'], ['rear', 'Arka']]) {
-      const p = solvers[k](t), dc = p.coilover - rest[k].coilover;
-      rows.push(`${ad}: kamber ${fmtDeg(p.camberDeg)} · coilover ${p.coilover.toFixed(1).replace('.', ',')} mm (${dc >= 0 ? '+' : '−'}${Math.abs(dc).toFixed(1).replace('.', ',')})`);
+      const p = solve(k, t), dc = p.coilover - rest[k].coilover;
+      rows.push(`${ad}: kamber ${fmtDeg(p.camberDeg)} · coilover ${num(p.coilover)} mm (${dc >= 0 ? '+' : '−'}${num(Math.abs(dc))})`);
     }
     live.textContent = `${t > 0 ? '+' : ''}${t} mm · ${rows.join(' · ')}`;
+    stop.hidden = t < L.bumpStop;
+    stop.textContent = t > L.bumpStop ? `Bump stop +${L.bumpStop} mm aşıldı (gösterim için +${L.travel} mm'ye kadar çözülür).` : `Bump stop: +${L.bumpStop} mm.`;
     window.vaccino?.setSuspensionTravel?.(t);
   };
   slider.addEventListener('input', update);
   const mounts = h('ul', {class: 'status-lines'}, h('li', {text: 'Ölçülüyor…'}));
-  const clashes = h('ul', {class: 'status-lines'});
+  const checks = h('div', {class: 'susp-checks'}, h('p', {class: 'section-note', text: 'Ölçülüyor…'}));
   const card = h('section', {class: 'card chassis-status suspension-card', id: 'suspension-1900', 'aria-labelledby': 'suspension-1900-title'},
     h('h2', {class: 'section-heading', id: 'suspension-1900-title'}, d.baslik + ' ', h('span', {class: 'badge-verify badge-aday', text: d.etiket})),
     h('div', {class: 'table-scroll', tabindex: '0', role: 'region', 'aria-label': 'Süspansiyon hesap sonuçları'},
       h('table', {class: 'data-table'}, h('thead', {}, h('tr', {}, d.sutunlar.map(text => h('th', {scope: 'col', text})))),
         h('tbody', {}, d.satirlar.map(([a, b, c]) => h('tr', {}, h('th', {scope: 'row', text: a}), h('td', {text: b}), h('td', {text: c})))))),
-    h('p', {class: 'section-note', text: d.ackermann}),
-    h('label', {class: 'susp-slider', for: 'susp-travel'}, h('span', {text: 'Tekerlek hareketi (−25…+25 mm)'}), slider),
-    live,
-    h('p', {class: 'section-note', id: 'susp-travel-note', text: 'Dört-çubuk çözümü: alt kol açısı → üst kol çemberi kesişimi. Kamber ve coilover boyu canlı hesaplanır; 3B sahnede rotil, teker ve coilover birlikte hareket eder.'}),
+    d.not ? h('p', {class: 'section-note', text: d.not}) : null,
+    h('p', {class: 'section-note'}, d.ackermann + ' ', h('span', {class: 'badge-verify badge-dogrula', text: 'doğrulanmadı'})),
+    h('label', {class: 'susp-slider', for: 'susp-travel'}, h('span', {text: `Tekerlek hareketi (${L.droop}…+${L.travel} mm · bump stop +${L.bumpStop})`}), slider),
+    live, stop,
+    h('p', {class: 'section-note', id: 'susp-travel-note', text: `Dört-çubuk çözümü (önden görünüş). Hesap: +25 mm'de coilover ön ${num(rest.front.coilover - solve('front', 25).coilover)} mm, arka ${num(rest.rear.coilover - solve('rear', 25).coilover)} mm kısalır (mekanik metin: 16–17 mm beklenir).`}),
     h('h3', {class: 'status-subhead'}, 'Bağlantı noktası – en yakın boru ', badge('dogrula')), mounts,
-    h('h3', {class: 'status-subhead'}, 'Çakışma kontrolü ', badge('dogrula')), clashes,
-    h('p', {class: 'section-note', text: `${d.kaynak}. Altın renkli borular adayla eklenenler (alçak raylar, ön çemberler). Uzaklıklar 3B şasi ağının yüzeyinden ölçülür; CAD ölçümü değildir.`}));
+    h('h3', {class: 'status-subhead'}, 'Çakışma ve boşluk denetimi ', badge('dogrula')), checks,
+    h('p', {class: 'section-note', text: `${d.kaynak}. Altın renkli borular adayla eklenenler (alçak raylar, dört kapalı çember); turuncu çizgi coilover alt braketi. Uzaklıklar 3B şasi ağının yüzeyinden ölçülür; CAD ölçümü değildir.`}));
   screen.append(card);
   update();
-  // Coilover ile tahrik aksı (arka) ve rot kolu (ön; rep-parts.js kremayer → mafsal) arasındaki en kısa mesafe
-  const coil = k => [[L.axles[k], L.corners[k].coilover.lower[1], L.corners[k].coilover.lower[0]], [L.axles[k], L.corners[k].coilover.top[1], L.corners[k].coilover.top[0]]];
-  const springR = L.coilover.springD / 2;
-  const checks = [
-    {ad: 'Arka coilover – tahrik aksı', seg: driveShafts(L)[1], r: driveShafts(L)[1].r, k: 'rear'},
-    {ad: 'Ön coilover – rot kolu (temsili, önceki yerleşimden)', seg: {a: [565, 150, 220], b: [L.axles.front - 40, L.wheelY + 20, L.track.front / 2 - 70]}, r: 8, k: 'front'}
-  ];
-  clashes.replaceChildren(...checks.map(c => {
-    const [a, b] = coil(c.k), r = segmentSegment(a, b, c.seg.a, c.seg.b), gap = r.d - springR - c.r;
-    const li = h('li', {class: gap <= 0 ? 'is-fail' : null}, h('span', {text: `${c.ad}: `}), h('b', {text: gap <= 0 ? `çakışma (${fmtMm(gap)})` : fmtMm(gap)}));
-    return li;
-  }));
   const measure = model => {
-    const rows = [];
-    for (const [k, ad] of [['front', 'Ön'], ['rear', 'Arka']]) {
-      const c = L.corners[k], x = L.axles[k], off = L.legOffset;
-      const pt = ([z, y], dx = 0) => [x + dx, y, z];
-      const worst = pts => pts.map(p => clearance(p, model)).reduce((a, b) => (b.mm > a.mm ? b : a));
-      rows.push([`${ad} alt kol iç pivot`, worst([pt(c.lower.inner, -off), pt(c.lower.inner, off)])]);
-      rows.push([`${ad} üst kol iç pivot`, worst([pt(c.upper.inner, -off), pt(c.upper.inner, off)])]);
-      rows.push([`${ad} coilover üst bağlantı`, clearance(pt(c.coilover.top), model)]);
-    }
-    mounts.replaceChildren(...rows.map(([ad, r]) => h('li', {class: r.mm > 40 ? 'is-warn' : null},
-      h('span', {text: `${ad} (${r.ad}): `}), h('b', {text: r.mm <= 0 ? 'boru üstünde' : fmtMm(r.mm)}))));
-    // Teker – boru boşluğu (Bölüm A: teker boru kafesin içinde kalmalı). Çakışma kırmızı gösterilir, gizlenmez.
-    clashes.prepend(...[['front', 'Ön teker'], ['rear', 'Arka teker']].map(([k, ad]) => {
-      const r = wheelClearance(model, L.axles[k], L.track[k] / 2), at = r.at ? ` · x ${Math.round(r.at[0])}, y ${Math.round(r.at[1])}, z ±${Math.abs(Math.round(r.at[2]))}` : '';
-      return h('li', {class: r.mm <= 0 ? 'is-fail' : null}, h('span', {text: `${ad} – en yakın boru (${r.ad}${at}): `}), h('b', {text: r.mm <= 0 ? `çakışma (${fmtMm(r.mm)})` : fmtMm(r.mm)}));
-    }));
+    mounts.replaceChildren(...mountPointsR2(model, clearance, L).map(r => h('li', {class: r.braket || r.mm > 40 ? 'is-warn' : null},
+      h('span', {text: r.braket ? `${r.ad}: ` : `${r.ad} (${r.boru}): `}),
+      h('b', {text: r.braket ? `${fmtMm(r.mm)} braket` : r.mm <= 0 ? 'boru üstünde' : fmtMm(r.mm)}))));
+    const groups = new Map();
+    for (const c of runChecksR2(model, solve, L)) { if (!groups.has(c.grup)) groups.set(c.grup, []); groups.get(c.grup).push(c); }
+    checks.replaceChildren(...[...groups].map(([grup, rows]) => h('div', {class: 'susp-check-group'},
+      h('h4', {class: 'susp-check-title', text: grup}),
+      h('ul', {class: 'status-lines'}, rows.map(c => h('li', {class: c.fail ? 'is-fail' : null},
+        h('span', {text: `${c.ad}: `}),
+        h('b', {text: c.fail && c.sinir == null ? `çakışma (${fmtMm(c.mm)})` : fmtMm(c.mm)}),
+        c.sinir != null ? h('span', {class: 'susp-limit', text: ` · şart ≥ ${c.sinir} mm`}) : null,
+        c.not ? h('small', {class: 'susp-check-note', text: ` · ${c.not}`}) : null))))));
   };
-  // Ölçüm modeli 3B sahne yüklenince gelir (kesilmiş STEP ağı); WebGL yoksa ölçüm yapılmaz
+  // Ölçüm modeli 3B sahne yüklenince gelir (kesilmiş STEP ağı + r2 boruları); WebGL yoksa ölçüm yapılmaz
   if (window.vaccino?.frameModel) measure(window.vaccino.frameModel);
   else document.addEventListener('vaccino:frame-model', () => window.vaccino?.frameModel ? measure(window.vaccino.frameModel) : mounts.replaceChildren(h('li', {text: '3B şasi yüklenemedi; ölçüm yapılamadı.'})), {once: true});
 }

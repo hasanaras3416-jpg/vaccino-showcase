@@ -467,6 +467,10 @@ body[data-route=overview] .presentation-enter { letter-spacing: .01em; }
 .status-lines li.is-warn b { color: #e9a85b; }
 .suspension-card .susp-slider { display: grid; gap: 8px; font-size: 14px; color: var(--text-muted); }
 .suspension-card .susp-slider input { width: 100%; accent-color: var(--champagne); }
+.suspension-card .susp-stop { margin: 0; font-size: 14px; color: #e9a85b; }
+.suspension-card .susp-check-group + .susp-check-group { margin-top: 10px; }
+.suspension-card .susp-check-title { margin: 6px 0 0; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+.suspension-card :is(.susp-limit, .susp-check-note) { font-size: 13px; color: var(--text-muted); }
 .suspension-card .susp-live { font-size: 15px; color: var(--ivory); font-variant-numeric: tabular-nums; }
 .suspension-card .data-table th[scope=row] { font-size: 14px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ivory); background: none; }
 .status-lines li:last-child { border-bottom: 0; }

@@ -110,7 +110,7 @@ export const systems = {
       {baslik: 'Tahrik', deger: 'Orta motor', not: 'Yarım diferansiyel · mafsallı aks', rozet: 'beyan',
         ayrinti: ['Zincir ve hub motor bırakıldı (Eski plan).', r('Motor etiketi 48 V · 1000 W · 450 dev/dk; anlamı doğrulanacak.', 'dogrula'), 'Marka ve model: Seçilmedi / model bilinmiyor; numune test edilecek.', r('450 dev/dk etiket değeri; motor milinde mi çıkışta mı olduğu doğrulanacak.', 'dogrula'), r('48 V × 20 A = 960 W; etiketteki 1000 W ile uyuşmuyor. Etiket yaklaşık kabul edilir.', 'dogrula'), 'Dişli oranı, aks mili ve flanş henüz bilinmiyor.', 'Birimin üstündeki disk fren sökülecek.', r('Seyir hedefi 30–35 km/sa; Mileage’ı bitirmek için gereken ortalama ≥ 25 km/sa (2026 Chapter II referansı).', 'tahmin'), r('Basit tur modeliyle gereken seyir hızı ≈ 27,4 km/sa.', 'tahmin')], href: '#/mechanical/transmission'},
       {baslik: 'Süspansiyon ve direksiyon', deger: 'Çift salıncak', not: 'Ön ve arka · merkez girişli kremayer', rozet: 'beyan',
-        ayrinti: ['Bağlantı noktaları ve kinematik açık; STEP çiziminde bağlantı tablası yok.', r('Alt kol: ön 207 mm, arka 130 mm; coilover ön ≈ 395 / arka ≈ 373 mm (1900 adayı, CAD/FEM ile doğrulanmadı).', 'aday'), r('Göbek rulmanı adayı DAC35680037.', 'aday'), 'Direksiyon: kremayer, mil çıkışı araç ortasında; direksiyon kutusu seçilmedi.', r('Step motor NEMA 43 olarak anılıyor; etiket teyidi bekliyor.', 'dogrula'), 'Elle ve otonom kullanım için dişli kutusu yapılacak.', r('Tekerlek 16 inç; jant ve lastik alınmadı.', 'beyan'), r('Kural: 14–18 inç jant, lastik en az 80 mm.', 'dogrula'), r('Lastik dış çapı ≈ 500 mm varsayımı.', 'tahmin')], href: '#/mechanical/suspension'},
+        ayrinti: ['Bağlantı noktaları ve kinematik açık; STEP çiziminde bağlantı tablası yok.', r('Alt kol: ön 207 mm, arka 165 mm; coilover ön ≈302 mm, 40° / arka ≈272 mm, 32°; strok ≥35 mm (1900 adayı r2, CAD’de doğrulanmadı).', 'aday'), r('Göbek rulmanı adayı DAC35680037.', 'aday'), 'Direksiyon: kremayer, mil çıkışı araç ortasında; direksiyon kutusu seçilmedi.', r('Step motor NEMA 43 olarak anılıyor; etiket teyidi bekliyor.', 'dogrula'), 'Elle ve otonom kullanım için dişli kutusu yapılacak.', r('Tekerlek 16 inç; jant ve lastik alınmadı.', 'beyan'), r('Kural: 14–18 inç jant, lastik en az 80 mm.', 'dogrula'), r('Lastik dış çapı ≈ 500 mm varsayımı.', 'tahmin')], href: '#/mechanical/suspension'},
       {baslik: 'Fren', deger: '4 disk · çift devre', not: 'Hidrolik · disk ve kaliper seçilmedi', rozet: 'beyan',
         ayrinti: [r('Madde 51: tek pedal, çift devre, disk en az 3 mm.', 'dogrula'), 'Ticari parça; disk çapı ve kaliper: Seçilmedi.'], href: '#/mechanical/braking'}
     ]
@@ -339,7 +339,7 @@ export const chassisStatus = {
     r('Kural: yer yüksekliği ≥ 100 mm, sürücü ve balast ile', 'dogrula'),
     r('Dingil x ≈ 550 / 2.450 mm (ön / arka) · dingil mesafesi 1.900 mm', 'aday'),
     r('İz ≈ 1.010 / 875 mm (ön / arka)', 'aday'),
-    r('Alt kol: ön 207 mm, arka 130 mm', 'aday'),
+    r('Alt kol: ön 207 mm, arka 165 mm (r2)', 'aday'),
     r('Akü x ≈ 2.600–2.820 mm, diferansiyel arkasında; kuyruk köşegenleri x ≤ 2.175’te biter (1900 adayı)', 'aday')
   ],
   eklenecek: {baslik: 'Şasiye eklenecekler', rozet: 'beyan',
@@ -347,29 +347,35 @@ export const chassisStatus = {
   not: 'Tekerlek, süspansiyon, tahrik, koltuk, direksiyon ve kabuk 3B’de temsilidir. Ön cam direkleri şasi gövdesinden ayrı çizilmiştir.'
 };
 
-/* Süspansiyon ADAYI · dingil mesafesi 1900 (mekanik ekip, 28 Kasım 2026; hesap: Vaccino_Suspansiyon bölüm 19).
-   Tablo ve Ackermann satırı kaynaktaki gibidir. ADAY – doğrulanmadı (CAD/FEM ile doğrulanmadı). */
+/* Süspansiyon ADAYI · dingil mesafesi 1900, revizyon 2 (mekanik ekip, 28 Kasım 2026; Vaccino_Suspansiyon_Bolum19.md bölüm 19.7).
+   Değerler kaynaktaki gibidir. ADAY – doğrulanmadı (CAD'de doğrulanmadı). 19.7'de yeniden verilmeyen satırlar önceki hesaptandır (not). */
 export const suspension1900 = {
-  baslik: 'Süspansiyon adayı · dingil mesafesi 1900',
+  baslik: 'Süspansiyon adayı · dingil mesafesi 1900 · r2',
   etiket: 'ADAY – doğrulanmadı',
-  kaynak: 'Mekanik ekip, 28 Kasım 2026 · hesap: Vaccino_Suspansiyon bölüm 19',
+  kaynak: 'Mekanik ekip, 28 Kasım 2026 · Vaccino_Suspansiyon_Bolum19.md bölüm 19.7',
   sutunlar: ['', 'Ön', 'Arka'],
   satirlar: [
+    ['Alt kol', '207 mm', '165 mm'],
+    ['Coilover (boy, dikeyden açı)', '≈302 mm, 40°', '≈272 mm, 32°'],
+    ['MR (coilover)', '0.57', '0.63'],
+    ['Yay (Ks)', '≈31 N/mm (177 lb/in)', '≈27 N/mm (154 lb/in)'],
+    ['Damper c düşük/yüksek hız', '2797 / 1290 Ns/m', '2250 / 1038 Ns/m'],
+    ['Kamber kazancı (+25 mm bump)', '−0.69°', '−0.82°/25 mm'],
     ['Roll center (zeminden)', '36 mm', '37 mm'],
-    ['Kamber kazancı (+25 mm bump)', '−0.69°', '−0.71°'],
+    ['Strok: bump stop / droop', '+20 / −25 mm', '+20 / −25 mm'],
+    ['Gerekli strok', '≈25 mm', '≈28 mm'],
+    ['Coilover stroku', '≥35 mm', '≥35 mm'],
     ['Temas noktası yanal kayma', '+0.3 mm', '−0.5 mm'],
-    ['MR (coilover)', '0.61', '0.65'],
-    ['Yay (Ks)', '26.9 N/mm', '25.3 N/mm'],
-    ['Damper düşük/yüksek hız', '2443 / 1128 Ns/m', '2114 / 976 Ns/m'],
     ['Tekerlek rate Kw', '10.0 N/mm', '10.7 N/mm'],
     ['Doğal frekans', '2.2 Hz', '2.4 Hz']
   ],
+  not: 'Temas noktası yanal kayma, tekerlek rate ve doğal frekans 19.7’de yeniden verilmedi; önceki hesaptan.',
   ackermann: 'Ackermann %100 (L=1900, iz 1010): iç 22.1°, dış 18.5°, dönüş çapı ≈5.1 m (kural ≤6 m).'
 };
 
 /* Belirsiz konular: Sistemler › Mekanik ekranındaki "Açık sorular" kartı. */
 export const acikSorular = [
-  {soru: 'Alt kol boyu', not: 'Ön 207 mm, arka 130 mm (1900 adayı; CAD/FEM ile doğrulanmadı).', rozet: 'aday'},
+  {soru: 'Alt kol boyu', not: 'Ön 207 mm, arka 165 mm (1900 adayı r2; CAD’de doğrulanmadı).', rozet: 'aday'},
   {soru: 'Koltuk konumu ve modeli', not: 'Elde bir otomobil koltuğu var; gerekirse yarış koltuğu alınacak.'},
   {soru: 'Motor dişli oranı', not: 'Aks mili ve flanş da bilinmiyor; numune testiyle ölçülecek.'},
   {soru: 'Şasi imalat tarihi', not: 'İmalatçı Şahinler Metal; bağlantı noktaları kilitlenmeden imalat yok.'},

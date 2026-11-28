@@ -4,7 +4,7 @@
    çizim yavaşsa sabit görsele düşer. */
 import {driverGear, driverInfo, rozetler, driverErgonomics} from '../data/vaccino-data.js';
 import {buildRepresentativeParts} from './rep-parts.js';
-import {cutTailDiagonals, buildFrameAdditions, frameModel, subModel, clearance} from './frame-1900.js';
+import {cutTailDiagonals, buildFrameAdditionsR2, frameModelR2, subModel, clearance} from './frame-1900-r2.js';   // 1900 adayı r2 (bölüm 19.7)
 
 /* Sekme → GLB katmanları ve kamera açısı. Kask sekmesi kaskın tüm katmanlarını birlikte vurgular. */
 const equipment = {
@@ -453,7 +453,7 @@ export function initializeDriver() {
     };
   }
   /* Bacak/ayak – en yakın boru: Suit ve Shoes köşe noktaları (kalçanın önü, STEP x < 1300) ile 1900 adayı şasinin
-     (kesilmiş STEP ağı + aday borular) yüzeyi arasındaki en kısa mesafe. Sürücü → STEP: X = 1400 − 1000z, Y = 1000y − 135, Z = 1000x. */
+     (kesilmiş STEP ağı + r2 aday boruları: dört kapalı çember dahil) yüzeyi arasındaki en kısa mesafe. Sürücü → STEP: X = 1400 − 1000z, Y = 1000y − 135, Z = 1000x. */
   function legClearance() {
     if (!ergo?.model) return null;
     const pts = [], v = new T.Vector3();
@@ -482,10 +482,10 @@ export function initializeDriver() {
     let model = null;
     for (const name of ['Frame', 'UnknownPartL', 'UnknownPartR']) {
       const m = gltf.scene.getObjectByName(name); if (!m) continue;
-      if (name === 'Frame') { cutTailDiagonals(m); model = frameModel(m); }      // 1900 adayı: kuyruk köşegenleri x > 2175 silinir
+      if (name === 'Frame') { cutTailDiagonals(m); model = frameModelR2(m); }      // 1900 adayı: kuyruk köşegenleri x > 2175 silinir
       m.visible = true; m.material = name === 'Frame' ? steel : pillar; frameHolder.add(m);
     }
-    frameHolder.add(buildFrameAdditions(T, new T.MeshStandardMaterial({color: 0xCBB98B, metalness: .5, roughness: .36, transparent: true, opacity: .7, depthWrite: false})));
+    frameHolder.add(buildFrameAdditionsR2(T, new T.MeshStandardMaterial({color: 0xCBB98B, metalness: .5, roughness: .36, transparent: true, opacity: .7, depthWrite: false})));
     const parts = buildRepresentativeParts(T);
     frameHolder.add(parts.seat);
     group.add(frameHolder);
@@ -519,7 +519,7 @@ export function initializeDriver() {
         if (!r) { p.textContent = 'Bacak/ayak – en yakın boru: ölçülemedi.'; return p; }
         const where = `${r.ad}, x ≈ ${Math.round(r.at[0])}`;
         if (r.mm <= 0) p.classList.add('is-fail');
-        p.append(`Bacak/ayak – en yakın boru (1900 adayı şasi): `, Object.assign(document.createElement('b'), {textContent: r.mm <= 0 ? `çakışma (${Math.round(r.mm)} mm)` : `${Math.round(r.mm)} mm`}), ` · ${where} `, badge({rozet: 'dogrula'}));
+        p.append(`Bacak/ayak – en yakın boru (1900 adayı r2 şasi): `, Object.assign(document.createElement('b'), {textContent: r.mm <= 0 ? `çakışma (${Math.round(r.mm)} mm)` : `${Math.round(r.mm)} mm`}), ` · ${where} `, badge({rozet: 'dogrula'}));
         return p;
       })(),
       Object.assign(document.createElement('p'), {className: 'drawer-caveat', textContent: driverErgonomics.not}));
