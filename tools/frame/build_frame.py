@@ -77,7 +77,8 @@ print('FRAME_MEASURE', json.dumps(measure))
 
 # ---------------------------------------------------------------- temsili katmanlar (çizimde yok)
 WHEEL_R, WHEEL_W, WHEEL_Y = 250, 90, 115        # 16" varsayım, teker merkezi Y=115 (devir kaydı 15.2)
-XF, XR, TF, TR = 550, 2825, 1010, 875           # aday dingil konumları ve izler (devir kaydı 15.3)
+XF, XR, TF, TR = 550, 2825, 1010, 875           # ÖNCEKİ aday dingil/iz (devir kaydı 15.3). Site 1900 adayını gösterir (platform/src/layout-1900.js);
+                                                # buradaki fırınlanmış Rep* katmanları sahnede kullanılmaz. STEP girdisi depoda yok, GLB yeniden üretilmedi.
 def B(x, y, z):   # STEP mm → Blender (ham)
     return Vector((x, -z, y)) * RAW
 def new_obj(name, bm):

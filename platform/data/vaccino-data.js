@@ -39,7 +39,7 @@ export const stats = [
 export const parts = [
   {id: 'frame', ad: 'Şasi', grup: 'Mekanik', durum: 'Ø30 boru çizimi', rozet: 'aday',
     gorev: 'Tüm parçaları bir arada tutan alüminyum boru iskelet (space frame).',
-    olcu: [r('2.830 × 1.230 × 980 mm (boy × genişlik × yükseklik; tekerlek ve kabuk hariç)', 'aday'), r('Ø30 × 2 mm alüminyum 6061-T6 boru', 'beyan'), r('İskelet ≈ 17 kg (plaka ve kaynak hariç)', 'tahmin'), r('Tekerleklerle toplam boy ≈ 3,1–3,2 m', 'tahmin')],
+    olcu: [r('2.830 × 1.230 × 980 mm (boy × genişlik × yükseklik; tekerlek ve kabuk hariç)', 'aday'), r('Ø30 × 2 mm alüminyum 6061-T6 boru', 'beyan'), r('İskelet ≈ 17 kg (plaka ve kaynak hariç)', 'tahmin'), r('1900 adayında tekerler şasi içinde; toplam boy ≈ şasi boyu 2.830 mm', 'aday')],
     ayrinti: ['Ön ve arka çift salıncak. Koltuk ve direksiyon kutusunun mil çıkışı araç ortasında.', 'İmalatçı Şahinler Metal; imalat tarihi belli değil.', 'Bağlantı noktaları kilitlenmeden imalata verilmeyecek.', 'Çizimde olmayan tekerlek, süspansiyon, tahrik, koltuk, direksiyon ve kabuk 3B’de temsilidir.', r('Ön cam direkleri şasi gövdesinden ayrı çizilmiş; kaynakla bağlanıp bağlanmayacağı ve yük taşıyıp taşımadığı doğrulanacak.', 'beyan')]},
   {id: 'suspension', ad: 'Süspansiyon', grup: 'Mekanik', durum: 'Çift salıncak · ön ve arka', rozet: 'beyan',
     gorev: 'Tekerlekleri şasiye bağlar, yol hareketini karşılar.',
@@ -72,7 +72,7 @@ export const parts = [
   {id: 'battery', ad: 'Batarya', grup: 'Elektrik', durum: 'Aday', rozet: 'aday',
     gorev: 'Motoru ve elektroniği besleyen enerji paketi.',
     olcu: [r('15S3P LiFePO₄ · 48 V · 18 Ah · 864 Wh', 'aday'), r('Tam dolu 54,75 V (3,65 V/hücre)', 'aday'), r('Şimdilik 9×5 kutu ≈ 316 × 220 × 90 mm', 'tahmin')],
-    ayrinti: [r('Çakışma: çizimdeki kutu arka halkaya (x = 2150) 50 mm biniyor. Madde 66e gereği kutu ön yüzü x ≥ 2190’a (en az 90 mm arkaya) alınacak.', 'dogrula'), 'Hücre adayı IFR32700 3,2 V 6 Ah.', 'Kutu seçimi değişebilir; sürücü bölmesinin arkasında kalmalı.', 'Hücre, BMS, şarj cihazı ve güvenlik tasarımı seçilmedi.', r('Shell sınırı: 60 V ve 1.000 Wh', 'dogrula')]},
+    ayrinti: [r('1900 adayında kutu diferansiyelin arkasında, x ≈ 2.600–2.820 mm. Önceki konumdaki arka halka çakışması (x = 2150) bu yerleşimde yok.', 'aday'), 'Hücre adayı IFR32700 3,2 V 6 Ah.', 'Kutu seçimi değişebilir; sürücü bölmesinin arkasında kalmalı.', 'Hücre, BMS, şarj cihazı ve güvenlik tasarımı seçilmedi.', r('Shell sınırı: 60 V ve 1.000 Wh', 'dogrula')]},
   {id: 'drive', ad: 'Motor sürücüsü', grup: 'Elektrik', durum: 'Seçilmedi', rozet: 'dogrula',
     gorev: 'Motora ne zaman, ne kadar güç gideceğini yönetir.',
     olcu: ['Yeni araç için sürücü seçilmedi'],
@@ -106,11 +106,11 @@ export const systems = {
     derin: {etiket: 'Mekanik 3B sergisi', href: '#/mechanical'},
     kartlar: [
       {baslik: 'Şasi', deger: '2.830 × 1.230 mm', not: 'Ø30 × 2 mm alüminyum boru', rozet: 'aday',
-        ayrinti: ['STEP çizimi; yükseklik 980 mm, tekerlek ve kabuk hariç.', r('Boru Ø30 × 2 mm, alüminyum 6061-T6.', 'beyan'), r('İskelet ≈ 17 kg; plaka, kaynak ve bağlantılar hariç.', 'tahmin'), r('Tekerleklerle toplam boy ≈ 3,1–3,2 m.', 'tahmin'), 'İmalatçı Şahinler Metal; tarih belli değil.', 'Bağlantı noktaları kilitlenmeden imalata verilmeyecek.', 'Kaynak bölgesi dayanımı ve yuvarlanma koruması ayrıca doğrulanacak.', 'Çizimde olmayan parçalar 3B’de temsilidir.'], href: '#/mechanical/chassis'},
+        ayrinti: ['STEP çizimi; yükseklik 980 mm, tekerlek ve kabuk hariç.', r('Boru Ø30 × 2 mm, alüminyum 6061-T6.', 'beyan'), r('İskelet ≈ 17 kg; plaka, kaynak ve bağlantılar hariç.', 'tahmin'), r('1900 adayında tekerler şasi içinde; toplam boy ≈ şasi boyu 2.830 mm.', 'aday'), 'İmalatçı Şahinler Metal; tarih belli değil.', 'Bağlantı noktaları kilitlenmeden imalata verilmeyecek.', 'Kaynak bölgesi dayanımı ve yuvarlanma koruması ayrıca doğrulanacak.', 'Çizimde olmayan parçalar 3B’de temsilidir.'], href: '#/mechanical/chassis'},
       {baslik: 'Tahrik', deger: 'Orta motor', not: 'Yarım diferansiyel · mafsallı aks', rozet: 'beyan',
         ayrinti: ['Zincir ve hub motor bırakıldı (Eski plan).', r('Motor etiketi 48 V · 1000 W · 450 dev/dk; anlamı doğrulanacak.', 'dogrula'), 'Marka ve model: Seçilmedi / model bilinmiyor; numune test edilecek.', r('450 dev/dk etiket değeri; motor milinde mi çıkışta mı olduğu doğrulanacak.', 'dogrula'), r('48 V × 20 A = 960 W; etiketteki 1000 W ile uyuşmuyor. Etiket yaklaşık kabul edilir.', 'dogrula'), 'Dişli oranı, aks mili ve flanş henüz bilinmiyor.', 'Birimin üstündeki disk fren sökülecek.', r('Seyir hedefi 30–35 km/sa; Mileage’ı bitirmek için gereken ortalama ≥ 25 km/sa (2026 Chapter II referansı).', 'tahmin'), r('Basit tur modeliyle gereken seyir hızı ≈ 27,4 km/sa.', 'tahmin')], href: '#/mechanical/transmission'},
       {baslik: 'Süspansiyon ve direksiyon', deger: 'Çift salıncak', not: 'Ön ve arka · merkez girişli kremayer', rozet: 'beyan',
-        ayrinti: ['Bağlantı noktaları ve kinematik açık; STEP çiziminde bağlantı tablası yok.', r('Ön alt salıncak ≈ 190–230 mm: şasi burnu dar; mekanik ekip değerlendiriyor.', 'dogrula'), r('Göbek rulmanı adayı DAC35680037.', 'aday'), 'Direksiyon: kremayer, mil çıkışı araç ortasında; direksiyon kutusu seçilmedi.', r('Step motor NEMA 43 olarak anılıyor; etiket teyidi bekliyor.', 'dogrula'), 'Elle ve otonom kullanım için dişli kutusu yapılacak.', r('Tekerlek 16 inç; jant ve lastik alınmadı.', 'beyan'), r('Kural: 14–18 inç jant, lastik en az 80 mm.', 'dogrula'), r('Lastik dış çapı ≈ 500 mm varsayımı.', 'tahmin')], href: '#/mechanical/suspension'},
+        ayrinti: ['Bağlantı noktaları ve kinematik açık; STEP çiziminde bağlantı tablası yok.', r('Alt kol: ön 207 mm, arka 130 mm; coilover ön ≈ 395 / arka ≈ 373 mm (1900 adayı, CAD/FEM ile doğrulanmadı).', 'aday'), r('Göbek rulmanı adayı DAC35680037.', 'aday'), 'Direksiyon: kremayer, mil çıkışı araç ortasında; direksiyon kutusu seçilmedi.', r('Step motor NEMA 43 olarak anılıyor; etiket teyidi bekliyor.', 'dogrula'), 'Elle ve otonom kullanım için dişli kutusu yapılacak.', r('Tekerlek 16 inç; jant ve lastik alınmadı.', 'beyan'), r('Kural: 14–18 inç jant, lastik en az 80 mm.', 'dogrula'), r('Lastik dış çapı ≈ 500 mm varsayımı.', 'tahmin')], href: '#/mechanical/suspension'},
       {baslik: 'Fren', deger: '4 disk · çift devre', not: 'Hidrolik · disk ve kaliper seçilmedi', rozet: 'beyan',
         ayrinti: [r('Madde 51: tek pedal, çift devre, disk en az 3 mm.', 'dogrula'), 'Ticari parça; disk çapı ve kaliper: Seçilmedi.'], href: '#/mechanical/braking'}
     ]
@@ -325,7 +325,7 @@ export const driverErgonomics = {
     {id: 'cabinHeight', ad: 'İç yükseklik (taban borusu üstü – çatı borusu altı)', sinir: '≈ 920 mm', madde: 'Madde 45f: ≥ 880', rozet: 'dogrula'},
     {id: 'shoulderWidth', ad: 'Omuz hizası iç genişlik (arka halka)', sinir: '≥ 700 mm', madde: 'Madde 45f', rozet: 'dogrula'}
   ],
-  sabit: [r('Bacak/diz – en yakın boru ≈ 76 mm (burun direği yanında, x ≈ 770); çakışma yok', 'dogrula')],
+  // Bacak/ayak – en yakın boru artık sahnede ölçülür (driver.js · legClearance, 1900 adayı şasi)
   not: 'Görsel kontrol; mühendislik doğrulaması değil. Ölçüler Ø30 STEP çizimi ve referans sürücü (174 cm) modelinden alınır.'
 };
 
@@ -337,19 +337,39 @@ export const chassisStatus = {
     r('İmalata serbest bırakma bekliyor; bağlantı noktaları kilitlenmeden imalat yok', 'beyan'),
     r('Yer yüksekliği ≈ 120 mm (en alçak boru dış yüzü – zemin)', 'tahmin'),
     r('Kural: yer yüksekliği ≥ 100 mm, sürücü ve balast ile', 'dogrula'),
-    r('Dingil x ≈ 550 / 2.825 mm (ön / arka)', 'aday'),
+    r('Dingil x ≈ 550 / 2.450 mm (ön / arka) · dingil mesafesi 1.900 mm', 'aday'),
     r('İz ≈ 1.010 / 875 mm (ön / arka)', 'aday'),
-    r('Ön alt salıncak ≈ 190–230 mm: şasi burnu dar; mekanik ekip değerlendiriyor', 'dogrula'),
-    r('Çakışma: akü kutusu arka halkaya (x = 2150) 50 mm biniyor; Madde 66e gereği ön yüz x ≥ 2190 (en az 90 mm arkaya)', 'dogrula')
+    r('Alt kol: ön 207 mm, arka 130 mm', 'aday'),
+    r('Akü x ≈ 2.600–2.820 mm, diferansiyel arkasında; kuyruk köşegenleri x ≤ 2.175’te biter (1900 adayı)', 'aday')
   ],
   eklenecek: {baslik: 'Şasiye eklenecekler', rozet: 'beyan',
     maddeler: ['Omuz hizası enine boru', 'Çatı orta enine boru', 'Taban paneli', 'Sürücü–enerji bölmesi paneli', 'Balast ve çekme kancası noktaları', 'Çelik akü tepsisi']},
   not: 'Tekerlek, süspansiyon, tahrik, koltuk, direksiyon ve kabuk 3B’de temsilidir. Ön cam direkleri şasi gövdesinden ayrı çizilmiştir.'
 };
 
+/* Süspansiyon ADAYI · dingil mesafesi 1900 (mekanik ekip, 28 Kasım 2026; hesap: Vaccino_Suspansiyon bölüm 19).
+   Tablo ve Ackermann satırı kaynaktaki gibidir. ADAY – doğrulanmadı (CAD/FEM ile doğrulanmadı). */
+export const suspension1900 = {
+  baslik: 'Süspansiyon adayı · dingil mesafesi 1900',
+  etiket: 'ADAY – doğrulanmadı',
+  kaynak: 'Mekanik ekip, 28 Kasım 2026 · hesap: Vaccino_Suspansiyon bölüm 19',
+  sutunlar: ['', 'Ön', 'Arka'],
+  satirlar: [
+    ['Roll center (zeminden)', '36 mm', '37 mm'],
+    ['Kamber kazancı (+25 mm bump)', '−0.69°', '−0.71°'],
+    ['Temas noktası yanal kayma', '+0.3 mm', '−0.5 mm'],
+    ['MR (coilover)', '0.61', '0.65'],
+    ['Yay (Ks)', '26.9 N/mm', '25.3 N/mm'],
+    ['Damper düşük/yüksek hız', '2443 / 1128 Ns/m', '2114 / 976 Ns/m'],
+    ['Tekerlek rate Kw', '10.0 N/mm', '10.7 N/mm'],
+    ['Doğal frekans', '2.2 Hz', '2.4 Hz']
+  ],
+  ackermann: 'Ackermann %100 (L=1900, iz 1010): iç 22.1°, dış 18.5°, dönüş çapı ≈5.1 m (kural ≤6 m).'
+};
+
 /* Belirsiz konular: Sistemler › Mekanik ekranındaki "Açık sorular" kartı. */
 export const acikSorular = [
-  {soru: 'Ön alt salıncak boyu ≈ 190–230 mm', not: 'Şasi burnu dar; mekanik ekip değerlendiriyor.', rozet: 'dogrula'},
+  {soru: 'Alt kol boyu', not: 'Ön 207 mm, arka 130 mm (1900 adayı; CAD/FEM ile doğrulanmadı).', rozet: 'aday'},
   {soru: 'Koltuk konumu ve modeli', not: 'Elde bir otomobil koltuğu var; gerekirse yarış koltuğu alınacak.'},
   {soru: 'Motor dişli oranı', not: 'Aks mili ve flanş da bilinmiyor; numune testiyle ölçülecek.'},
   {soru: 'Şasi imalat tarihi', not: 'İmalatçı Şahinler Metal; bağlantı noktaları kilitlenmeden imalat yok.'},

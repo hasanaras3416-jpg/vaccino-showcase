@@ -84,6 +84,12 @@ for (const race of data.races) {
   if (race.genel.filter(isVerify).length > 2) warn(`races.${race.id}: 2'den fazla "Doğrulanacak" rozeti`);
 }
 
+/* 8. Dingil mesafesi 1900 adayı: eski arka dingil / dingil mesafesi (2825 / 2275) ekran verisinde kalmasın */
+for (const value of ['2.825', '2825', '2.275', '2275']) {
+  const where = JSON.stringify({...data, eskiPlan: undefined});
+  if (where.includes(value)) warn(`Eski yerleşim değeri "${value}" vaccino-data.js içinde duruyor`);
+}
+
 if (problems.length) {
   console.error(`Veri kontrolü: ${problems.length} uyarı`);
   for (const line of problems) console.error(`  - ${line}`);

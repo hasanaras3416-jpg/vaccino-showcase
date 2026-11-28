@@ -22,7 +22,7 @@
     'interactive-upgrades.js','inventory-store.js','inventory-ui.js',
     'mechanical-details.js','presentation.js','season.js','simulation-engine.js',
     'simulation-ui.js','store.js','studio.js','track-geometry.js','track-scene.js',
-    'vehicle-layout.js','vehicle.js','workshop-scene.js','workspace.js','app-screens.js','rep-parts.js',
+    'vehicle-layout.js','vehicle.js','workshop-scene.js','workspace.js','app-screens.js','rep-parts.js','layout-1900.js','suspension-1900.js','frame-1900.js',
     '../data/geometry.js','../data/vaccino-data.js','../vendor/driver-gltf-loader.js'
   ];
   function versioned(url) {

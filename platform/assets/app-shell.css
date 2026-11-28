@@ -463,6 +463,12 @@ body[data-route=overview] .presentation-enter { letter-spacing: .01em; }
 .chassis-status { margin-top: 24px; gap: 12px; min-height: 0; }
 .status-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
 .status-lines li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 0; border-bottom: 1px solid var(--hairline); font-size: 15px; line-height: 1.45; }
+.status-lines li.is-fail b { color: #ff6b5e; }   /* kural sınırı altı veya çakışma: gizlenmez, kırmızı */
+.status-lines li.is-warn b { color: #e9a85b; }
+.suspension-card .susp-slider { display: grid; gap: 8px; font-size: 14px; color: var(--text-muted); }
+.suspension-card .susp-slider input { width: 100%; accent-color: var(--champagne); }
+.suspension-card .susp-live { font-size: 15px; color: var(--ivory); font-variant-numeric: tabular-nums; }
+.suspension-card .data-table th[scope=row] { font-size: 14px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ivory); background: none; }
 .status-lines li:last-child { border-bottom: 0; }
 .status-subhead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0 4px; font-size: 15px; font-weight: 600; }
 .archive-figure { margin: 8px 0 16px; }
@@ -483,6 +489,7 @@ body[data-route=overview] .presentation-enter { letter-spacing: .01em; }
 .driver-ergonomics dd { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px; }
 .ergo-note { flex-basis: 100%; font-size: 13px; color: var(--text-muted); }
 .ergo-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 14px; }
+.ergo-list li.is-fail .ergo-value b, .ergo-line.is-fail b { color: #ff6b5e; }   /* kural sınırı altı / çakışma: kırmızı, gizlenmez */
 
 /* ---------- Kenar menüsü: yalnız aktif sayfa vurgulu; hover ayrı ve daha hafif ---------- */
 .sidebar .primary-nav a:hover:not([aria-current=page]) { background: transparent; color: var(--ivory); }

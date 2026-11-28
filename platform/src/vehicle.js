@@ -7,7 +7,10 @@ import {addMechanicalDetails} from './mechanical-details.js';
 import {createCameraMotion} from './camera-motion.js';
 import {createHubMotor,createDrivetrainTransition} from './drivetrain-configurator.js';
 import {vehicleLayout,checkVisualEnvelopes} from './vehicle-layout.js';
-import {buildRepresentativeParts,repLayout} from './rep-parts.js';
+import {buildRepresentativeParts} from './rep-parts.js';   // koltuk ve direksiyon; önceki tekerlek/süspansiyon yerleşimi (repLayout) dosyada duruyor
+import {layout1900} from './layout-1900.js';
+import {buildSuspension1900} from './suspension-1900.js';
+import {cutTailDiagonals,buildFrameAdditions,buildDrivetrain1900,buildLuggage,frameModel} from './frame-1900.js';
 import {record, parameters, state as workspaceState, inspectionSystem, activeDrivetrain} from './store.js';
 export let vehicleApi;
 const sections=record.parts;
@@ -569,31 +572,47 @@ try{
  for(const c of [...frame.children])if(c.isMesh||c.isInstancedMesh)frame.remove(c);
  const pillarMat=new T.MeshStandardMaterial({color:0xE9A85B,metalness:.45,roughness:.38});
  for(const name of ['Frame','UnknownPartL','UnknownPartR']){const m=stepMeshes[name];if(!m)continue;m.material=name==='Frame'?steel:pillarMat;m.name=name==='Frame'?'Frame':'WindshieldPillar';chassis.add(m);}
- // Akü kutusu: çizimdeki 9×5 kutu; arka halkayla (x=2150) çakışan 50 mm bölge kırmızı işaretlenir (Madde 66e: ön yüz x ≥ 2190)
+ // 1900 ADAYI şasi değişiklikleri (frame-1900.js): kuyruk köşegenleri x>2175 silinir; alçak raylar ve ön çemberler eklenir (altın renk = aday boru)
+ if(stepMeshes.Frame)cutTailDiagonals(stepMeshes.Frame);
+ const frame1900=stepMeshes.Frame?frameModel(stepMeshes.Frame):null;   // ölçüm modeli: Araç sayfasındaki süspansiyon kartı kullanır
+ const newTubeMat=new T.MeshStandardMaterial({color:0xCBB98B,metalness:.5,roughness:.36});
+ chassis.add(buildFrameAdditions(T,newTubeMat));
+ // Akü kutusu: çizimdeki 9×5 kutu, 1900 adayında diferansiyelin arkasına (x 2100–2320 → 2600–2820) taşınır.
+ // Önceki konumdaki arka halka çakışması (x=2150) bu yerleşimde yok; kırmızı işaret kaldırıldı.
  batterySupport.clear();
- if(stepMeshes.BatteryBox){stepMeshes.BatteryBox.material=blue;batterySupport.add(stepMeshes.BatteryBox);}
- const clash=new T.Mesh(new T.BoxGeometry(.05,.094,.32),new T.MeshStandardMaterial({color:0xd8433a,transparent:true,opacity:.55,depthWrite:false}));
- clash.position.copy(toStep(2125,60,8));clash.name='BatteryClash';batterySupport.add(clash);
+ if(stepMeshes.BatteryBox){stepMeshes.BatteryBox.material=blue;stepMeshes.BatteryBox.position.x+=(layout1900.battery.x[0]-2100)/1000;batterySupport.add(stepMeshes.BatteryBox);}
  // Koltuk, direksiyon, süspansiyon: V2 geometrisi yeni yerleşimde (rep-parts.js, Temsili)
  seat.clear();seat.position.set(0,0,0);seat.rotation.set(0,0,0);seat.add(rep.seat);
  steering.clear();steering.position.set(0,0,0);steering.rotation.set(0,0,0);steering.add(rep.steering);
- suspension.clear();suspension.add(rep.suspension);
+ // Süspansiyon: 1900 adayı çift salıncak + coilover (suspension-1900.js); tekerlek hareketi API ile canlandırılır
+ const susp1900=buildSuspension1900(T);
+ suspension.clear();suspension.add(susp1900.group);
  // V2 fren boruları/pedal/kaliperler V2 tekerlek konumundaydı; diskler tekerleklerde kalır
  brakes.clear();brakeLines.length=0;for(const m of brakeMarkers)m.removeFromParent();brakeMarkers.length=0;
- // Tekerlekler: V2 jantlı lastik 16″ Ø500 × 90 mm'ye ölçeklenir, aday dingil ve izlere taşınır (dönme animasyonu korunur)
- const kr=repLayout.wheelR/1000/.269,kw=repLayout.wheelW/1000/.134;
+ // Tekerlekler: V2 jantlı lastik 16″ Ø500 × 90 mm'ye ölçeklenir, 1900 adayı dingil ve izlere taşınır (dönme animasyonu korunur)
+ const kr=layout1900.wheelR/1000/.269,kw=layout1900.wheelW/1000/.134;
  for(const r of rollers){
-  const side=Math.sign(r.wheel.position.z),half=(r.rear?repLayout.track.rear:repLayout.track.front)/2;
-  r.wheel.position.copy(toStep(r.rear?repLayout.axles.rear:repLayout.axles.front,repLayout.wheelY,side*half));
-  r.wheel.scale.set(kr,kr,kw);
+  const side=Math.sign(r.wheel.position.z),half=(r.rear?layout1900.track.rear:layout1900.track.front)/2;
+  r.wheel.position.copy(toStep(r.rear?layout1900.axles.rear:layout1900.axles.front,layout1900.wheelY,side*half));
+  r.wheel.scale.set(kr,kr,kw);r.side=side;r.base=r.wheel.position.clone();
+ }
+ let suspensionTravel=0;
+ function setSuspensionTravel(mm){
+  suspensionTravel=Math.max(-layout1900.travel,Math.min(layout1900.travel,+mm||0));
+  const out=susp1900.setTravel(suspensionTravel);
+  for(const r of rollers){const c=out[r.rear?'rear':'front'];r.wheel.position.copy(r.base).add(new T.Vector3(0,c.wheelDy/1000,r.side*c.wheelDz/1000));r.wheel.rotation.x=r.side*c.camberDeg*Math.PI/180;}
+  draw=true;return {travel:suspensionTravel,...out};
  }
  // Tahrik: eski merkezi motor/kayış görseli kaldırılır; temsili orta motor + diferansiyel ve akslar
  for(const g of [motorGroup,clutchGroup,diffGroup,axleGroup])g.clear();
  for(const c of [...driveline.children])if(c.isMesh)driveline.remove(c);
- if(stepMeshes.RepDrivetrain){stepMeshes.RepDrivetrain.material=housing;motorGroup.add(stepMeshes.RepDrivetrain);}
+ // Orta motor + yarım diferansiyel birimi arka dingilde (x 2450); GLB'deki eski RepDrivetrain (x 2640 / aks 2825) kullanılmaz
+ motorGroup.add(buildDrivetrain1900(T,housing));
+ // Bagaj 500 × 400 × 200 koltuk arkasında (konum temsili)
+ frame.add(buildLuggage(T,new T.MeshStandardMaterial({color:0x3a4650,metalness:.1,roughness:.8,transparent:true,opacity:.75})));
  // Elektronik ve yardımcı parçalar: V2 konumundan yeni yerleşimde temsili konuma (STEP mm)
  const relocate=(group,[x,y,z])=>{const b=new T.Box3().setFromObject(group);if(b.isEmpty())return;const c=b.getCenter(new T.Vector3());group.position.add(toStep(x,y,z).sub(c));};
- relocate(nose,[40,330,0]);relocate(computer,[1700,180,360]);relocate(panel,[1200,620,210]);relocate(motorController,[2420,170,-200]);relocate(fire,[2420,170,200]);
+ relocate(nose,[40,330,0]);relocate(computer,[1700,180,360]);relocate(panel,[1200,620,210]);relocate(motorController,[2230,170,-200]);relocate(fire,[2230,170,200]);   // 1900: arka dingil/coilover bölgesinden akünün eski yerine (temsili)
  // Kabuk: temsili dış zarf (yarı saydam)
  body.clear();
  if(stepMeshes.RepShell){stepMeshes.RepShell.material=new T.MeshStandardMaterial({color:0xe9ecef,transparent:true,opacity:.22,roughness:.25,depthWrite:false,side:T.DoubleSide});body.add(stepMeshes.RepShell);}
@@ -749,7 +768,7 @@ try{
  for(const id of ['rear','top','cockpit']){const old=$(id).onclick;$(id).onclick=()=>{old();focusGoal=null;draw=true};}
 
  /* Yan görünüş: tam yandan, dar açılı (≈ ortografik) kamera ve ölçü çizgileri. Ölçüler STEP şasi ağından ve
-    repLayout aday aks konumlarından okunur; sabit sayı yazılmaz. Teker, salıncak ve kabuk temsilidir. */
+    layout1900 aday aks konumlarından okunur; sabit sayı yazılmaz. Teker, salıncak ve kabuk temsilidir. */
  let sideView=false;const sideFov=10,baseFov=camera.fov;
  const svgNS='http://www.w3.org/2000/svg';
  const sideSvg=document.createElementNS(svgNS,'svg');sideSvg.id='side-dims';sideSvg.setAttribute('aria-hidden','true');sideSvg.style.display='none';   // SVG'de .hidden yok; display kullanılır
@@ -759,23 +778,23 @@ try{
  function sideMeasures(){
   const box=new T.Box3().setFromObject(stepMeshes.Frame||frame);
   const nose=box.min.x*1000+1400,tail=box.max.x*1000+1400,bottom=box.min.y*1000-135;
-  const {front,rear}=repLayout.axles;
+  const {front,rear}=layout1900.axles;
   return {nose,tail,bottom,front,rear,wheelbase:rear-front,frontOverhang:front-nose,rearOverhang:tail-rear};
  }
  function buildSideLegend(){
   sideLegend.innerHTML='';
   const add=(tag,text,cls)=>{const e=document.createElement(tag);if(cls)e.className=cls;e.textContent=text;sideLegend.append(e);return e;};
   add('strong','Yan görünüş · mm');
-  add('span','Şasi: STEP çizimi. Aks konumları: aday. Teker ve salıncak temsili.','side-legend-muted');
-  const q=add('span','Ön alt salıncak ≈ 190–230 mm: şasi burnu dar; mekanik ekip değerlendiriyor ','side-legend-question');
-  const b=document.createElement('span');b.className='badge-verify badge-dogrula';b.textContent='Doğrulanacak';q.append(b);
+  add('span','ADAY – doğrulanmadı · dingil mesafesi 1900 adayı. Şasi: STEP çizimi + aday değişiklikleri.','side-legend-muted');
+  const q=add('span','Alt kol: ön 207 mm, arka 130 mm ','side-legend-question');
+  const b=document.createElement('span');b.className='badge-verify badge-aday';b.textContent='Aday';q.append(b);
  }
  function enterSideView(){
   cameraMotion.cancel();if(pickMode==='body')setMode('frame');
   rearView=false;cockpitView=false;refreshDrive();focusGoal=null;
   const m=sideMeasures();sideView=m;buildSideLegend();
   camera.fov=sideFov;az=0;el=0;rad=1;
-  target.copy(toStep((m.nose+m.rear+repLayout.wheelR)/2,560,0)).applyMatrix4(vehicleRoot.matrixWorld);
+  target.copy(toStep((m.nose+m.rear+layout1900.wheelR)/2,560,0)).applyMatrix4(vehicleRoot.matrixWorld);
   sideSvg.style.display='';sideLegend.hidden=false;$('stage').classList.add('is-side-view');$('side-view').setAttribute('aria-pressed','true');draw=true;
  }
  function exitSideView(){
@@ -788,7 +807,7 @@ try{
  for(const id of ['reset','rear','top','cockpit','bottom','frame','body']){const old=$(id).onclick;$(id).onclick=e=>{exitSideView();old?.(e);};}
  function sideFit(aspect){
   const m=sideView,c=[];
-  for(const x of [m.nose-60,m.rear+repLayout.wheelR+60])for(const y of [-430,1000])for(const z of [-615,615])c.push(toStep(x,y,z).applyMatrix4(vehicleRoot.matrixWorld));
+  for(const x of [m.nose-60,m.rear+layout1900.wheelR+60])for(const y of [-430,1000])for(const z of [-615,615])c.push(toStep(x,y,z).applyMatrix4(vehicleRoot.matrixWorld));
   return distanceToFit(c,{az:0,el:0,rad:1,target:target.toArray()},aspect,.86,.84);
  }
  function drawSideDims(w,h){
@@ -802,7 +821,7 @@ try{
    for(const p of [a,b])line([p[0],p[1]-tick],[p[0],p[1]+tick]);
    label(anchor==='end'?[Math.min(a[0],b[0])-10,a[1]]:[(a[0]+b[0])/2,a[1]],text,anchor||'middle',anchor==='end'?4:-7);
   };
-  for(const x of [m.front,m.rear])line(P(x,repLayout.wheelY),P(x,rowB-20),'dim-ext');
+  for(const x of [m.front,m.rear])line(P(x,layout1900.wheelY),P(x,rowB-20),'dim-ext');
   for(const x of [m.nose,m.tail])line(P(x,m.bottom),P(x,rowB-20),'dim-ext');
   dim(m.front,m.rear,rowA,`Dingil mesafesi ${fmt(m.wheelbase)} mm · aday`);
   dim(m.nose,m.front,rowB,`Ön çıkıntı ${fmt(m.frontOverhang)} mm`);
@@ -1018,8 +1037,8 @@ try{
  function setShell(mode,{immediate=isHomeView()}={}){cameraMotion.cancel();pickMode='frame';frame.visible=true;bodyShell.style(mode,{immediate});draw=true;}
  function moveCamera(pose){cameraMotion.moveTo(pose,800);draw=true;}
 
- select('frame');focusGoal=null;rad=4.04;refreshDrive();vehicleApi={state:()=>({drivetrain:{variant:activeDrivetrain()?workspaceState.drivetrain:'central',transitioning:drivetrain.active,blend:drivetrain.blend,centralVisible:driveline.visible,hubVisible:hubMotor.visible,batteryPosition:batteryPack.position.toArray(),hubPosition:rightRearWheel.position.toArray()},shell:bodyShell.state(),world:world.state(),graphics:studio.status(),brakeFlow,cameraTransition:cameraMotion.active,layoutChecks:checkVisualEnvelopes(),focusContext,isolation,focusedParts:[...focusIds],engaged,playing,exploded,batteryHidden,hideWheels,wheelSpin,chosen,camera:{az,el,rad,target:target.toArray()},visible:{body:body.visible,frame:frame.visible,battery:batterySupport.visible,guard:guard.visible,wheels:wheels.visible},explodePosition:motorGroup.position.toArray(),rotor:rotor.rotation.z,carrier:carrier.rotation.z,sleeve:sleeve.position.z,small:smallPulley.rotation.z,large:largePulley.rotation.z,meshes:render.info.render.calls}),setStudioPose(pose,duration){cameraMotion.moveTo(pose,duration);},resetHomeView,applyDrivetrain,drivetrainTransitioning:()=>drivetrain.active,resetVehicleView:()=>$('reset').click(),toggleBrakeFlow(){if(focusContext!=='braking')focusSystem('braking',inspectionSystem()?.parts);brakeFlow=!brakeFlow;draw=true;return brakeFlow;},setShell,moveCamera,experienceState:()=>world.state(),shellState:()=>bodyShell.state(),captureView,restoreView,presentScene,setAnimating,setEngaged,setQuality,setShadows,select,inspect,focusSystem,clearFocus,isolate:enabled=>{isolation=enabled;updateHighlight();draw=true;}};
- window.vaccino=vehicleApi;
+ select('frame');focusGoal=null;rad=4.04;refreshDrive();vehicleApi={setSuspensionTravel,suspensionLayout:layout1900,frameModel:frame1900,state:()=>({drivetrain:{variant:activeDrivetrain()?workspaceState.drivetrain:'central',transitioning:drivetrain.active,blend:drivetrain.blend,centralVisible:driveline.visible,hubVisible:hubMotor.visible,batteryPosition:batteryPack.position.toArray(),hubPosition:rightRearWheel.position.toArray()},shell:bodyShell.state(),world:world.state(),graphics:studio.status(),brakeFlow,cameraTransition:cameraMotion.active,layoutChecks:checkVisualEnvelopes(),focusContext,isolation,focusedParts:[...focusIds],engaged,playing,exploded,batteryHidden,hideWheels,wheelSpin,chosen,camera:{az,el,rad,target:target.toArray()},visible:{body:body.visible,frame:frame.visible,battery:batterySupport.visible,guard:guard.visible,wheels:wheels.visible},explodePosition:motorGroup.position.toArray(),rotor:rotor.rotation.z,carrier:carrier.rotation.z,sleeve:sleeve.position.z,small:smallPulley.rotation.z,large:largePulley.rotation.z,meshes:render.info.render.calls}),setStudioPose(pose,duration){cameraMotion.moveTo(pose,duration);},resetHomeView,applyDrivetrain,drivetrainTransitioning:()=>drivetrain.active,resetVehicleView:()=>$('reset').click(),toggleBrakeFlow(){if(focusContext!=='braking')focusSystem('braking',inspectionSystem()?.parts);brakeFlow=!brakeFlow;draw=true;return brakeFlow;},setShell,moveCamera,experienceState:()=>world.state(),shellState:()=>bodyShell.state(),captureView,restoreView,presentScene,setAnimating,setEngaged,setQuality,setShadows,select,inspect,focusSystem,clearFocus,isolate:enabled=>{isolation=enabled;updateHighlight();draw=true;}};
+ window.vaccino=vehicleApi;document.dispatchEvent(new Event('vaccino:frame-model'));
  document.body.dataset.webgl='ready';
  requestAnimationFrame(loop);
 }catch(e){document.querySelector('.part-library').open=true;$('fallback').hidden=false;document.body.dataset.webgl='failed';console.error(e)}

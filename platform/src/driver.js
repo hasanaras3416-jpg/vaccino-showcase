@@ -4,6 +4,7 @@
    çizim yavaşsa sabit görsele düşer. */
 import {driverGear, driverInfo, rozetler, driverErgonomics} from '../data/vaccino-data.js';
 import {buildRepresentativeParts} from './rep-parts.js';
+import {cutTailDiagonals, buildFrameAdditions, frameModel, subModel, clearance} from './frame-1900.js';
 
 /* Sekme → GLB katmanları ve kamera açısı. Kask sekmesi kaskın tüm katmanlarını birlikte vurgular. */
 const equipment = {
@@ -451,6 +452,26 @@ export function initializeDriver() {
       shoulderWidth: {mm: 2 * (600 - 15), a: S2D(2150, 520, -585), b: S2D(2150, 520, 585)}
     };
   }
+  /* Bacak/ayak – en yakın boru: Suit ve Shoes köşe noktaları (kalçanın önü, STEP x < 1300) ile 1900 adayı şasinin
+     (kesilmiş STEP ağı + aday borular) yüzeyi arasındaki en kısa mesafe. Sürücü → STEP: X = 1400 − 1000z, Y = 1000y − 135, Z = 1000x. */
+  function legClearance() {
+    if (!ergo?.model) return null;
+    const pts = [], v = new T.Vector3();
+    for (const name of ['Suit', 'Shoes']) for (const mesh of layerMeshes.get(name) || []) {
+      const pos = mesh.geometry.attributes.position; mesh.updateMatrixWorld(true);
+      for (let i = 0; i < pos.count; i += 3) {
+        v.fromBufferAttribute(pos, i).applyMatrix4(mesh.matrixWorld);
+        const X = 1400 - v.z * 1000; if (X < 1300) pts.push([X, v.y * 1000 - 135, v.x * 1000]);
+      }
+    }
+    if (!pts.length) return null;
+    const min = [0, 1, 2].map(k => Math.min(...pts.map(p => p[k]))), max = [0, 1, 2].map(k => Math.max(...pts.map(p => p[k])));
+    const local = subModel(ergo.model, min, max, 250);
+    let best = {mm: Infinity};
+    for (const p of pts) { const r = clearance(p, local, 250); if (r.mm < best.mm) best = {...r, p}; }
+    return best;
+  }
+  const limitOf = item => { const m = /≥\s*([\d.]+)/.exec(item.sinir) || /≥\s*([\d.]+)/.exec(item.madde || ''); return m ? +m[1].replace('.', '') : null; };
   async function buildErgonomics() {
     const url = new URL('../assets/vehicle/frame-step.glb', import.meta.url); url.search = new URL(import.meta.url).search;
     const gltf = await loader.loadAsync(url.href);
@@ -458,15 +479,18 @@ export function initializeDriver() {
     const steel = new T.MeshStandardMaterial({color: 0xC9CDD0, metalness: .6, roughness: .35, transparent: true, opacity: .5, depthWrite: false});
     const pillar = new T.MeshStandardMaterial({color: 0xE9A85B, metalness: .4, roughness: .4, transparent: true, opacity: .6, depthWrite: false});
     gltf.scene.traverse(o => { if (o.isMesh) o.visible = false; });
+    let model = null;
     for (const name of ['Frame', 'UnknownPartL', 'UnknownPartR']) {
       const m = gltf.scene.getObjectByName(name); if (!m) continue;
+      if (name === 'Frame') { cutTailDiagonals(m); model = frameModel(m); }      // 1900 adayı: kuyruk köşegenleri x > 2175 silinir
       m.visible = true; m.material = name === 'Frame' ? steel : pillar; frameHolder.add(m);
     }
+    frameHolder.add(buildFrameAdditions(T, new T.MeshStandardMaterial({color: 0xCBB98B, metalness: .5, roughness: .36, transparent: true, opacity: .7, depthWrite: false})));
     const parts = buildRepresentativeParts(T);
     frameHolder.add(parts.seat);
     group.add(frameHolder);
     const lines = new T.Group(); group.add(lines);
-    return {group, lines};
+    return {group, lines, model};
   }
   function refreshErgonomics() {
     if (!ergo) return;
@@ -484,11 +508,20 @@ export function initializeDriver() {
           const num = Object.assign(document.createElement('span'), {className: 'ergo-num', textContent: String(i + 1)}); num.setAttribute('aria-hidden', 'true');
           const name = Object.assign(document.createElement('span'), {className: 'ergo-name', textContent: item.ad});
           const value = document.createElement('span'); value.className = 'ergo-value';
+          const lim = limitOf(item), fail = lim != null && m[item.id].mm < lim;
+          if (fail) li.classList.add('is-fail');   // kural sınırının altında: gizlenmez, kırmızı
           value.append(Object.assign(document.createElement('b'), {textContent: `${m[item.id].mm} mm`}), ` sınır ${item.sinir} (${item.madde}) `, badge(item));
           if (item.not) value.append(Object.assign(document.createElement('small'), {className: 'ergo-note', textContent: item.not}));
           li.append(num, name, value); ol.append(li);
         }); return ol; })(),
-      ...driverErgonomics.sabit.map(item => { const p = document.createElement('p'); p.className = 'ergo-line'; p.append(`${item.metin} `, badge(item)); return p; }),
+      (() => {
+        const p = document.createElement('p'), r = legClearance(); p.className = 'ergo-line';
+        if (!r) { p.textContent = 'Bacak/ayak – en yakın boru: ölçülemedi.'; return p; }
+        const where = `${r.ad}, x ≈ ${Math.round(r.at[0])}`;
+        if (r.mm <= 0) p.classList.add('is-fail');
+        p.append(`Bacak/ayak – en yakın boru (1900 adayı şasi): `, Object.assign(document.createElement('b'), {textContent: r.mm <= 0 ? `çakışma (${Math.round(r.mm)} mm)` : `${Math.round(r.mm)} mm`}), ` · ${where} `, badge({rozet: 'dogrula'}));
+        return p;
+      })(),
       Object.assign(document.createElement('p'), {className: 'drawer-caveat', textContent: driverErgonomics.not}));
   }
   async function setErgonomics(on) {
