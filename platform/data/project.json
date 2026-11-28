@@ -1282,12 +1282,6 @@
         "type": "JSON",
         "note": "Tek kaynak · parametreler, kararlar, sensörler",
         "path": "data/project.json"
-      },
-      {
-        "name": "Pist simülasyonu mimarisi ve sınırları",
-        "type": "MD",
-        "note": "İlk boyuna demo model · gerçek pist bekleniyor",
-        "path": "../docs/simulation-architecture.md"
       }
     ],
     "interfaceSummaries": {
