@@ -15,13 +15,13 @@ const systems = {mechanical, electrical};
 const software = record.presentation.software;
 const drivetrainData=record.presentation.drivetrain;
 if(!drivetrainData?.variants?.central||!drivetrainData?.variants?.hub){
-  throw new Error('Vaccino veri sürümü uyuşmuyor: aktarma mimarileri bulunamadı. Sayfayı yenileyin.');
+  throw new Error('VACCİNO veri sürümü uyuşmuyor: aktarma mimarileri bulunamadı. Sayfayı yenileyin.');
 }
 // All route data must come from the same revision as the JavaScript modules.
 // A stale project.json previously prevented any navigation from initializing.
 for (const [section, entries] of Object.entries({...systems, autonomy: software})) {
   if (!Array.isArray(entries)) {
-    throw new Error(`Vaccino veri sürümü uyuşmuyor: ${section} alt menüleri bulunamadı. Sayfayı önbelleği temizleyerek yenileyin.`);
+    throw new Error(`VACCİNO veri sürümü uyuşmuyor: ${section} alt menüleri bulunamadı. Sayfayı önbelleği temizleyerek yenileyin.`);
   }
 }
 const viewer = $('viewer');
@@ -439,7 +439,7 @@ const vehicle=await import('./vehicle.js');
 if(!Object.hasOwn(vehicle,'vehicleApi')||
   (document.body.dataset.webgl==='ready'&&
     (typeof vehicle.vehicleApi?.applyDrivetrain!=='function'||typeof vehicle.vehicleApi?.drivetrainTransitioning!=='function'))){
-  throw new Error(`Vaccino 3B görüntüleyici sürümü uyuşmuyor: ${import.meta.url}`);
+  throw new Error(`VACCİNO 3B görüntüleyici sürümü uyuşmuyor: ${import.meta.url}`);
 }
 ({inspect:inspectPart,vehicleApi}=vehicle);
 vehicleApi?.applyDrivetrain({immediate:true});
