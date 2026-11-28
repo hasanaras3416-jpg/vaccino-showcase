@@ -36,3 +36,6 @@ inputs/
 *.step
 *.stp
 *.f3d
+
+# Local hand-off notes, never committed
+docs/Vaccino_ATLAS_Proje_Devir_Promptu.md
