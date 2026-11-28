@@ -15,7 +15,7 @@ export function validateItem(input){
 }
 export function seedInventory(record){
  const electrical=new Set(['battery','drive','pc','hmi','power','camera','software']);
- const rows=record.parts.filter(p=>!['shell','camera','software'].includes(p.id)).map(p=>validateItem({id:'part-'+p.id,name:p.label,category:electrical.has(p.id)?inventoryCategories[1]:inventoryCategories[0],quantity:p.id==='motor'?'1':null,description:p.desc,status:'Tasarlanıyor',priority:p.id==='motor'?'Yüksek':'Normal',team:electrical.has(p.id)?'Elektrik':'Mekanik',estimatedCost:null,supplier:'',document:'../inputs/Vaccino_ATLAS_Web_Sitesi_ve_3B_Model_Promptu.md',source:'Gereksinim R01; stok ve tedarik doğrulanmadı.'}));
+ const rows=record.parts.filter(p=>!['shell','camera','software'].includes(p.id)).map(p=>validateItem({id:'part-'+p.id,name:p.label,category:electrical.has(p.id)?inventoryCategories[1]:inventoryCategories[0],quantity:p.id==='motor'?'1':null,description:p.desc,status:'Tasarlanıyor',priority:p.id==='motor'?'Yüksek':'Normal',team:electrical.has(p.id)?'Elektrik':'Mekanik',estimatedCost:null,supplier:'',document:'',source:'Gereksinim R01; stok ve tedarik doğrulanmadı.'}));
  for(const r of record.inventory[0].rows.slice(4))rows.push(validateItem({id:r.A,name:r.C,category:'Sensörler',quantity:r.E||null,description:r.D+' · '+r.G,status:r.A==='S01'?'Temin edilecek':'Planlanıyor',priority:['S01','S03','S04','S05'].includes(r.A)?'Yüksek':r.B==='Karara bağlı'?'Koşullu':'Normal',team:r.K,estimatedCost:null,supplier:'',document:r.L||'',source:'Sensör envanteri R01 · '+r.J+'; stok/sipariş bilgisi sağlanmadı.'}));return rows;
 }
 export function parseCSV(text){
@@ -27,9 +27,17 @@ export function parseCSV(text){
 export function exportCSV(rows){const safe=v=>{let t=v==null?'':String(v);if(/^[=+\-@\t\r]/.test(t))t="'"+t;return '"'+t.replaceAll('"','""')+'"';};return '\uFEFF'+[inventoryFields,...rows.map(r=>inventoryFields.map(k=>r[k]))].map(r=>r.map(safe).join(',')).join('\r\n');}
 export function parseImport(text,format){let rows;if(format==='csv')rows=parseCSV(text);else{const doc=JSON.parse(text);if(!Array.isArray(doc)&&doc.version!==1)throw Error('Desteklenmeyen envanter sürümü.');rows=Array.isArray(doc)?doc:doc.records;}if(!Array.isArray(rows)||rows.length>2000)throw Error('En çok 2000 kayıt desteklenir.');const clean=rows.map(validateItem);if(new Set(clean.map(r=>r.id)).size!==clean.length)throw Error('Yinelenen ID var.');return clean;}
 export function isMissing(row){return !['Temin edildi','Test ediliyor','Onaylandı'].includes(row.status);}
+// Saved data has no 2000-row cap: older releases could store more, and those rows must still load.
+function savedRows(text){const doc=JSON.parse(text);const rows=Array.isArray(doc)?doc:doc?.version===1?doc.records:null;if(!Array.isArray(rows))throw Error('Desteklenmeyen envanter sürümü.');const clean=rows.map(validateItem);if(new Set(clean.map(r=>r.id)).size!==clean.length)throw Error('Yinelenen ID var.');return clean;}
 export class InventoryStore{
- constructor(seed,adapter){this.adapter=adapter;this.rows=seed.map(validateItem);this.persistent=true;this.warning='';try{const saved=adapter?.load();if(saved)this.rows=parseImport(saved,'json');}catch{this.persistent=false;this.warning='Yerel depolama okunamadı; bu sekmedeki kayıt geçicidir.';}}
- save(rows){const validated=rows.map(validateItem);const payload=JSON.stringify({version:1,records:validated});try{this.adapter?.save(payload);}catch{this.persistent=false;this.warning='Yerel depolamaya yazılamadı; dışa aktararak kaydı koruyun.';}this.rows=validated;}
+ constructor(seed,adapter){this.adapter=adapter;this.rows=seed.map(validateItem);this.readable=true;this.warning='';
+  // A saved inventory that cannot be read is never overwritten: writes stay off until the page is fixed or reloaded.
+  try{this.saved=adapter?.load();if(this.saved!=null)this.rows=savedRows(this.saved);}catch{this.readable=false;this.warning='Yerel envanter okunamadı. Başlangıç kayıtları gösteriliyor; mevcut veriyi korumak için kaydetme kapalı.';}}
+ save(rows){if(!this.readable)throw Error(this.warning);const validated=rows.map(validateItem);if(new Set(validated.map(r=>r.id)).size!==validated.length)throw Error('Yinelenen ID var.');const payload=JSON.stringify({version:1,records:validated});
+  let current;try{current=this.adapter?.load();}catch{current=undefined;}
+  if(this.adapter&&current!==this.saved)throw Error('Yerel envanter başka bir sekmede değişti. Sayfayı yenileyip tekrar deneyin.');
+  try{this.adapter?.save(payload);}catch{throw Error('Yerel depolamaya yazılamadı. Önceki kayıtlar korundu; dışa aktararak yedek alın.');}
+  this.saved=this.adapter?payload:undefined;this.rows=validated;}
  update(row){row=validateItem(row);const exists=this.rows.some(r=>r.id===row.id);this.save(exists?this.rows.map(r=>r.id===row.id?row:r):[...this.rows,row]);}
  import(text,format){const imported=parseImport(text,format);const map=new Map(this.rows.map(r=>[r.id,r]));imported.forEach(r=>map.set(r.id,r));this.save([...map.values()]);return imported.length;}
  exportJSON(){return JSON.stringify({version:1,scope:'Yalnızca bu tarayıcı; ortak senkronizasyon yok',records:this.rows},null,2);}

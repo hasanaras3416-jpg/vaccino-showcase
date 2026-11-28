@@ -1,7 +1,7 @@
 {
   "revision": "R01",
   "date": "2026-11-17",
-  "source": "Vaccino_ATLAS_Web_Sitesi_ve_3B_Model_Promptu.md",
+  "source": "VACCİNO platform kaydı",
   "inventory": [
     {
       "name": "Sensör envanteri",
@@ -1266,22 +1266,16 @@
     "competitionMedia": [],
     "files": [
       {
-        "name": "Özgün 3B aktarma prototipi",
-        "type": "HTML",
-        "note": "Eski plan · V2 şasi ve özgün etkileşimler",
-        "path": "../inputs/Vaccino_26-27_Aktarma_3B.html"
+        "name": "Mekanik 3B görünüm",
+        "type": "SAYFA",
+        "note": "Sitede · şasi ve aktarmanın 3B yerleşimi",
+        "path": "#/mechanical"
       },
       {
         "name": "Sensör envanteri",
-        "type": "XLSX",
-        "note": "Sensörler ve veri arayüzleri",
-        "path": "../inputs/Vaccino_26-27_Sensor_Envanteri.xlsx"
-      },
-      {
-        "name": "Ana gereksinim belgesi",
-        "type": "MD",
-        "note": "Tasarım yönü ve doğrulama kapsamı",
-        "path": "../inputs/Vaccino_ATLAS_Web_Sitesi_ve_3B_Model_Promptu.md"
+        "type": "SAYFA",
+        "note": "Sitede · sensörler ve veri arayüzleri",
+        "path": "#/sensors"
       },
       {
         "name": "Platform kaydı",

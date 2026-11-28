@@ -20,7 +20,7 @@ export function initializeInventoryUI(parent){
     ['Tedarikçi',row.supplier],['Kaynak',row.source]
    ]) properties.append(make('dt',label),make('dd',value||'Belirtilmedi'));
    details.append(properties);
-   if(row.document){
+   if(row.document&&!row.document.startsWith('../inputs/')){
     const link=make('a','Teknik belge');link.href=row.document;link.target='_blank';link.rel='noopener noreferrer';
     details.append(link);
    }
