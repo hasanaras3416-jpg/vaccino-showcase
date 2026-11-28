@@ -1,0 +1,100 @@
+/* VACCİNO hareket sistemi — tüm süre ve eğriler burada.
+   Kural: yalnızca transform ve opacity; en çok 400 ms; zıplama, dönme, büyüyüp küçülme yok.
+   Tek sonsuz animasyon: durum noktasındaki hafif nabız. Diğer stil dosyaları en son bu dosyayı yükler. */
+:root {
+  --dur-screen: 320ms;   /* ekran geçişi (280–360) */
+  --dur-panel: 260ms;    /* çekmece / panel (240–300) */
+  --dur-micro: 150ms;    /* hover, sekme, odak (120–180) */
+  --dur-fade: 120ms;     /* azaltılmış hareket: yalnızca opaklık */
+  --ease-in: cubic-bezier(.2, 0, 0, 1);   /* giriş */
+  --ease-out: cubic-bezier(.4, 0, 1, 1);  /* çıkış */
+  --shift: 14px;         /* en çok 12–16 px kayma */
+  --stagger: 40ms;       /* sıralı giriş aralığı, en çok 6 öğe */
+  /* Yön: varsayılan ileri (aşağıdaki ekran → içerik aşağıdan girer). */
+  --vt-in-x: 0px;  --vt-in-y: var(--shift);
+  --vt-out-x: 0px; --vt-out-y: calc(var(--shift) * -.5);
+}
+html[data-dir=back] { --vt-in-y: calc(var(--shift) * -1); --vt-out-y: calc(var(--shift) * .5); }
+/* Mobilde menü yatay: ileri sağdan, geri soldan. */
+@media (max-width: 900px) {
+  :root { --vt-in-x: var(--shift); --vt-in-y: 0px; --vt-out-x: calc(var(--shift) * -.5); --vt-out-y: 0px; }
+  html[data-dir=back] { --vt-in-x: calc(var(--shift) * -1); --vt-in-y: 0px; --vt-out-x: calc(var(--shift) * .5); --vt-out-y: 0px; }
+}
+
+@keyframes m-screen-in  { from { opacity: 0; transform: translate(var(--vt-in-x), var(--vt-in-y)); } }
+@keyframes m-screen-out { to   { opacity: 0; transform: translate(var(--vt-out-x), var(--vt-out-y)); } }
+@keyframes m-item-in    { from { opacity: 0; transform: translateY(8px); } }
+@keyframes m-fade-in    { from { opacity: 0; } }
+@keyframes m-fade-out   { to   { opacity: 0; } }
+
+/* ---------- Ekran geçişi: View Transitions API ---------- */
+@supports (view-transition-name: none) {
+  #workspace { view-transition-name: screen; }
+  .sidebar { view-transition-name: rail; }
+  .topbar { view-transition-name: topbar; }
+  .nav-indicator { view-transition-name: nav-indicator; }
+  /* Ortak 3B sahne iki ekranda da görünüyorsa aynı öğe olarak taşınır. */
+  html[data-shared] #viewer { view-transition-name: vehicle-stage; }
+
+  ::view-transition-group(*) { animation-duration: var(--dur-screen); animation-timing-function: var(--ease-in); }
+  ::view-transition-old(screen) { animation: m-screen-out calc(var(--dur-screen) * .6) var(--ease-out) both; }
+  ::view-transition-new(screen) { animation: m-screen-in var(--dur-screen) var(--ease-in) both; }
+  /* Kenar menüsü ve üst çubuk kıpırdamaz: eski görüntü hemen kalkar, yenisi sabit durur. */
+  ::view-transition-old(rail), ::view-transition-old(topbar) { animation: none; opacity: 0; }
+  ::view-transition-new(rail), ::view-transition-new(topbar) { animation: none; }
+  /* Gösterge kayar; görüntüleri çapraz solmaz. */
+  ::view-transition-old(nav-indicator) { animation: none; opacity: 0; }
+  ::view-transition-new(nav-indicator) { animation: none; }
+  ::view-transition-old(vehicle-stage) { animation: m-fade-out var(--dur-screen) var(--ease-out) both; }
+  ::view-transition-new(vehicle-stage) { animation: m-fade-in var(--dur-screen) var(--ease-in) both; }
+  html[data-transition] .screen { animation: none; }
+}
+/* Destek yoksa aynı süre ve eğriyle CSS yedeği. */
+@supports not (view-transition-name: none) {
+  html[data-dir] .screen:not([hidden]) { animation: m-screen-in var(--dur-screen) var(--ease-in) both; }
+}
+
+/* ---------- Kenar menüsü göstergesi ---------- */
+.primary-nav { position: relative; }
+.nav-indicator {
+  position: absolute; left: -10px; top: 0; width: 3px; height: 34px; border-radius: 3px;
+  background: var(--champagne); pointer-events: none;
+  transform: translate3d(var(--nav-x, 0), var(--nav-y, 0), 0);
+  transition: transform var(--dur-screen) var(--ease-in), opacity var(--dur-micro) var(--ease-in);
+}
+.nav-indicator:not([data-ready]), html[data-transition] .nav-indicator { transition: none; }
+.sidebar .primary-nav a[aria-current=page]::before { content: none; }
+@media (max-width: 900px) {
+  .nav-indicator { left: 0; width: 28px; height: 3px; }
+}
+
+/* ---------- Sıralı giriş: en çok 6 öğe, 40 ms aralık, gerisi birlikte ---------- */
+.m-stagger > * { animation: m-item-in var(--dur-micro) var(--ease-in) both; animation-delay: calc(var(--i, 0) * var(--stagger)); }
+.panel-enter { animation: m-item-in var(--dur-panel) var(--ease-in) both; }
+
+/* ---------- Çekmece: hep sağdan girer, aynı yoldan çıkar ---------- */
+.detail-drawer { transition: transform var(--dur-panel) var(--ease-out); }
+.detail-drawer.is-open { transition-timing-function: var(--ease-in); }
+
+/* ---------- Durum noktası: tek izinli sonsuz animasyon ---------- */
+.status-dot { position: relative; box-shadow: none; }
+.status-dot::after {
+  content: ""; position: absolute; inset: -4px; border-radius: 50%;
+  background: rgb(203 185 139 / 22%);
+  animation: m-pulse 2.8s var(--ease-in) infinite;
+}
+@keyframes m-pulse { 0%, 100% { opacity: .9; transform: scale(1); } 50% { opacity: .35; transform: scale(1.15); } }
+
+/* ---------- Azaltılmış hareket: kayma yok, yalnızca 120 ms opaklık ---------- */
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-screen: var(--dur-fade); --dur-panel: var(--dur-fade); --dur-micro: var(--dur-fade); --stagger: 0ms; --shift: 0px; }
+  ::view-transition-group(*) { animation: none !important; }
+  ::view-transition-old(screen), ::view-transition-old(vehicle-stage) { animation: m-fade-out var(--dur-fade) linear both !important; }
+  ::view-transition-new(screen), ::view-transition-new(vehicle-stage) { animation: m-fade-in var(--dur-fade) linear both !important; }
+  .m-stagger > *, .panel-enter { animation: none !important; }
+  .nav-indicator { transition: none !important; }
+  .detail-drawer { transform: none !important; opacity: 0; transition: opacity var(--dur-fade) linear !important; }
+  .detail-drawer.is-open { opacity: 1; }
+  .status-dot::after { animation: none; }
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}

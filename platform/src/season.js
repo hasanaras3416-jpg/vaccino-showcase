@@ -23,7 +23,7 @@ export function initializeSeason(logo) {
     if(!intro.open)return;
     if(reset&&onHome())window.vaccino?.resetHomeView();
     intro.close();
-    if(focus)document.getElementById('menu-toggle').focus({preventScroll:true});
+    if(focus)(document.querySelector('.primary-nav a[aria-current]')||document.querySelector('.primary-nav a'))?.focus({preventScroll:true});
   }
   start.onclick=()=>{
     const api=window.vaccino;
@@ -54,7 +54,7 @@ export function initializeSeason(logo) {
       start.hidden=true;
       error.hidden=false;
       intro.classList.add('season-unavailable');
-      skip.textContent='Stüdyoya geç';
+      skip.textContent='Siteye geç';
       skip.focus();
       return;
     }

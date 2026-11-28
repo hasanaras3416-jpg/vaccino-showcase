@@ -19,7 +19,7 @@ A polished public-facing digital presentation for Vaccino, an electric student c
 - `#/experience/showroom`: chassis showroom. The draft exterior source remains available for future integration, while default public routes and Reset show the chassis.
 - `#/vehicle`: dedicated front three-quarter view of the chassis and wheels, with responsive framing and a matching reset.
 - `#/mechanical` and `#/electrical`: scoped 3D exhibits of each system. Electrical groups battery calculations and power distribution under separate disclosures.
-- `#/mechanical/transmission`: compare the Hub Motor and Merkezi Aktarma concepts in the shared Three.js scene. Part labels and comparison data are kept in `platform/data/project.json`.
+- `#/mechanical/transmission`: the drivetrain decided on 27 Nov 2026 (single mid motor + half differential + jointed axles). The hub-motor comparison selector is hidden; its data stays in `platform/data/project.json` as an archived "Eski plan" variant.
 - `#/autonomy/simulation` and `#/autonomy/vision`: independent software exhibits. Previous perception, sensor and interface routes open Görüntü İşleme, with the corresponding technical resources expanded for the sensor and interface links.
 - `#/team/goals`, `#/inventory`: competition context and inventory. The team photo gallery and both software media showcases currently await approved media.
 - Add media entries to `presentation.software[].media` or `presentation.competitionMedia` in `platform/data/project.json`. Each entry uses `type` (`image` or `video`), `src` relative to `platform/`, descriptive `alt` and an optional `caption`. Video entries can also reference a Turkish WebVTT file with `captions`.
@@ -30,8 +30,8 @@ A polished public-facing digital presentation for Vaccino, an electric student c
 
 ## Driver Studio asset
 
-- The base is [tevy Pit Crew Member v1, LOD0](https://tevy.dev/models/pit-crew) ([original GLB](https://tevy.dev/models/pit-crew/v1/lod0.glb)), published under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). CC0 permits display, modification and redistribution of the base asset with no attribution requirement. The supplied Shell logo and the Vaccino identity have separate trademark rights. The concept artwork carries no endorsement claim.
-- The repackaged `platform/assets/driver/pilot.glb` is a self-contained static pose with 27,999 triangles. It preserves the baked normal map, adds matte black and charcoal with a champagne V and the supplied Shell mark in the suit texture, and uses an adjusted roughness map. The embedded JPEG maps are 2048 px (base color), 1024 px (normal) and 512 px (roughness). No animation, skinning, texture transcoder or network dependency is required at runtime.
+- Driver Studio uses `platform/assets/driver/driver-adc.glb` and `driver-mileage.glb` (mode switch, ADC by default) plus an ergonomics view that loads `frame-step.glb` and measures helmet–roof, helmet–rear hoop and toe–nose live. Each GLB is a static, rig-free 174 cm reference driver built with MPFB 2.0.18 from MakeHuman CC0 assets by `tools/driver/build_driver.py`. Every gear piece is its own mesh (Body, Suit, SuitPanels, Gloves, Shoes, Helmet, HelmetSeal, HelmetStripe, Visor, Harness, Emblem); `platform/src/driver.js` assigns the final materials per layer. Sources and licences: `docs/ASSETS.md`.
+- The GLB loads only when the Driver screen opens; without WebGL, on load failure or slow mobile rendering the page shows `driver-fallback.jpg`.
 - For a replacement GLB, export a standing pilot facing +Z with +Y up and feet at ground level. Set three named empty nodes in the desired camera target positions: `FocusHelmet`, `FocusSuit`, and `FocusGlove`. Review their close-up distances and camera angles in `platform/src/driver.js`.
 - The lazy GLB loader is the MIT-licensed GLTFLoader and BufferGeometryUtils from [Three.js 0.160.1](https://github.com/mrdoob/three.js/tree/r160), bundled against the application's existing Three.js global. The loader and GLB share the app release query. Automatic pixel density follows the vehicle policy of 1× at 700 px and below, capped at 1.35× above it.
 
@@ -39,9 +39,9 @@ A polished public-facing digital presentation for Vaccino, an electric student c
 A **new chassis** may be provided by the actual CAD designer later. Until supplied and explicitly approved, **do not replace the current vehicle/chassis**; produce independent visual comparisons if requested.
 
 ## Technical factual boundaries
-- Transmission concept A under evaluation: one hub motor within the **right rear wheel**, with the left rear wheel free. The visualization uses a translucent right wheel and an illustrative battery reserve near the former differential. The hub, mount compatibility, battery clearance, weight distribution, wiring and service access await engineering verification.
-- Transmission concept B under evaluation: central BLDC, belt/pulley, differential and axle shafts to both rear wheels. The configurator reuses this geometry, the existing battery reserve and the coupled/coasting demonstration. Both configurations and transitions illustrate architecture only. Any efficiency and dynamics differences require validation.
-- Older two-hub sketch is historical, not approved alternative A.
+- Drivetrain (team decision, 27 Nov 2026): single mid motor (label 48 V, 1000 W, 450 r/min, 20 A; 3-phase, hall sensors; make/model unknown) + half differential + jointed axles. The 3D scene hides the old belt and pulleys behind a representative gear case.
+- Dropped ("Eski plan"): hub motor(s), chain/belt-pulley drive, Arora/UUMotor/QS260 motors, Flipsky drive. They appear only in the archive and inventory with the "Eski plan" status.
+- Frame: Ø30×2 mm 6061-T6 tube, drawing 2,830 × 1,230 × 980 mm (wheels and body excluded). The 3D frame is still the old V2 layout until the STEP-based model replaces it. Run `npm run check:data` after editing either data file.
 - Actual material choice, finished vehicle safety, dimensions of every part, driver clothing compliance, battery packaging and performance require verification.
 - Driver scene and Nextion screens are visual demonstrations, never specification sheets.
 

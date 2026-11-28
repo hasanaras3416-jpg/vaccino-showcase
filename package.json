@@ -1,0 +1,9 @@
+{
+  "name": "vaccino-showcase",
+  "private": true,
+  "type": "module",
+  "description": "VACCİNO showcase site. Static files; no build step and no dependencies.",
+  "scripts": {
+    "check:data": "node tools/check-data.mjs"
+  }
+}

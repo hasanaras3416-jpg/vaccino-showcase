@@ -10,19 +10,18 @@ const make = (tag, text, className) => {
 };
 const paragraph = (text, className) => make('p', text, className);
 const link = (text, href, className) => {const a=make('a', text, className);a.href=href;return a;};
-const routes = record.presentation.routes;
 const {mechanical, electrical} = record.presentation.systems;
 const systems = {mechanical, electrical};
 const software = record.presentation.software;
 const drivetrainData=record.presentation.drivetrain;
 if(!drivetrainData?.variants?.central||!drivetrainData?.variants?.hub){
-  throw new Error('Vaccino veri sürümü uyuşmuyor: aktarma mimarileri bulunamadı. Sayfayı yenileyin.');
+  throw new Error('VACCİNO veri sürümü uyuşmuyor: aktarma mimarileri bulunamadı. Sayfayı yenileyin.');
 }
 // All route data must come from the same revision as the JavaScript modules.
 // A stale project.json previously prevented any navigation from initializing.
 for (const [section, entries] of Object.entries({...systems, autonomy: software})) {
   if (!Array.isArray(entries)) {
-    throw new Error(`Vaccino veri sürümü uyuşmuyor: ${section} alt menüleri bulunamadı. Sayfayı önbelleği temizleyerek yenileyin.`);
+    throw new Error(`VACCİNO veri sürümü uyuşmuyor: ${section} alt menüleri bulunamadı. Sayfayı önbelleği temizleyerek yenileyin.`);
   }
 }
 const viewer = $('viewer');
@@ -45,60 +44,30 @@ function renderTabs() {
     }));
   }
 }
+const screenInfo={
+  overview:['Genel',''],vehicle:['Araç','Parçaya dokun, ayrıntısını gör.'],systems:['Sistemler',''],
+  races:['Yarışlar',''],inventory:['Envanter','Arama ve filtreyle tüm donanım kayıtları.'],support:['Takım ve Destek',''],
+  mechanical:['Mekanik 3B','Mekanik sistemleri 3B yerleşimde incele.'],electrical:['Elektrik 3B','Enerji ve kontrolü 3B yerleşimde incele.'],
+  autonomy:['Yazılım',''],driver:['Sürücü Stüdyosu','Pilot ekipmanı · görsel konsept'],decisions:['Mühendislik kararları',''],
+  tests:['Test planı',''],experience:['Araç ortamı','']
+};
 function updateHeading() {
-  const route = routes.find(r => r.id === state.route);
-  $('screen-title').textContent = ({overview:'Vaccino stüdyosu',vehicle:'3B Model',mechanical:'Mekanik',electrical:'Elektrik',autonomy:'Yazılım',driver:'Driver',team:'Yarışmalar',inventory:'Envanter'})[state.route] || route?.title || 'Vaccino';
-  $('breadcrumb').textContent = $('screen-title').textContent;
-  const descriptions={overview:'',autonomy:'',mechanical:'Aracı oluşturan mekanik sistemleri 3B yerleşim üzerinden incele.',electrical:'Enerji, kontrol ve yardımcı sistemleri 3B yerleşim üzerinden incele.'};
-  $('screen-description').textContent = descriptions[state.route] ?? route?.simple ?? (state.route==='driver'?'Pilot ekipmanı / konsept görselleştirme':'');
-  $('footer-context').textContent = `${record.revision} / v${record.uiVersion}`;
-  document.title = `${route?.label || 'Driver'} — Vaccino 26/27`;
+  const [title,description]=screenInfo[state.route]||['VACCİNO',''];
+  $('screen-title').textContent=title;
+  $('breadcrumb').textContent=title;
+  $('screen-description').textContent=description;
+  $('footer-context').textContent=`${record.revision} / v${record.uiVersion}`;
+  document.title=state.route==='overview'?'VACCİNO — Otonom elektrikli yarış aracı':`${title} — VACCİNO`;
 }
-function closeMenu(returnFocus = false) {
-  document.body.classList.remove('menu-open');
-  $('menu-toggle').setAttribute('aria-expanded','false');
-  $('menu-toggle').setAttribute('aria-label','Menüyü aç');
-  $('menu-scrim').hidden = true;
-  $('sidebar').inert = true;
-  document.querySelector('.app-shell').inert = false;
-  if (returnFocus) $('menu-toggle').focus();
-}
-function toggleMenu() {
-  if (document.body.classList.contains('menu-open')) return closeMenu(true);
-  $('sidebar').inert = false;
-  document.body.classList.add('menu-open');
-  $('menu-toggle').setAttribute('aria-expanded','true');
-  $('menu-toggle').setAttribute('aria-label','Menüyü kapat');
-  $('menu-scrim').hidden = false;
-  document.querySelector('.app-shell').inert = true;
-  ($('sidebar').querySelector('[aria-current="page"]') || $('sidebar').querySelector('nav a')).focus();
-}
+function closeMenu(){}
 document.querySelector('.skip-link').addEventListener('click',event=>{
   event.preventDefault();
   const headingId={autonomy:'software-title',driver:'driver-title'}[state.route]??'screen-title';
-  const heading=state.route==='overview'?document.querySelector('.v-hero-content h2'):$(headingId);
+  const heading=state.route==='overview'?$('home-title'):$(headingId);
   heading.tabIndex=-1;
   heading.focus({preventScroll:true});
   heading.scrollIntoView({block:'start',behavior:'instant'});
 });
-$('menu-toggle').onclick = toggleMenu;
-$('menu-close').onclick = () => closeMenu(true);
-$('menu-scrim').onclick = () => closeMenu(true);
-$('sidebar').addEventListener('click',event=>{
-  if(event.target.closest('a')) closeMenu(true);
-});
-document.addEventListener('keydown', event => {
-  if (!document.body.classList.contains('menu-open')) return;
-  if (event.key === 'Escape') {event.preventDefault();closeMenu(true);}
-  if (event.key === 'Tab') {
-    const items = [...$('sidebar').querySelectorAll('a, button')].filter(n=>n.getClientRects().length);
-    const first=items[0], last=items.at(-1);
-    if (event.shiftKey && document.activeElement===first) {event.preventDefault();last.focus();}
-    else if (!event.shiftKey && document.activeElement===last) {event.preventDefault();first.focus();}
-  }
-});
-closeMenu();
-
 function diagram(labels, className='principle-flow') {
   const node=make('ol',null,className);
   labels.forEach((label,i)=>{const li=make('li');li.append(make('small',String(i+1).padStart(2,'0')),make('span',label));node.append(li);});
@@ -173,7 +142,8 @@ function drivetrainBrief(variant){
 function syncDrivetrainPanel(){
   const variant=activeDrivetrain();
   const pending=vehicleApi?.drivetrainTransitioning()??false;
-  $('drivetrain-selector').hidden=!variant;
+  // Hub motor seçeneği 27 Kasım 2026'da bırakıldı (eski plan); karşılaştırma seçicisi gösterilmez.
+  $('drivetrain-selector').hidden=true;
   $('drivetrain-options').querySelectorAll('input').forEach(input=>{
     input.checked=input.value===state.drivetrain;
     input.disabled=!inspectPart;
@@ -315,22 +285,57 @@ function syncViewerControls({closeSettings=true}={}){
   viewer.querySelectorAll('[data-transmission-view]').forEach(button=>{button.hidden=scoped&&!central;});
   if(closeSettings)settings.open=false;
 }
+const knownRoutes=new Set(['overview','vehicle','systems','races','inventory','support','driver','mechanical','electrical','autonomy','decisions','tests','experience']);
+const navParent={mechanical:'systems',electrical:'systems',autonomy:'systems',driver:'systems',decisions:'systems',tests:'systems',experience:'vehicle'};
+function resolveHash(hash) {
+  const raw=hash.replace(/^#\/?/,'').split('/');
+  const alias={competitions:['races'],team:['races'],files:['races'],garage:['systems'],sensors:['autonomy','sensors'],'vehicle-section':['vehicle'],
+    genel:['overview'],arac:['vehicle'],sistemler:['systems',...raw.slice(1)],yarislar:['races',...raw.slice(1)],envanter:['inventory'],destek:['support'],takim:['support']};
+  return alias[raw[0]]||raw;
+}
+const routeOf=path=>knownRoutes.has(path[0])?path[0]:'overview';
+// Menü sırası geçiş yönünü belirler: aşağıdaki ekran ileri, yukarıdaki geri.
+const navOrder=['overview','vehicle','systems','races','inventory','support'];
+const navIndex=route=>navOrder.indexOf(navParent[route]||route);
+// 3B sahnenin yuvası olan ekranlar; iki ekranda da varsa sahne tek öğe olarak taşınır.
+const sceneRoutes=new Set([...document.querySelectorAll('[data-slot]')].map(slot=>slot.dataset.slot));
+function placeNavIndicator() {
+  const indicator=document.querySelector('.nav-indicator');
+  const active=document.querySelector('.primary-nav a[aria-current=page]');
+  if(!indicator)return;
+  if(!active){indicator.style.opacity='0';return;}
+  indicator.style.opacity='1';
+  const horizontal=getComputedStyle(active.parentElement).flexDirection==='row';
+  indicator.style.setProperty('--nav-x',horizontal?`${active.offsetLeft+(active.offsetWidth-indicator.offsetWidth)/2}px`:'0px');
+  indicator.style.setProperty('--nav-y',horizontal?'0px':`${active.offsetTop+(active.offsetHeight-indicator.offsetHeight)/2}px`);
+  requestAnimationFrame(()=>{indicator.dataset.ready='';});
+}
+new ResizeObserver(()=>{const i=document.querySelector('.nav-indicator');if(i)delete i.dataset.ready;placeNavIndicator();}).observe(document.querySelector('.primary-nav'));
+// Kart ve listeler sırayla girer: en çok 6 öğe, 40 ms aralık; gerisi altıncıyla birlikte.
+function staggerIn(root) {
+  if(!root)return;
+  root.querySelectorAll('.card-grid, .part-list, .race-switch, .tag-list, .talk-list').forEach(list=>{
+    if(list.closest('[hidden]'))return;
+    [...list.children].forEach((item,i)=>item.style.setProperty('--i',String(Math.min(i,5))));
+    list.classList.remove('m-stagger');void list.offsetWidth;list.classList.add('m-stagger');
+  });
+}
 function navigate({focusHeading=false}={}) {
   document.dispatchEvent(new Event('vaccino:inspector-close'));
   if(document.body.classList.contains('presentation-active'))document.dispatchEvent(new Event('vaccino:presentation-exit'));
-  const raw=location.hash.replace(/^#\/?/,'').split('/');
-  const alias={competitions:['team','goals'],sensors:['autonomy','sensors'],files:['team','files'],'vehicle-section':['vehicle']};
-  const path=alias[raw[0]]||raw;
-  state.route=(path[0]==='driver'||routes.some(r=>r.id===path[0]))?path[0]:'overview';
+  const path=resolveHash(location.hash);
+  state.route=routeOf(path);
   const entries=state.route==='autonomy'?software:systems[state.route];
   const legacySoftware={perception:'vision',sensors:'vision',interfaces:'vision'};
   const requested=state.route==='autonomy'?(legacySoftware[path[1]]??path[1]):path[1];
-  state.sub=entries?(entries.some(s=>s.id===requested)?requested:entries[0].id):state.route==='team'&&path[1]==='files'?'files':state.route==='team'?'goals':'';
+  state.sub=entries?(entries.some(s=>s.id===requested)?requested:entries[0].id):['systems','races'].includes(state.route)?path.slice(1).join('/'):'';
   if(state.route==='experience')state.sub=['showroom','workshop','track'].includes(path[1])?path[1]:'showroom';
   if(state.route!=='mechanical'||state.sub!=='transmission')state.drivetrain='central';
   document.body.dataset.route=state.route;document.body.dataset.sub=state.sub;
   document.querySelectorAll('[data-screen]').forEach(screen=>{screen.hidden=screen.dataset.screen!==state.route;});
-  document.querySelectorAll('.primary-nav a').forEach(a=>{if(a.dataset.route===(['vehicle','mechanical','electrical','autonomy','experience','decisions','tests'].includes(state.route)?'garage':state.route))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  const navRoute=navParent[state.route]||state.route;
+  document.querySelectorAll('.primary-nav a').forEach(a=>{if(a.dataset.route===navRoute)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  placeNavIndicator();
   document.querySelectorAll('.subnav a').forEach(a=>{if(a.closest('[data-screen]')?.dataset.screen===state.route&&a.dataset.sub===state.sub)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   const slot=document.querySelector(`[data-slot="${state.route}"]`);
   if(slot){slot.insertBefore(viewer,state.route==='overview'?$('v-hero-restore'):null);viewer.hidden=false;viewer.dataset.context=state.route;}
@@ -342,7 +347,6 @@ function navigate({focusHeading=false}={}) {
     else if(variant)drivetrainBrief(variant);
     else systemBrief(state.route,entry);
   }
-  $('team-goals').hidden=state.sub==='files';$('files').hidden=state.sub!=='files';
   const softwareRoute=state.route==='autonomy';
   $('software-resources').open=softwareRoute&&['sensors','interfaces'].includes(path[1]);
   document.querySelector('.interface-disclosure').open=softwareRoute&&path[1]==='interfaces';
@@ -353,7 +357,7 @@ function navigate({focusHeading=false}={}) {
   if(focusHeading){
     const tab=document.querySelector('[data-screen]:not([hidden]) .subnav a[aria-current]');
     const heading=$(state.route==='driver'?'driver-title':'screen-title');
-    (state.route==='overview'?$('menu-toggle'):tab??heading).focus({preventScroll:true});
+    (state.route==='overview'?document.getElementById('home-title'):tab??heading).focus({preventScroll:true});
   }
   document.dispatchEvent(new CustomEvent('vaccino:route',{detail:{route:state.route,sub:state.sub}}));
   document.dispatchEvent(new Event('vaccino:resize'));
@@ -392,45 +396,11 @@ function tests() {
     const content=make('div',null,'test-method');content.append(paragraph(test.method),make('span',test.result,'result-pending'));node.append(summary,content);return node;
   }));
 }
-function filesAndTeam() {
-  $('file-list').replaceChildren(...record.presentation.files.map(file=>{
-    const a=link('',file.path);a.download='';const name=make('span');name.append(make('b',file.name),make('small',file.note));a.append(make('span',file.type,'file-type'),name,make('span','↗','file-arrow'));return a;
-  }));
-  $('competition-media').replaceChildren(mediaFrame(record.presentation.competitionMedia,'gallery-media'));
-  const rules='https://www.shellecomarathon.com/about/global-rules.html';
-  const competitions=[
-    ['TEKNOFEST','Robotaksi','Özgün Araç Yarışması','Özgün araçlarda otonom sürüşü sınamak.','Vaccino V2 üzerinde algılama, karar ve araç kontrolünü birleştirmek.','Kamera, araç bilgisayarı, direksiyon ve fren.','https://www.teknofest.org/tr/yarismalar/robotaksi-binek-otonom-arac-yarismasi/'],
-    ['Shell Eco-marathon','Autonomous Driving Competition','','Kapalı parkurda otonom sürüş görevlerini tamamlamak.','Parkur takibi ve araç kontrolünü demo ortamından araç testine taşımak.','Algılama, şerit takibi ve kontrol.',rules],
-    ['Shell Eco-marathon','Mileage Challenge','','Pist üzerinde enerji verimliliğini karşılaştırmak.','Aktarma ve enerji tüketimi varsayımlarını ölçümle sınamak.','BLDC motor, kayış-kasnak, batarya ve enerji modeli.',rules]
-  ];
-  const organizerLogos={'TEKNOFEST':'teknofest-logo.png','Shell Eco-marathon':'shell-logo.png'};
-  $('competition-record').replaceChildren(...competitions.map(([organizer,title,category,purpose,goal,systems,url])=>{
-    const detail=make('details'), summary=make('summary');
-    const heading=make('div');
-    heading.append(make('h2',title));
-    if(category) heading.append(make('p',category));
-    const identity=make('span',null,'competition-brand');
-    identity.textContent=organizer;
-    const logo=make('img');
-    logo.alt=organizer;
-    logo.addEventListener('load',()=>identity.replaceChildren(logo),{once:true});
-    logo.src=`assets/branding/${organizerLogos[organizer]}`;
-    summary.append(identity,heading);
-    const body=make('div',null,'competition-detail');
-    const facts=make('dl');
-    for(const [label,value] of [['Amaç',purpose],['Vaccino’nun hedefi',goal],['Temel sistemler',systems],['Hazırlık durumu','Tasarım ve demo çalışmaları mevcut. Başvuru, kabul ve teknik uygunluk doğrulanmayı bekliyor.']]){
-      facts.append(make('dt',label),make('dd',value));
-    }
-    body.append(facts,link('Resmî yarışma gereksinimleri',url,'text-link'));
-    detail.append(summary,body);
-    return detail;
-  }));
-}
 document.addEventListener('vaccino:part',event=>{
   document.querySelectorAll('[data-inspect]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.inspect===event.detail)));
 });
 $('decision-filter').onchange=decisions;$('sensor-search').oninput=sensors;$('sensor-filter').onchange=sensors;
-renderTabs();decisions();sensors();tests();filesAndTeam();
+renderTabs();decisions();sensors();tests();
 table('interface-table',record.inventory[1],record.inventory[1].rows.slice(4));$('interface-count').textContent=`${record.inventory[1].rows.length-4} arayüz`;
 const interfaceSummary=make('div',null,'sensor-list simple-only');interfaceSummary.id='interface-summary';
 for(const row of record.inventory[1].rows.slice(4)){
@@ -440,7 +410,28 @@ for(const row of record.inventory[1].rows.slice(4)){
 const interfaceSection=document.querySelector('.interface-disclosure');interfaceSection.insertBefore(interfaceSummary,interfaceSection.querySelector('p'));
 
 navigate();
-window.addEventListener('hashchange',()=>navigate({focusHeading:true}));
+const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+let lastRoute=state.route;
+const root=document.documentElement;
+window.addEventListener('hashchange',()=>{
+  const before=lastRoute;
+  const next=routeOf(resolveHash(location.hash));
+  const run=()=>{navigate({focusHeading:true});lastRoute=state.route;if(next!==before&&!reducedMotion.matches)staggerIn(document.querySelector('[data-screen]:not([hidden])'));};
+  if(next===before||document.body.classList.contains('presentation-active')){run();return;}
+  root.dataset.dir=navIndex(next)>=navIndex(before)?'forward':'back';
+  if(sceneRoutes.has(next)&&sceneRoutes.has(before))root.dataset.shared='';else delete root.dataset.shared;
+  // Ekran değişirken 3B render döngüleri durur; yeni ekran görününce yeniden başlar.
+  root.dataset.transition='screen';
+  const done=()=>{delete root.dataset.transition;delete root.dataset.shared;document.dispatchEvent(new Event('vaccino:resize'));};
+  if(document.startViewTransition){
+    const transition=document.startViewTransition(run);
+    transition.finished.finally(done);
+  }else{
+    run();
+    const ms=parseFloat(getComputedStyle(root).getPropertyValue('--dur-screen'))||320;
+    setTimeout(done,ms);
+  }
+});
 document.body.dataset.data='ready';
 const logo=loadBrandLogo();
 const finishSeasonSetup=initializeSeason(logo);
@@ -448,7 +439,7 @@ const vehicle=await import('./vehicle.js');
 if(!Object.hasOwn(vehicle,'vehicleApi')||
   (document.body.dataset.webgl==='ready'&&
     (typeof vehicle.vehicleApi?.applyDrivetrain!=='function'||typeof vehicle.vehicleApi?.drivetrainTransitioning!=='function'))){
-  throw new Error(`Vaccino 3B görüntüleyici sürümü uyuşmuyor: ${import.meta.url}`);
+  throw new Error(`VACCİNO 3B görüntüleyici sürümü uyuşmuyor: ${import.meta.url}`);
 }
 ({inspect:inspectPart,vehicleApi}=vehicle);
 vehicleApi?.applyDrivetrain({immediate:true});

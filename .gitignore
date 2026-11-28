@@ -27,3 +27,15 @@ screenshots/
 *.log
 *.tmp
 *.zip
+
+# Local Playwright MCP output
+.playwright-mcp/
+
+# Private CAD inputs (STEP/STL/F3D) stay local; only generated GLB files are committed
+inputs/
+*.step
+*.stp
+*.f3d
+
+# Local hand-off notes, never committed
+docs/Vaccino_ATLAS_Proje_Devir_Promptu.md

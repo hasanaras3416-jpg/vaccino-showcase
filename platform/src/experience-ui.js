@@ -5,7 +5,7 @@ import {initializeInventoryUI} from './inventory-ui.js';
 export function initializeExperienceUI(){
  const api=window.vaccino,$=id=>document.getElementById(id);
  const simUI=initializeSimulationUI($('simulation-panel'));initializeInventoryUI($('engineering-inventory'));
- const labels={showroom:'SHOWROOM',workshop:'ATÖLYE',track:'PİST / DEMO'};
+ const labels={showroom:'SERGİ',workshop:'ATÖLYE',track:'PİST / DEMO'};
  function route(){
   const wasActive=experienceState.active,active=['experience','overview'].includes(state.route);experienceState.active=active;
   if(!active&&wasActive){simulation.pause();api?.setShell('hidden',{immediate:true});api?.setAnimating(false);}

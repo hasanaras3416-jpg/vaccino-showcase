@@ -10,7 +10,7 @@ body[data-route="overview"] #menu-toggle { background:transparent; border:1px so
 body[data-route="overview"] .presentation-enter {
   background:transparent; border:1px solid rgba(255,255,255,.42);
   border-radius:0; padding:13px 21px; color:#f3f0eb; text-transform:uppercase;
-  letter-spacing:.14em; font-size:.68rem; font-weight:600; transition:background .25s,color .25s;
+  letter-spacing:.14em; font-size:.68rem; font-weight:600; transition:background var(--dur-micro) var(--ease-in),color var(--dur-micro) var(--ease-in);
 }
 body[data-route="overview"] .presentation-enter:hover { background:var(--v-ivory); color:#0c1012; }
 body[data-route="overview"] .studio-home { overflow:clip; background:#090b0d; }
@@ -83,7 +83,7 @@ body[data-route="overview"] .studio-description { display:none; }
 .v-hero-actions { display:flex; align-items:center; gap:12px 24px; flex-wrap:wrap; margin-top:32px; }
 .v-link { display:inline-flex; min-height:50px; align-items:center; justify-content:space-between; gap:14px;
   padding:0 0 8px; border-bottom:1px solid rgba(245,242,237,.6); color:var(--v-ivory);
-  text-transform:uppercase; letter-spacing:.15em; font-weight:600; transition:color .2s,border-color .2s; }
+  text-transform:uppercase; letter-spacing:.15em; font-weight:600; transition:color var(--dur-micro) var(--ease-in),border-color var(--dur-micro) var(--ease-in); }
 #workspace .v-link { font-size:.76rem; }
 .v-link:hover { color:var(--v-champagne); border-color:var(--v-champagne); }
 .v-link.primary { background:var(--v-ivory); padding:0 21px; color:#151718; border:1px solid var(--v-ivory); min-width:165px; }
@@ -110,7 +110,7 @@ body[data-route="overview"] .studio-description { display:none; }
   transform:rotate(-45deg);
   transform-origin:right;
 }
-.v-hero-content,.v-hero-bottom { transition:opacity .24s ease,visibility .24s; }
+.v-hero-content,.v-hero-bottom { transition:opacity var(--dur-micro) var(--ease-in),visibility var(--dur-micro); }
 .studio-home.v-inspecting :is(.v-hero-content,.v-hero-bottom),
 body:has(#season-intro[open]) :is(.v-hero-content,.v-hero-bottom) { opacity:0; visibility:hidden; }
 #workspace .v-hero-restore {
@@ -146,7 +146,7 @@ body:has(#season-intro[open]) :is(.v-hero-content,.v-hero-bottom) { opacity:0; v
 .v-pathways-head { display:flex; justify-content:space-between; gap:25px; align-items:end; margin-bottom:40px; }
 .v-pathways h3 { font-size:clamp(2.8rem,5vw,6rem); line-height:1; font-weight:350; letter-spacing:-.065em; margin:16px 0 0; }
 .v-pathway-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-top:1px solid #353a3d; border-bottom:1px solid #353a3d; }
-.v-pathway-grid a { display:flex; flex-direction:column; min-height:300px; padding:32px; border-right:1px solid #353a3d; transition:background .25s; }
+.v-pathway-grid a { display:flex; flex-direction:column; min-height:300px; padding:32px; border-right:1px solid #353a3d; transition:background var(--dur-micro) var(--ease-in); }
 .v-pathway-grid a:first-child { padding-left:0; }
 .v-pathway-grid a:last-child { border-right:0; }
 .v-pathway-grid a:hover { background:#1a1f22; }

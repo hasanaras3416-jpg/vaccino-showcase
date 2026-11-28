@@ -178,7 +178,7 @@
           "A": "S09",
           "B": "Karara bağlı",
           "C": "Ayırıcı konumu ve devir farkı",
-          "D": "Konum anahtarları + kasnak tarafı enkoderi",
+          "D": "Konum anahtarları + çıkış tarafı enkoderi",
           "E": "1 set",
           "F": "Dijital / darbe → MCU → CAN",
           "G": "Bağlı/ayrık/belirsiz, iki tarafın devri",
@@ -379,8 +379,8 @@
       "team": "Mekanik",
       "title": "Tek motorlu aktarma",
       "status": "Tasarım yönü",
-      "reason": "Tek şasi içi BLDC, redüksiyon, kapalı gövdeli açık diferansiyel, iki mafsallı yarım aks ve arka çift salıncak. Güncel CAD adayı.",
-      "next": "Kasnak oranı, aks boy değişimi ve mafsal açıları kontrol edilecek.",
+      "reason": "Ekip kararı (27 Kasım 2026): tek orta motor, yarım diferansiyel ve mafsallı aks. Ön ve arka çift salıncak. Zincir ve hub motor planı bırakıldı.",
+      "next": "Dişli oranı, aks mili ve flanş ölçülecek; aks boy değişimi ve mafsal açıları kontrol edilecek.",
       "date": "2026-11-17",
       "source": "Ana gereksinim belgesi · karar kaydı",
       "simple": "Tek motorun gücü iki arka tekerleğe aktarılacak. Mevcut araç bu tasarım yönünü gösteriyor.",
@@ -399,13 +399,13 @@
     },
     {
       "team": "Elektrik",
-      "title": "48 V BLDC motor",
+      "title": "48 V · 1000 W orta motor",
       "status": "Aday",
-      "reason": "800 W ve 1000 W adayları; 1000 W ilk inceleme adayı. Nihai model seçilmedi.",
+      "reason": "Eldeki birimin etiketi: 48 V, 1000 W, 450 dev/dk, 20 A; 3 fazlı, hall sensörlü, dişli/diferansiyel gövdeli. Marka ve model bilinmiyor; numune test edilecek.",
       "next": "Tork-devir, redüksiyon, faz akımı ve sıcaklık sınırları ölçülecek.",
       "date": "2026-11-17",
       "source": "Ana gereksinim belgesi · karar kaydı",
-      "simple": "Motor seçimi kesinleşmedi. Adaylar aracın ihtiyacına ve test sonuçlarına göre karşılaştırılacak.",
+      "simple": "Eldeki motor biriminin modeli bilinmiyor. Etiket değerleri testle doğrulanacak.",
       "nextSimple": "Güç ihtiyacı, ısınma ve uygun aktarım düzeni ölçülerek kontrol edilecek."
     },
     {
@@ -454,21 +454,21 @@
     },
     {
       "team": "Tarihçe",
-      "title": "Önceki aktarma seçenekleri",
+      "title": "Eski plan: hub motor ve zincir/kayış",
       "status": "Tarihçe",
-      "reason": "Çift hub motor ve tek arka tekeri kayışla sürme önceki kıyas seçenekleridir. Güncel model tek şasi içi motor kullanır.",
+      "reason": "Eski plan. İki arka hub motor, tek hub motor ve zincir/kayış-kasnak aktarma 27 Kasım 2026'da bırakıldı. Güncel karar: tek orta motor + yarım diferansiyel + mafsallı aks.",
       "next": "Gerekirse kıyas gerekçelerini tarihli karar belgesiyle tamamla.",
       "date": "2026-11-17",
       "source": "Ana gereksinim belgesi · karar kaydı",
-      "simple": "Önceki motor yerleşimleri karşılaştırma için tutuluyor. Güncel araç tek şasi içi motorla gösteriliyor.",
+      "simple": "Eski plan. Bırakılan motor yerleşimleri yalnızca arşiv için tutuluyor.",
       "nextSimple": "Eski seçeneklerin gerekçeleri tarihli karar kayıtlarıyla tamamlanacak."
     }
   ],
   "tests": [
     {
       "team": "Aktarma",
-      "title": "25 → 15 km/sa süzülme",
-      "method": "Aynı zeminde bağlı/ayrık kıyas. Tekrar adedi, süre, yön, rüzgâr, lastik basıncı ve zemin kaydedilecek.",
+      "title": "Motor + diferansiyel karakterizasyonu",
+      "method": "Boşta çıkış devri, toplam oran ve tork sabiti ölçülecek. Gerilim, akım, devir ve sıcaklık kaydedilecek.",
       "status": "Planlandı",
       "result": "Ölçüm bekliyor"
     },
@@ -497,9 +497,9 @@
   "parts": [
     {
       "id": "hub-motor",
-      "label": "Sağ arka hub motor",
+      "label": "Sağ arka hub motor (eski plan)",
       "status": "DEĞERLENDİRME AŞAMASINDA",
-      "simple": "Tek hub motor sağ arka tekerleğin içinde gösteriliyor.",
+      "simple": "Eski plan. Tek hub motor sağ arka tekerleğin içinde gösteriliyordu.",
       "desc": "Yarı saydam tekerlek, motorun tekerlek içindeki konumunu görünür kılar.",
       "facts": [
         "Jant ve porya kesiti, kablo güzergâhı, soğutma ve servis erişimi doğrulanacak."
@@ -535,17 +535,17 @@
     },
     {
       "id": "belt",
-      "label": "Kayış ve kasnaklar",
+      "label": "Dişli kutusu (temsili)",
       "status": "DEĞERLENDİRME AŞAMASINDA",
       "point": [
         0.68,
         0.34,
         0.255
       ],
-      "simple": "Kayış iki kasnak arasında hareketi aktarır.",
-      "desc": "Görsel aktarım oranı {{transmission.ratio}}. Nihai oran seçilmedi.",
+      "simple": "Motor ile diferansiyel arasındaki dişli kademesini temsil eder.",
+      "desc": "Dişli oranı henüz bilinmiyor. Görsel kutu ölçüsü temsilidir.",
       "facts": [
-        "Kasnak hizalaması, kayış gerginliği ve muhafaza açıklığı mühendislik doğrulaması gerektirir."
+        "Gerçek birim tek gövdede motor, dişli ve diferansiyel içerir; ölçüleri alınacak."
       ],
       "scope": "drivetrain"
     },
@@ -584,7 +584,7 @@
     {
       "id": "frame",
       "label": "Şasi",
-      "status": "V2 GEOMETRİSİ",
+      "status": "Ø30 BORU ŞASİ",
       "point": [
         -0.3,
         0.78,
@@ -592,30 +592,30 @@
       ],
       "desc": "Yeni araç için tek sürücülü, dört tekerli hafif alüminyum şasi hedefleniyor.",
       "facts": [
-        "Prototipte belirtilen V2 şasi: yaklaşık {{chassis.lengthMm}} × {{chassis.widthMm}} × {{chassis.heightMm}} mm. Ayrı STEP sağlanmadığı için ölçüler bağımsız doğrulanmadı.",
-        "Ø40 × 2 mm boru ve R50/R60 büküm yarıçapları CAD varsayımları. Malzeme ve bağlantılar seçilecek.",
-        "Ön tarafta çift salıncak yaklaşımı var. Arka süspansiyon geometrisi açık.",
-        "16 inç jant önceki tasarım hedefiydi. Jant, porya, disk ve kaliper kesiti birlikte kontrol edilecek.",
+        "Şasi: 27 Kasım 2026 STEP çizimi, 2.830 × 1.230 × 980 mm (tekerlek ve kabuk hariç). İmalata serbest bırakma bekliyor.",
+        "Ø30 × 2 mm alüminyum 6061-T6 boru. Borular çizimde dolu çubuk; kütle bu modelden hesaplanmaz (iskelet ≈ 17 kg, Tahmin).",
+        "Ön ve arka çift salıncak (ekip kararı). Bağlantı noktaları açık.",
+        "16 inç jant hedefi; jant ve lastik alınmadı. Jant, porya, disk ve kaliper kesiti birlikte kontrol edilecek.",
         "v1.2 bağlantı plakaları ve kaynak izleri görsel detaydır; üretim çizimi veya kaynak yöntemi doğrulaması değildir."
       ],
-      "simple": "Aracın tüm parçalarını bir arada tutan hafif taşıyıcı yapı. V2 yerleşimi bu çalışmanın temelini oluşturuyor."
+      "simple": "Aracın tüm parçalarını bir arada tutan alüminyum boru iskelet. Görünüm 27 Kasım 2026 Ø30 STEP çizimidir; tekerlek, süspansiyon, koltuk ve kabuk temsilidir."
     },
     {
       "id": "motor",
-      "label": "Tek motor ve redüksiyon",
-      "status": "800 / 1.000 W ADAY",
+      "label": "Orta motor ve dişli kutusu",
+      "status": "48 V · 1000 W · MODEL BİLİNMİYOR",
       "point": [
         0.49,
         0.34,
         0.01
       ],
-      "desc": "Enine yerleşimli şasi içi BLDC motor, triger kasnakları üzerinden diferansiyelin taşıyıcısını döndürür.",
+      "desc": "Tek orta motor, dişli kademesi ve yarım diferansiyel üzerinden iki arka tekerleği sürer. 3B yerleşim temsilidir.",
       "facts": [
-        "Motor modeli ve çalışma devri açık. Toplam oran motorun verim haritasına ve yüklü teker çevresine göre seçilecek.",
-        "Çizimdeki kasnaklar yerleşimi gösterir. Gerekli toplam oran için ikinci kademe gerekebilir.",
-        "Kayış ve kasnak koruması araçta kapalı olacak."
+        "Etiket: 48 V, 1000 W, 450 dev/dk, 20 A; 3 fazlı, hall sensörlü. Marka ve model bilinmiyor.",
+        "Dişli oranı, aks mili ve flanş henüz bilinmiyor; numune testiyle ölçülecek.",
+        "Dönen parçalar (dişli, mafsal) için koruma tasarlanacak."
       ],
-      "simple": "Tek motor, kayış ve kasnaklar üzerinden arka tekerleklere güç gönderir."
+      "simple": "Tek orta motor, dişli kutusu ve diferansiyel üzerinden arka tekerleklere güç gönderir."
     },
     {
       "id": "clutch",
@@ -626,9 +626,9 @@
         0.27,
         0.17
       ],
-      "desc": "Kumandalı ayırıcı motor çıkışı ile küçük kasnak arasındadır. Açıldığında tekerlekler motor rotorunu çevirmeden süzülür.",
+      "desc": "İsteğe bağlı ayırıcı motor çıkışındadır. Açıldığında tekerlekler motor rotorunu çevirmeden süzülür. Yeni birimde kullanılıp kullanılmayacağı açık.",
       "facts": [
-        "Bu yerleşimde kayış, kasnaklar, diferansiyel ve akslar tekerlekle dönmeye devam eder.",
+        "Bu yerleşimde dişli kutusu, diferansiyel ve akslar tekerlekle dönmeye devam eder.",
         "Yeniden bağlama sıfır tork ve düşük devir farkıyla denenmeli. Ayrık durumda motor freni ve rejenerasyon yok.",
         "Kayar manşon hareketi temsili. Kavrama tipi, aktüatör ve konum geri bildirimi seçilmedi."
       ],
@@ -648,7 +648,7 @@
         "İki yarım aks, içte boy değişimi yapabilen mafsal ve dışta CV mafsalı ile poryalara uzanır.",
         "Körükler, çıkış flanşları, gövde cıvataları ve arka frenler şematik 3B parçalarla gösteriliyor.",
         "Gerçek aks boyu, mafsal açıları, taşıma noktaları ve kaliper boşluğu henüz doğrulanmadı.",
-        "Sağ iç CV körüğü görsel kasnak hacminden uzağa taşındı. Kasnaklar ve giriş boynu delikli modellenir. Bu, sınırlı statik hacim incelemesidir; imalat veya süspansiyon hareketi doğrulaması değildir."
+        "Görsel yerleşim sınırlı bir statik hacim incelemesidir; imalat veya süspansiyon hareketi doğrulaması değildir."
       ],
       "simple": "Gücü iki arka tekerleğe dağıtır. Virajda tekerleklerin farklı hızlarda dönmesine izin verir."
     },
@@ -697,7 +697,7 @@
       ],
       "desc": "Araç bilgisayarı kameradan gelen görüntüyü işler ve aracın izleyeceği yolu belirler.",
       "facts": [
-        "V2’de PC koltuğun yanında. Koltuk arkası alternatif konum.",
+        "Bilgisayarın 3B konumu temsili (koltuk yanı); kesin yer belirlenmedi.",
         "İşlemci, besleme ve soğutma henüz seçilecek.",
         "Kontrol kartıyla haberleşme için CAN değerlendiriliyor."
       ],
@@ -803,7 +803,7 @@
     {
       "id": "power",
       "label": "Yardımcı sistemler",
-      "status": "V2 YERLEŞİMİ",
+      "status": "TEMSİLİ KONUM",
       "point": [
         0.58,
         0.31,
@@ -835,11 +835,11 @@
       "status": "GÖRSEL KONSEPT",
       "desc": "Eğrisel kesitlerden üretilen simetrik BufferGeometry gövde, tek kişilik saydam kokpit ve ön/arka davlumbaz rezervleri. CAD/CFD ve hareket zarfı doğrulanmadı.",
       "facts": [
-        "V2 geometri ve tekerlek merkezleri değiştirilmedi. Gövde ayrı bir konsept katmanıdır.",
+        "Kabuk, Ø30 şasi ve aday tekerlek konumlarını örten temsili bir dış zarftır.",
         "Gövde yüzeyleri, davlumbazlar ve servis kapağı üretici CAD’i değildir.",
         "Direksiyon/süspansiyon hareketi, teker boşluğu, kapak mafsalı, görüş ve aerodinamik analiz bekliyor."
       ],
-      "simple": "V2 yerleşimi üzerine geliştirilen beyaz, altın ve grafit gövde konsepti. Tekerlek açıklıkları ve kapaklar gerçek araçta doğrulanacak."
+      "simple": "Temsili dış kabuk. Tekerlek açıklıkları, kapılar ve kapaklar gerçek araçta doğrulanacak."
     }
   ],
   "uiVersion": "1.3",
@@ -869,29 +869,29 @@
         "id": "garage",
         "label": "Araç",
         "title": "Araç",
-        "simple": "Vaccino V2’yi ve mühendislik sistemlerini keşfet.",
-        "technical": "Vaccino V2 yerleşimi ve teknik sistem kayıtları."
+        "simple": "VACCİNO aracını ve mühendislik sistemlerini keşfet.",
+        "technical": "VACCİNO Ø30 şasi yerleşimi ve teknik sistem kayıtları."
       },
       {
         "id": "overview",
         "label": "Genel Bakış",
         "title": "Mühendisliği birlikte ilerlet.",
         "simple": "Araç, sistemler ve takımın sıradaki adımları.",
-        "technical": "Kaynak tabanlı tasarım kaydı / V2 yerleşim / R01"
+        "technical": "Kaynak tabanlı tasarım kaydı / Ø30 STEP çizimi / R01"
       },
       {
         "id": "vehicle",
         "label": "3B Araç",
         "title": "Tasarımı her açıdan gör.",
         "simple": "Döndür, bir parça seç ve nasıl çalıştığını keşfet.",
-        "technical": "Şasi ölçeği korunmuş V2 model. Üretici CAD’i olmayan bileşenler temsili."
+        "technical": "Ø30 STEP çizimi. Üretici CAD’i olmayan bileşenler temsili."
       },
       {
         "id": "mechanical",
         "label": "Mekanik Sistemler",
         "title": "Güçten harekete.",
         "simple": "Motorun gücünün tekerleklere nasıl ulaştığını keşfet.",
-        "technical": "Tek BLDC / kayış redüksiyonu / açık diferansiyel / çift salıncak"
+        "technical": "Tek orta motor / yarım diferansiyel / mafsallı aks / çift salıncak"
       },
       {
         "id": "electrical",
@@ -933,7 +933,7 @@
         "label": "Araç Deneyimi",
         "title": "Bir araç. Üç perspektif.",
         "simple": "Gövdeyi keşfet, atölyede incele, demo parkurda bir varsayımı sına.",
-        "technical": "Showroom / Atölye / Demo pist · temsili geometri ve parametrik boyuna model"
+        "technical": "Sergi / Atölye / Demo pist · temsili geometri ve parametrik boyuna model"
       },
       {
         "id": "inventory",
@@ -947,7 +947,7 @@
       "mechanical": [
         {
           "id": "transmission",
-          "summary": "Motor torkunun ayırıcı, kayış-kasnak ve diferansiyel üzerinden arka tekerleklere iletilmesini incele.",
+          "summary": "Motor torkunun dişli kutusu ve yarım diferansiyel üzerinden arka tekerleklere iletilmesini incele.",
           "label": "Aktarma",
           "parts": [
             "motor",
@@ -961,7 +961,7 @@
           "flow": [
             "Motor",
             "Ayırıcı",
-            "Kayış & kasnak",
+            "Dişli kutusu",
             "Diferansiyel",
             "Arka tekerlekler"
           ]
@@ -1118,7 +1118,7 @@
       ]
     },
     "drivetrain": {
-      "status": "DEĞERLENDİRME AŞAMASINDA",
+      "status": "EKİP KARARI · 3B YERLEŞİM TEMSİLİ",
       "transitionNote": "Geçiş iki yerleşimin görsel karşılaştırmasıdır. Parça hareketleri montaj sürecini temsil etmez.",
       "topics": [
         [
@@ -1164,16 +1164,16 @@
       ],
       "variants": {
         "hub": {
-          "label": "Hub Motor",
+          "label": "Hub motor (eski plan)",
           "parts": [
             "hub-motor",
             "hub-battery",
             "free-wheel"
           ],
-          "summary": "Tek hub motor sağ arka tekerleği tahrik eder. Sol arka tekerlek serbest döner. Batarya için eski diferansiyel bölgesine yakın bir yerleşim inceleniyor.",
+          "summary": "Eski plan. Tek hub motor sağ arka tekerleği tahrik eder. Sol arka tekerlek serbest döner. Batarya için eski diferansiyel bölgesine yakın bir yerleşim inceleniyor.",
           "advantages": [
             "Daha az merkezi aktarma elemanı.",
-            "Kayış-kasnak ve diferansiyelin kaldırılabilmesi.",
+            "Merkezi aktarma ve diferansiyelin kaldırılabilmesi.",
             "Daha sade bir mekanik yerleşim olasılığı.",
             "Batarya için alternatif alan kazanılması."
           ],
@@ -1189,7 +1189,7 @@
             "wheels": "Bir. Sol arka tekerlek serbest.",
             "method": "Sağ arka tekerleğe doğrudan tahrik.",
             "differential": "Bulunmaz.",
-            "complexity": "Merkezi kayış, kasnak, diferansiyel ve tahrik aksları kaldırılır.",
+            "complexity": "Merkezi aktarma, diferansiyel ve tahrik aksları kaldırılır.",
             "mass": "Tekerlek tarafındaki kütle ve aday batarya yerinin etkileri incelenecek.",
             "service": "Jant içi erişim, soğutma ve hareketli kablo güzergâhı doğrulanacak.",
             "efficiency": "Motor çalışma noktası ve ısıl koşullar testle değerlendirilecek.",
@@ -1198,7 +1198,7 @@
           }
         },
         "central": {
-          "label": "Merkezi Aktarma",
+          "label": "Orta motor",
           "parts": [
             "motor",
             "belt",
@@ -1208,29 +1208,29 @@
             "battery",
             "clutch"
           ],
-          "summary": "Şasi içi BLDC motor, kayış-kasnak ve diferansiyel üzerinden iki arka tekerleği tahrik eder. Mevcut batarya konumu korunur.",
+          "summary": "Ekip kararı: tek orta motor, yarım diferansiyel ve mafsallı akslar iki arka tekerleği sürer. Motor, dişli kutusu ve akslar 3B'de temsilidir.",
           "advantages": [
             "Torkun iki arka tekerleğe aktarılabilmesi.",
             "Motorun şasi üzerinde konumlandırılması.",
             "Aktarma oranının mekanik olarak seçilebilmesi.",
-            "Motor, diferansiyel ve kayış erişiminin farklı düzenlenebilmesi."
+            "Motor ve diferansiyelin tek birimde toplanması."
           ],
           "considerations": [
             "Daha fazla mekanik bileşen.",
-            "Kayış hizalaması ve gerginliği.",
+            "Aks mili ve flanş uyumu.",
             "Diferansiyel ve aksların ek kütlesi.",
             "Mekanik kayıplar ve bakım ihtiyacı.",
             "Yerleşim ve montaj karmaşıklığı."
           ],
           "comparison": {
-            "motor": "Şasi üzerinde, merkezi BLDC motor.",
+            "motor": "Şasi üzerinde, tek orta motor (3 fazlı, hall sensörlü).",
             "wheels": "İki arka tekerlek.",
-            "method": "Kayış-kasnak, diferansiyel ve iki tahrik aksı.",
+            "method": "Dişli kademesi, yarım diferansiyel ve iki mafsallı aks.",
             "differential": "Mevcut temsili yerleşimde kullanılır.",
-            "complexity": "Ayırıcı, kasnaklar, kayış, diferansiyel ve mafsallı akslar birlikte çalışır.",
+            "complexity": "Motor, dişli kutusu, diferansiyel ve mafsallı akslar birlikte çalışır.",
             "mass": "Şasi üzerindeki motor ve arka aktarma bileşenlerinin kütle dağılımı incelenecek.",
-            "service": "Kayış gerginliği, muhafaza ve diferansiyel erişimi doğrulanacak.",
-            "efficiency": "Motor çalışma noktası, kayış ve diferansiyel kayıpları gerçek testlerle değerlendirilecek.",
+            "service": "Diferansiyel erişimi ve dönen parça koruması doğrulanacak.",
+            "efficiency": "Motor çalışma noktası, dişli ve diferansiyel kayıpları gerçek testlerle değerlendirilecek.",
             "dynamics": "İki arka tekerleğe tork aktarımı ve diferansiyelin tutunma davranışı incelenecek.",
             "status": "Mevcut görsel yerleşim ve çalışma prensibi. CAD ve performans henüz doğrulanmadı."
           }
@@ -1268,7 +1268,7 @@
       {
         "name": "Özgün 3B aktarma prototipi",
         "type": "HTML",
-        "note": "V2 şasi ve özgün etkileşimler",
+        "note": "Eski plan · V2 şasi ve özgün etkileşimler",
         "path": "../inputs/Vaccino_26-27_Aktarma_3B.html"
       },
       {
@@ -1309,10 +1309,10 @@
     "slides": [
       {
         "id": "introduction",
-        "title": "Vaccino 26/27",
+        "title": "VACCİNO 26/27",
         "subtitle": "Bir araç. Ortak mühendislik.",
         "simple": "Mekanik, elektrik ve yazılımı aynı araç üzerinde buluşturuyoruz. Tasarımı her açıdan birlikte keşfedelim.",
-        "technical": "V2 yerleşim · {{chassis.lengthMm}} × {{chassis.widthMm}} mm şasi beyanı. Kaynak R01; bağımsız CAD ölçümü ve doğrulama bekleniyor.",
+        "technical": "Ø30 STEP çizimi · 2.830 × 1.230 × 980 mm (tekerlek ve kabuk hariç). Bağımsız doğrulama bekleniyor.",
         "focus": null,
         "camera": {
           "az": -0.88,
@@ -1365,8 +1365,8 @@
         "id": "transmission",
         "title": "Motor ve Aktarma",
         "subtitle": "Gücün tekerleklere yolculuğu.",
-        "simple": "Tek motor kayış üzerinden iki arka tekerleği besler. Bağlantı ayrıldığında tekerlekler ve kayış dönerken motor durabilir.",
-        "technical": "Motor mili → ayırıcı → kasnak/kayış → kapalı diferansiyel → CV yarım akslar. Görsel oran {{transmission.ratio}}; nihai oran değildir. Çalışma prensibi gösterimi.",
+        "simple": "Tek orta motor, dişli kutusu ve diferansiyel üzerinden iki arka tekerleği besler. 3B yerleşim temsilidir.",
+        "technical": "Motor mili → dişli kademesi → yarım diferansiyel → mafsallı yarım akslar. Dişli oranı henüz bilinmiyor. Çalışma prensibi gösterimi.",
         "focus": "transmission",
         "camera": {
           "az": 1.03,
@@ -1418,7 +1418,7 @@
       {
         "id": "future",
         "title": "Genel Araç Görünümü",
-        "subtitle": "Vaccino V2",
+        "subtitle": "VACCİNO",
         "simple": "Sıradaki adım parçaları seçmek, ölçmek ve kontrollü testlerle tasarımı geliştirmek. Araç bölümünden pist demosunu ve teknik kayıtları açabilirsin.",
         "technical": "Boyuna demo model ve yerel mühendislik envanteri eklendi. Gerçek pist, yanal dinamik, ölçülmüş araç parametreleri ve donanım doğrulaması bekleniyor.",
         "focus": null,
